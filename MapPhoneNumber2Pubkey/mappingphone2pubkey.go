@@ -73,8 +73,8 @@ func NewMappingPhone2Pubkey(serviceID string, etcdServers []string, defaultEnpoi
 	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
 	err, ep := aepm.GetEndPoint()
 	if err != nil {
-		log.Println("Load endpoit ", serviceID, "err", err.Error())
-		log.Println("Init MappingPhone2Pubkey sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+		// log.Println("Load endpoit ", serviceID, "err", err.Error())
+		log.Println("Init Local MappingPhone2Pubkey sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
 		return &MappingPhone2PubkeyServiceModel{
 			host: defaultEnpoint.Host,
 			port: defaultEnpoint.Port,
@@ -88,6 +88,6 @@ func NewMappingPhone2Pubkey(serviceID string, etcdServers []string, defaultEnpoi
 	}
 	go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
 	sv.epm = aepm
-	log.Println("Init MappingPhone2Pubkey sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	log.Println("Init From Etcd MappingPhone2Pubkey sid:", sv.sid, "host:", sv.host, "port:", sv.port)
 	return sv
 }

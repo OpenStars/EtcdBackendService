@@ -119,8 +119,8 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
 	err, ep := aepm.GetEndPoint()
 	if err != nil {
-		log.Println("Load endpoit ", serviceID, "err", err.Error())
-		log.Println("Init StringBigsetSerivce sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+		// log.Println("Load endpoit ", serviceID, "err", err.Error())
+		log.Println("Init Local StringBigsetSerivce sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
 		return &StringBigsetService{
 			host: defaultEnpoint.Host,
 			port: defaultEnpoint.Port,
@@ -134,6 +134,6 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 	}
 	go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
 	sv.epm = aepm
-	log.Println("Init StringBigsetSerivce sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	log.Println("Init From Etcd StringBigsetSerivce sid:", sv.sid, "host:", sv.host, "port:", sv.port)
 	return sv
 }
