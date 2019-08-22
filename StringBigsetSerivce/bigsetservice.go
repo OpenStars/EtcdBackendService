@@ -19,6 +19,7 @@ type StringBigsetService struct {
 }
 
 func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.TItem) error {
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -26,6 +27,7 @@ func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.
 	defer client.BackToPool()
 
 	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsPutItem(context.Background(), bskey, item)
+
 	if err != nil {
 		return errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
