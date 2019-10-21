@@ -30,7 +30,7 @@ func (m *String2Int64Service) PutData(key string, value int64) error {
 		Value: value,
 	}
 
-	_, err := client.Client.(*S2I64KV.TDataServiceClient).PutData(context.Background(), tkey, tvalue)
+	_, err := client.Client.(*S2I64KV.TString2I64KVServiceClient).PutData(context.Background(), tkey, tvalue)
 	return err
 }
 
@@ -42,10 +42,11 @@ func (m *String2Int64Service) GetData(key string) (int64, error) {
 	defer client.BackToPool()
 
 	tkey := S2I64KV.TKey(key)
-	r, err := client.Client.(*S2I64KV.TDataServiceClient).GetData(context.Background(), tkey)
+	r, err := client.Client.(*S2I64KV.TString2I64KVServiceClient).GetData(context.Background(), tkey)
 	if err != nil {
 		return -1, err
 	}
+	log.Println("r:", r.ErrorCode.String())
 	if r.Data == nil || r.ErrorCode != S2I64KV.TErrorCode_EGood {
 		return -1, errors.New("Can not found key")
 	}

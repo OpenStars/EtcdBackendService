@@ -8,4 +8,6 @@ type Int64BigsetServiceIf interface {
 	GetTotalCount(bskey generic.TKey) (int64, error)
 	GetSlice(bskey generic.TKey, fromPos int32, count int32) ([]*generic.TItem, error)
 	MultiPut(bskey generic.TKey, lsItems []*generic.TItem) error
+	RemoveItem(bskey generic.TKey, itemkey generic.TItemKey) error
+	RangeQuery(bskey generic.TKey, startKey generic.TItemKey, endKey generic.TItemKey) ([]*generic.TItem, error)
 }

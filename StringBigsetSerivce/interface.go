@@ -10,4 +10,8 @@ type StringBigsetServiceIf interface {
 	GetTotalCount(bskey generic.TStringKey) (int64, error)
 	BsMultiPut(bskey generic.TStringKey, lsItems []*generic.TItem) error
 	BsGetSlice(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error)
+	BsRemoveItem(bskey generic.TStringKey, itemkey generic.TItemKey) error
+	GetBigSetInfoByName(bskey generic.TStringKey) (*generic.TStringBigSetInfo, error)
+	CreateStringBigSet(bskey generic.TStringKey) (*generic.TStringBigSetInfo, error)
+	BsRangeQuery(bskey generic.TStringKey, startKey generic.TItemKey, endKey generic.TItemKey) ([]*generic.TItem, error)
 }

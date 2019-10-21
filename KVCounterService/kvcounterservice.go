@@ -36,6 +36,21 @@ func (m *KVCounterService) GetValue(genname string) (int64, error) {
 
 }
 
+func (m *KVCounterService) GetStepValue(genname string, step int64) (int64, error) {
+	client := transports.GetKVCounterCompactClient(m.host, m.port)
+
+	if client == nil || client.Client == nil {
+		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+
+	r, err := client.Client.(*KVStepCounter.KVStepCounterServiceClient).GetStepValue(context.Background(), genname, step)
+	if err != nil {
+		return -1, errors.New("KVCounterService: " + m.sid + " error: " + err.Error())
+	}
+	return r, nil
+}
+
 func (m *KVCounterService) CreateGenerator(genname string) (int32, error) {
 
 	client := transports.GetKVCounterCompactClient(m.host, m.port)
@@ -59,7 +74,7 @@ func (m *KVCounterService) handlerEventChangeEndpoint(ep *GoEndpointBackendManag
 	log.Println("Change config endpoint serviceID", ep.ServiceID, m.host, ":", m.port)
 }
 
-func NewStringBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) KVCounterServiceIf {
+func NewKVCounterServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) KVCounterServiceIf {
 	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
 	err, ep := aepm.GetEndPoint()
 	if err != nil {

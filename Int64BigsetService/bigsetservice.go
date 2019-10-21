@@ -29,10 +29,10 @@ func (m *Int64BigsetService) PutItem(bskey generic.TKey, item *generic.TItem) er
 	r, err := client.Client.(*generic.TIBSDataServiceClient).PutItem(context.Background(), bskey, item)
 
 	if err != nil {
-		return errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		return errors.New("IntBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if r.Error != generic.TErrorCode_EGood {
-		return errors.New("StringBigsetSerice: " + m.sid + " error: " + r.Error.String())
+		return errors.New("IntBigsetSerice: " + m.sid + " error: " + r.Error.String())
 	}
 	return nil
 
@@ -120,7 +120,34 @@ func (m *Int64BigsetService) handlerEventChangeEndpoint(ep *GoEndpointBackendMan
 	log.Println("Change config endpoint serviceID", ep.ServiceID, m.host, ":", m.port)
 }
 
-func NewStringBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) Int64BigsetServiceIf {
+func (m *Int64BigsetService) RemoveItem(bskey generic.TKey, itemkey generic.TItemKey) error {
+	client := transports.GetIBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+
+	r, err := client.Client.(*generic.TIBSDataServiceClient).RemoveItem(context.Background(), bskey, itemkey)
+	if err != nil || r == false {
+		return errors.New("IntBigsetSerice: " + m.sid + " error:")
+	}
+	return nil
+}
+func (m *Int64BigsetService) RangeQuery(bskey generic.TKey, startKey generic.TItemKey, endKey generic.TItemKey) ([]*generic.TItem, error) {
+	client := transports.GetIBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+
+	rs, err := client.Client.(*generic.TIBSDataServiceClient).RangeQuery(context.Background(), bskey, startKey, endKey)
+	if err != nil || rs == nil || rs.Items == nil || len(rs.Items.Items) == 0 {
+		return nil, errors.New("IntBigsetSerice: " + m.sid + " error")
+	}
+	return rs.Items.Items, nil
+}
+
+func NewIntBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) Int64BigsetServiceIf {
 	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
 	err, ep := aepm.GetEndPoint()
 	if err != nil {

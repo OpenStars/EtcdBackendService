@@ -38,6 +38,23 @@ func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.
 
 }
 
+func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey generic.TItemKey, endKey generic.TItemKey) ([]*generic.TItem, error) {
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(context.Background(), bskey, startKey, endKey)
+	if err != nil {
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+	}
+	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil || len(rs.Items.Items) == 0 {
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+	}
+	return rs.Items.Items, nil
+}
+
 func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generic.TItemKey) (*generic.TItem, error) {
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
@@ -75,6 +92,40 @@ func (m *StringBigsetService) GetTotalCount(bskey generic.TStringKey) (int64, er
 
 }
 
+func (m *StringBigsetService) GetBigSetInfoByName(bskey generic.TStringKey) (*generic.TStringBigSetInfo, error) {
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetBigSetInfoByName(context.Background(), bskey)
+	if err != nil {
+		return nil, err
+	}
+	if rs.Info == nil {
+		return nil, errors.New("Get bigset info by name err " + rs.Error.String())
+	}
+	return rs.Info, nil
+
+}
+func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*generic.TStringBigSetInfo, error) {
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).CreateStringBigSet(context.Background(), bskey)
+	if err != nil {
+		return nil, err
+	}
+	if rs.Info == nil {
+		return nil, errors.New("Get bigset info by name err " + rs.Error.String())
+	}
+	return rs.Info, nil
+}
+
 func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error) {
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
@@ -90,6 +141,22 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
 	}
 	return rs.Items.Items, nil
+}
+
+func (m *StringBigsetService) BsRemoveItem(bskey generic.TStringKey, itemkey generic.TItemKey) error {
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+	ok, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRemoveItem(context.Background(), bskey, itemkey)
+	if err != nil {
+		errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+	}
+	if ok == false {
+		return errors.New("StringBigsetSerice: " + m.sid + " remove false")
+	}
+	return nil
 }
 
 func (m *StringBigsetService) BsMultiPut(bskey generic.TStringKey, lsItems []*generic.TItem) error {
@@ -121,7 +188,6 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
 	err, ep := aepm.GetEndPoint()
 	if err != nil {
-		// log.Println("Load endpoit ", serviceID, "err", err.Error())
 		log.Println("Init Local StringBigsetSerivce sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
 		return &StringBigsetService{
 			host: defaultEnpoint.Host,
