@@ -7,6 +7,7 @@ import (
 
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 	"github.com/OpenStars/backendclients/go/mapphone2pubkey/thrift/gen-go/OpenStars/Common/MapPhoneNumberPubkeyKV"
+
 	"github.com/OpenStars/backendclients/go/mapphone2pubkey/transports"
 )
 
