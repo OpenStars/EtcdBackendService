@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/OpenStars/EtcdBackendSerivce/StringBigsetSerivce"
@@ -13,7 +16,7 @@ func TestSV() {
 	svClient := StringBigsetSerivce.NewStringBigsetServiceModel("/aa/bb", []string{"127.0.0.1:2379"},
 		GoEndpointBackendManager.EndPoint{
 			Host:      "127.0.0.1",
-			Port:      "18407",
+			Port:      "12017",
 			ServiceID: "/aa/bb",
 		})
 
@@ -22,16 +25,22 @@ func TestSV() {
 			Key:   []byte(strconv.FormatInt(int64(i), 10)),
 			Value: []byte("test"),
 		}
-		svClient.BsPutItem(generic.TStringKey("test"), item)
-
+		err := svClient.BsPutItem(generic.TStringKey("test"), item)
+		if err != nil {
+			log.Println("bsputitem err", err)
+		}
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter text: ")
+		text, _ := reader.ReadString('\n')
+		fmt.Println(text)
 	}
 
-	startKey := generic.TItemKey(strconv.FormatInt(1, 10))
-	endKey := generic.TItemKey(strconv.FormatInt(5, 10))
-	item, _ := svClient.BsRangeQuery(generic.TStringKey("test"), startKey, endKey)
-	for i := 0; i < len(item); i++ {
-		log.Println(string(item[i].Key))
-	}
+	// startKey := generic.TItemKey(strconv.FormatInt(1, 10))
+	// endKey := generic.TItemKey(strconv.FormatInt(5, 10))
+	// item, _ := svClient.BsRangeQuery(generic.TStringKey("test"), startKey, endKey)
+	// for i := 0; i < len(item); i++ {
+	// 	log.Println(string(item[i].Key))
+	// }
 
 }
 func main() {

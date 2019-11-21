@@ -4,12 +4,16 @@ import (
 	"context"
 	"errors"
 	"log"
+	"sync"
 
 	"github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	"github.com/OpenStars/backendclients/go/bigset/transports"
 
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
+
+var reconnect = true
+var mureconnect sync.Mutex
 
 type StringBigsetService struct {
 	host string
@@ -29,6 +33,7 @@ func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.
 	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsPutItem(context.Background(), bskey, item)
 
 	if err != nil {
+		client = transports.NewGetBsGenericClient(m.host, m.port)
 		return errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if r.Error != generic.TErrorCode_EGood {
@@ -47,6 +52,7 @@ func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey ge
 
 	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(context.Background(), bskey, startKey, endKey)
 	if err != nil {
+		client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil || len(rs.Items.Items) == 0 {
@@ -64,7 +70,8 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 
 	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetItem(context.Background(), bskey, itemkey)
 	if err != nil {
-		return nil, err
+		client = transports.NewGetBsGenericClient(m.host, m.port)
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	if r.Error != generic.TErrorCode_EGood {
@@ -83,6 +90,7 @@ func (m *StringBigsetService) GetTotalCount(bskey generic.TStringKey) (int64, er
 	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetTotalCount(context.Background(), bskey)
 
 	if err != nil {
+		client = transports.NewGetBsGenericClient(m.host, m.port)
 		return -1, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if r <= 0 {
@@ -101,7 +109,8 @@ func (m *StringBigsetService) GetBigSetInfoByName(bskey generic.TStringKey) (*ge
 
 	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetBigSetInfoByName(context.Background(), bskey)
 	if err != nil {
-		return nil, err
+		client = transports.NewGetBsGenericClient(m.host, m.port)
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 	if rs.Info == nil {
 		return nil, errors.New("Get bigset info by name err " + rs.Error.String())
@@ -118,7 +127,8 @@ func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*gen
 
 	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).CreateStringBigSet(context.Background(), bskey)
 	if err != nil {
-		return nil, err
+		client = transports.NewGetBsGenericClient(m.host, m.port)
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 	if rs.Info == nil {
 		return nil, errors.New("Get bigset info by name err " + rs.Error.String())
@@ -135,6 +145,7 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 
 	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSlice(context.Background(), bskey, fromPos, count)
 	if err != nil {
+		client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil || len(rs.Items.Items) == 0 {
@@ -151,6 +162,7 @@ func (m *StringBigsetService) BsRemoveItem(bskey generic.TStringKey, itemkey gen
 	defer client.BackToPool()
 	ok, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRemoveItem(context.Background(), bskey, itemkey)
 	if err != nil {
+		client = transports.NewGetBsGenericClient(m.host, m.port)
 		errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if ok == false {
@@ -170,6 +182,7 @@ func (m *StringBigsetService) BsMultiPut(bskey generic.TStringKey, lsItems []*ge
 	}
 	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsMultiPut(context.Background(), bskey, itemset, false, false)
 	if err != nil {
+		client = transports.NewGetBsGenericClient(m.host, m.port)
 		return errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if rs.Error != generic.TErrorCode_EGood {
