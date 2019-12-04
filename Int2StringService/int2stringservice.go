@@ -28,10 +28,11 @@ func (m *Int2StringService) PutData(key int64, value string) error {
 		Value: value,
 	}
 	_, err := client.Client.(*I2SKV.TI2StringServiceClient).PutData(context.Background(), tkey, tvalue)
-	defer client.BackToPool()
+
 	if err != nil {
 		return errors.New("Int2StringService sid:" + m.sid + " addresss: " + m.host + ":" + m.port + " err: " + err.Error())
 	}
+	defer client.BackToPool()
 	return nil
 
 }

@@ -23,10 +23,9 @@ func (m *mapnotifycallservice) PutData(pubkey string, token string) error {
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	_, err := client.Client.(*MapNotifyCallKV.TMapNotifyKVServiceClient).PutData(context.Background(), pubkey, token)
-
+	defer client.BackToPool()
 	return err
 }
 
@@ -35,12 +34,12 @@ func (m *mapnotifycallservice) GetTokenByPubkey(pubkey string) (string, error) {
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*MapNotifyCallKV.TMapNotifyKVServiceClient).GetTokenByPubkey(context.Background(), pubkey)
 	if err != nil {
 		return "", err
 	}
+	defer client.BackToPool()
 	if r.ErrorCode != MapNotifyCallKV.TErrorCode_EGood {
 		return "", errors.New("Get token by pubkey errors " + r.ErrorCode.String())
 	}
@@ -52,12 +51,12 @@ func (m *mapnotifycallservice) GetPubkeyByToken(token string) (string, error) {
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*MapNotifyCallKV.TMapNotifyKVServiceClient).GetPubkeyByToken(context.Background(), token)
 	if err != nil {
 		return "", err
 	}
+	defer client.BackToPool()
 	if r.ErrorCode != MapNotifyCallKV.TErrorCode_EGood {
 		return "", errors.New("Get phonenubmer by pubkey errors " + r.ErrorCode.String())
 	}

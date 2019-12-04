@@ -24,13 +24,13 @@ func (m *Int64BigsetService) PutItem(bskey generic.TKey, item *generic.TItem) er
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*generic.TIBSDataServiceClient).PutItem(context.Background(), bskey, item)
 
 	if err != nil {
 		return errors.New("IntBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
+	defer client.BackToPool()
 	if r.Error != generic.TErrorCode_EGood {
 		return errors.New("IntBigsetSerice: " + m.sid + " error: " + r.Error.String())
 	}
@@ -43,13 +43,12 @@ func (m *Int64BigsetService) GetItem(bskey generic.TKey, itemkey generic.TItemKe
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*generic.TIBSDataServiceClient).GetItem(context.Background(), bskey, itemkey)
 	if err != nil {
 		return nil, err
 	}
-
+	defer client.BackToPool()
 	if r.Error != generic.TErrorCode_EGood {
 		return nil, errors.New("Int64BigsetService: " + m.sid + " error: " + r.Error.String())
 	}
@@ -61,13 +60,13 @@ func (m *Int64BigsetService) GetTotalCount(bskey generic.TKey) (int64, error) {
 	if client == nil || client.Client == nil {
 		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*generic.TIBSDataServiceClient).GetTotalCount(context.Background(), bskey)
 
 	if err != nil {
 		return -1, errors.New("Int64BigsetService: " + m.sid + " error: " + err.Error())
 	}
+	defer client.BackToPool()
 	if r <= 0 {
 		return -1, errors.New("Int64BigsetService: " + m.sid + " bigset key don't have any item")
 	}
@@ -80,13 +79,13 @@ func (m *Int64BigsetService) GetSlice(bskey generic.TKey, fromPos int32, count i
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
 
 	rs, err := client.Client.(*generic.TIBSDataServiceClient).GetSlice(context.Background(), bskey, fromPos, count)
 
 	if err != nil {
 		return nil, errors.New("Int64BigsetService: " + m.sid + " error: " + err.Error())
 	}
+	defer client.BackToPool()
 
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil || len(rs.Items.Items) == 0 {
 		return nil, errors.New("Int64BigsetService: " + m.sid + " error: " + rs.Error.String())
@@ -100,7 +99,7 @@ func (m *Int64BigsetService) MultiPut(bskey generic.TKey, lsItems []*generic.TIt
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
+
 	itemset := &generic.TItemSet{
 		Items: lsItems,
 	}
@@ -108,6 +107,7 @@ func (m *Int64BigsetService) MultiPut(bskey generic.TKey, lsItems []*generic.TIt
 	if err != nil {
 		return errors.New("Int64BigsetService: " + m.sid + " error: " + err.Error())
 	}
+	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood {
 		return errors.New("Int64BigsetService: " + m.sid + " error: " + rs.Error.String())
 	}
@@ -125,12 +125,12 @@ func (m *Int64BigsetService) RemoveItem(bskey generic.TKey, itemkey generic.TIte
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*generic.TIBSDataServiceClient).RemoveItem(context.Background(), bskey, itemkey)
 	if err != nil || r == false {
 		return errors.New("IntBigsetSerice: " + m.sid + " error:")
 	}
+	defer client.BackToPool()
 	return nil
 }
 func (m *Int64BigsetService) RangeQuery(bskey generic.TKey, startKey generic.TItemKey, endKey generic.TItemKey) ([]*generic.TItem, error) {
@@ -138,12 +138,12 @@ func (m *Int64BigsetService) RangeQuery(bskey generic.TKey, startKey generic.TIt
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
 
 	rs, err := client.Client.(*generic.TIBSDataServiceClient).RangeQuery(context.Background(), bskey, startKey, endKey)
 	if err != nil || rs == nil || rs.Items == nil || len(rs.Items.Items) == 0 {
 		return nil, errors.New("IntBigsetSerice: " + m.sid + " error")
 	}
+	defer client.BackToPool()
 	return rs.Items.Items, nil
 }
 

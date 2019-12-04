@@ -24,11 +24,12 @@ func (m *stringMapKV) GetData(key string) (string, error) {
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
+
 	r, err := client.Client.(*StringMapKV.StringMapKVServiceClient).GetData(context.Background(), StringMapKV.TKey(key))
 	if err != nil {
 		return "", errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	if r.Data == nil || r.Data.Value == "" {
 		return "", errors.New("Backend service:" + m.sid + " key not found")
 	}
@@ -42,11 +43,12 @@ func (m *stringMapKV) PutData(key, value string) error {
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
+
 	_, err := client.Client.(*StringMapKV.StringMapKVServiceClient).PutData(context.Background(), StringMapKV.TKey(key), &StringMapKV.TStringValue{Value: value})
 	if err != nil {
 		return errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	return nil
 }
 
@@ -55,8 +57,9 @@ func (m *stringMapKV) DeleteKey(key string) error {
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
+
 	_, err := client.Client.(*StringMapKV.StringMapKVServiceClient).DeleteData(context.Background(), StringMapKV.TKey(key))
+	defer client.BackToPool()
 	return err
 }
 

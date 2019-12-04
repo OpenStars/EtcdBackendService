@@ -29,7 +29,6 @@ func (m *KVCounterService) GetValue(genname string) (int64, error) {
 	r, err := client.Client.(*KVStepCounter.KVStepCounterServiceClient).GetValue(context.Background(), genname)
 
 	if err != nil {
-		client = transports.NewGetKVCounterCompactClient(m.host, m.port)
 		return -1, errors.New("KVCounterService: " + m.sid + " error: " + err.Error())
 	}
 	defer client.BackToPool()
