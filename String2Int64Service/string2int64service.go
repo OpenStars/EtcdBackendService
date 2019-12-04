@@ -23,7 +23,6 @@ func (m *String2Int64Service) PutData(key string, value int64) error {
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	tkey := S2I64KV.TKey(key)
 	tvalue := &S2I64KV.TI64Value{
@@ -31,7 +30,11 @@ func (m *String2Int64Service) PutData(key string, value int64) error {
 	}
 
 	_, err := client.Client.(*S2I64KV.TString2I64KVServiceClient).PutData(context.Background(), tkey, tvalue)
-	return err
+	defer client.BackToPool()
+	if err != nil {
+		return errors.New("String2Int64Service sid: " + m.sid + " address: " + m.host + ":" + m.port + " err: " + err.Error())
+	}
+	return nil
 }
 
 func (m *String2Int64Service) GetData(key string) (int64, error) {
@@ -39,15 +42,15 @@ func (m *String2Int64Service) GetData(key string) (int64, error) {
 	if client == nil || client.Client == nil {
 		return -1, errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	tkey := S2I64KV.TKey(key)
 	r, err := client.Client.(*S2I64KV.TString2I64KVServiceClient).GetData(context.Background(), tkey)
 	if err != nil {
-		return -1, err
+		return -1, errors.New("String2Int64Service sid: " + m.sid + " address: " + m.host + ":" + m.port + " err: " + err.Error())
 	}
-	log.Println("r:", r.ErrorCode.String())
-	if r.Data == nil || r.ErrorCode != S2I64KV.TErrorCode_EGood {
+	defer client.BackToPool()
+
+	if r.Data == nil || r.ErrorCode != S2I64KV.TErrorCode_EGood || r.Data.Value <= 0 {
 		return -1, errors.New("Can not found key")
 	}
 	return r.Data.Value, nil

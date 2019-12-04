@@ -1,4 +1,4 @@
-package TPostStorageService
+package TMediaStorageService
 
 import (
 	"log"
@@ -6,18 +6,18 @@ import (
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
-func NewTPostStorageService(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) TPostStorageServiceIf {
+func NewTMediaStorageService(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) TMediaStorageServiceIf {
 	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
 	err, ep := aepm.GetEndPoint()
 	if err != nil {
-		log.Println("Init Local TPostStorageService sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
-		return &tpoststorageservice{
+		log.Println("Init Local TMediaStorageService sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+		return &tmediastorageservice{
 			host: defaultEnpoint.Host,
 			port: defaultEnpoint.Port,
 			sid:  defaultEnpoint.ServiceID,
 		}
 	}
-	sv := &tpoststorageservice{
+	sv := &tmediastorageservice{
 		host: ep.Host,
 		port: ep.Port,
 		sid:  ep.ServiceID,

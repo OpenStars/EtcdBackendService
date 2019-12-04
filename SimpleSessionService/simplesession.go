@@ -22,12 +22,13 @@ func (m *simpleSessionClient) GetSession(sskey string) (*simplesession.TUserSess
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
+
 	r, err := client.Client.(*simplesession.TSimpleSessionService_WClient).GetSession(context.Background(), simplesession.TSessionKey(sskey))
 	if err != nil {
 		return nil, errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
-	if r.Error == simplesession.TErrorCode_EFailed || r == nil || r.UserInfo == nil {
+	defer client.BackToPool()
+	if r == nil || r.Error == simplesession.TErrorCode_EFailed || r.UserInfo == nil {
 		return nil, errors.New("Backedn services:" + m.sid + " err:" + r.Error.String())
 	}
 	return r.UserInfo, nil
@@ -38,7 +39,7 @@ func (m *simpleSessionClient) CreateSession(uid int64) (string, error) {
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
+
 	userinfo := &simplesession.TUserSessionInfo{
 		Version: 1,
 		Code:    simplesession.TSessionCode_EFullRight,
@@ -48,6 +49,7 @@ func (m *simpleSessionClient) CreateSession(uid int64) (string, error) {
 	if err != nil {
 		return "", errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	if r.Error == simplesession.TErrorCode_EFailed || r == nil || r.Session == nil {
 		return "", errors.New("Backedn services:" + m.sid + " err:" + r.Error.String())
 	}
@@ -59,12 +61,12 @@ func (m *simpleSessionClient) RemoveSession(sskey string) error {
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*simplesession.TSimpleSessionService_WClient).RemoveSession(context.Background(), simplesession.TSessionKey(sskey))
 	if err != nil {
 		return errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	if r == false {
 		return errors.New("Backedn services:" + m.sid + " err: remove session false")
 	}

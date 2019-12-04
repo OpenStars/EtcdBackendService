@@ -1,4 +1,4 @@
-package StringMapKV
+package TPostStorageService
 
 import (
 	"github.com/OpenStars/backendclients/go/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"

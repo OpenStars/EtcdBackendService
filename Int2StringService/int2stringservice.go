@@ -22,15 +22,18 @@ func (m *Int2StringService) PutData(key int64, value string) error {
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	tkey := I2SKV.TKey(key)
 	tvalue := &I2SKV.TStringValue{
 		Value: value,
 	}
+	_, err := client.Client.(*I2SKV.TI2StringServiceClient).PutData(context.Background(), tkey, tvalue)
+	defer client.BackToPool()
+	if err != nil {
+		return errors.New("Int2StringService sid:" + m.sid + " addresss: " + m.host + ":" + m.port + " err: " + err.Error())
+	}
+	return nil
 
-	_, err := client.Client.(*I2SKV.TDataServiceClient).PutData(context.Background(), tkey, tvalue)
-	return err
 }
 
 func (m *Int2StringService) GetData(key int64) (string, error) {
@@ -38,15 +41,16 @@ func (m *Int2StringService) GetData(key int64) (string, error) {
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	tkey := I2SKV.TKey(key)
-	r, err := client.Client.(*I2SKV.TDataServiceClient).GetData(context.Background(), tkey)
+	r, err := client.Client.(*I2SKV.TI2StringServiceClient).GetData(context.Background(), tkey)
 	if err != nil {
-		return "", err
+		return "", errors.New("Int2StringService sid:" + m.sid + " addresss: " + m.host + ":" + m.port + " err: " + err.Error())
 	}
-	if r.Data == nil || r.ErrorCode != I2SKV.TErrorCode_EGood {
-		return "", errors.New("Can not found key")
+	defer client.BackToPool()
+
+	if r.Data == nil || r.ErrorCode != I2SKV.TErrorCode_EGood || r.Data.Value == "" {
+		return "", errors.New("Int2StringService sid:" + m.sid + " addresss: " + m.host + ":" + m.port + " err: " + r.ErrorCode.String())
 	}
 	return r.Data.Value, nil
 }

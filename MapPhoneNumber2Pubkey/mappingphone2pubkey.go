@@ -23,10 +23,12 @@ func (m *MappingPhone2PubkeyServiceModel) PutData(pubkey string, phonenumber str
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	_, err := client.Client.(*MapPhoneNumberPubkeyKV.TMapPhoneNumberPubkeyKVServiceClient).PutData(context.Background(), pubkey, phonenumber)
-
+	if err != nil {
+		return errors.New("Serviceid:" + m.sid + " address:" + m.host + ":" + m.port + " err:" + err.Error())
+	}
+	defer client.BackToPool()
 	return err
 }
 
@@ -35,12 +37,12 @@ func (m *MappingPhone2PubkeyServiceModel) GetPhoneNumberByPubkey(pubkey string) 
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*MapPhoneNumberPubkeyKV.TMapPhoneNumberPubkeyKVServiceClient).GetPhoneNumberByPubkey(context.Background(), pubkey)
 	if err != nil {
-		return "", err
+		return "", errors.New("Serviceid:" + m.sid + " address:" + m.host + ":" + m.port + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	if r.ErrorCode != MapPhoneNumberPubkeyKV.TErrorCode_EGood {
 		return "", errors.New("Get phonenubmer by pubkey errors " + r.ErrorCode.String())
 	}
@@ -52,12 +54,12 @@ func (m *MappingPhone2PubkeyServiceModel) GetPubkeyByPhoneNumber(phonenumber str
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
 	}
-	defer client.BackToPool()
 
 	r, err := client.Client.(*MapPhoneNumberPubkeyKV.TMapPhoneNumberPubkeyKVServiceClient).GetPubkeyByPhoneNumber(context.Background(), phonenumber)
 	if err != nil {
-		return "", err
+		return "", errors.New("Serviceid:" + m.sid + " address:" + m.host + ":" + m.port + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	if r.ErrorCode != MapPhoneNumberPubkeyKV.TErrorCode_EGood {
 		return "", errors.New("Get phonenubmer by pubkey errors " + r.ErrorCode.String())
 	}
