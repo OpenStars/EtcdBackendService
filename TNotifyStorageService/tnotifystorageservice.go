@@ -1,4 +1,4 @@
-package TPostStorageService
+package TNotifyStorageService
 
 import (
 	"context"
