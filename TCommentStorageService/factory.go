@@ -10,7 +10,7 @@ func NewTCommentStorageService(serviceID string, etcdServers []string, defaultEn
 	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
 	err, ep := aepm.GetEndPoint()
 	if err != nil {
-		log.Println("Init Local TPostStorageService sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+		log.Println("Init Local TCommentStorageService sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
 		return &tcommentstorageservice{
 			host: defaultEnpoint.Host,
 			port: defaultEnpoint.Port,
