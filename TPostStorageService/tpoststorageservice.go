@@ -51,7 +51,6 @@ func (m *tpoststorageservice) PutData(key int64, data *TPostStorageService.TPost
 	defer client.BackToPool()
 	return nil
 }
-
 func (m *tpoststorageservice) RemoveData(key int64) error {
 	client := transports.GetTPostStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
