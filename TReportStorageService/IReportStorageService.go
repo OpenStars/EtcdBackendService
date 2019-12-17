@@ -19,5 +19,6 @@ type IReportStorageService interface {
 	RemoveReport(idReport int64) error
 	GetAll(idReport []int64) ([]*TReportStorageService.TReportItem, error)
 	GetAllFromStartReportId(idReport int64, count int32) ([]*TReportStorageService.TReportItem, error)
+	GetAllFromPosition(start int32, count int32) ([]*TReportStorageService.TReportItem, error)
 	GetPostById(idPost int64)(*TPostStorageService.TPostItem, error)
 }
