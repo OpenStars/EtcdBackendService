@@ -89,15 +89,15 @@ func (m *reportStorageService) PutReport(idReport int64, data *TReportStorageSer
 				Key:   bsKey,
 				Value: data.ToBytes(),
 			})
-		fmt.Println("Get result: ", res, " with err: ", err, " value: ", data.ToBytes())
+		fmt.Println("Get result: ", res, " with err: ", err, " value: ", data)
 		if res != nil && res.Error == bs.TErrorCode_EGood && err == nil {
 			if res.IsSetOldItem() {
 				var oldItem TReportStorageService.TReportItem
 				oldItem.FromBytes(res.GetOldItem().Value)
 
 				fmt.Println("Update old item: ", res, " value: ", oldItem.ToBytes())
-				return nil
 			}
+			return nil
 		} else if err != nil {
 			return errors.New("Backend service:" + m.sid + " err:" + err.Error())
 		}
@@ -160,6 +160,33 @@ func (m *reportStorageService) GetAllFromStartReportId(idReport int64, count int
 			context.Background(),
 			bs.TStringKey(Common.REPORT_APP_ID),
 			bs.TItemKey(bsKey),
+			count)
+
+		if res != nil && err == nil {
+			if res.IsSetItems() {
+				var results [] *TReportStorageService.TReportItem
+				for _, item := range res.GetItems().Items {
+					var result TReportStorageService.TReportItem
+					result.FromBytes(item.Value)
+					results = append(results, &result)
+				}
+				return results, nil
+			}
+		} else {
+			return nil, err
+		}
+	}
+	return nil, errors.New("Cannot connect to bigset database: " + m.sid + "host: " + m.hostBigset + "port: " + m.portBigset)
+}
+func (m *reportStorageService) GetAllFromPosition(start int32, count int32) ([]*TReportStorageService.TReportItem, error){
+	client := m.getBigsetDatabaseClient()
+	if client != nil {
+		defer client.BackToPool()
+
+		res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsGetSlice(
+			context.Background(),
+			bs.TStringKey(Common.REPORT_APP_ID),
+			start,
 			count)
 
 		if res != nil && err == nil {
