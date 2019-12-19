@@ -7,7 +7,6 @@ import (
 
 	"github.com/OpenStars/backendclients/go/tmediastorageservice/thrift/gen-go/OpenStars/Common/TMediaStorageService"
 	"github.com/OpenStars/backendclients/go/tmediastorageservice/transports"
-	"github.com/OpenStars/backendclients/go/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
 
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
@@ -24,11 +23,12 @@ func (m *tmediastorageservice) GetData(key int64) (*TMediaStorageService.TMediaI
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
+
 	r, err := client.Client.(*TMediaStorageService.TMediaStorageServiceClient).GetData(context.Background(), TMediaStorageService.TKey(key))
 	if err != nil {
 		return nil, errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	if r.Data == nil {
 		return nil, errors.New("Backend service:" + m.sid + " key not found")
 	}
@@ -43,11 +43,12 @@ func (m *tmediastorageservice) PutData(key int64, data *TMediaStorageService.TMe
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
+
 	_, err := client.Client.(*TMediaStorageService.TMediaStorageServiceClient).PutData(context.Background(), TMediaStorageService.TKey(key), data)
 	if err != nil {
 		return errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	return nil
 }
 
@@ -56,9 +57,24 @@ func (m *tmediastorageservice) RemoveData(key int64) error {
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
+
+	_, err := client.Client.(*TMediaStorageService.TMediaStorageServiceClient).RemoveData(context.Background(), TMediaStorageService.TKey(key))
 	defer client.BackToPool()
-	_, err := client.Client.(*TPostStorageService.TPostStorageServiceClient).RemoveData(context.Background(), TPostStorageService.TKey(key))
 	return err
+}
+
+func (m *tmediastorageservice) GetListDatas(listkey []TMediaStorageService.TKey) (r []*TMediaStorageService.TMediaItem, err error) {
+	client := transports.GetTMediaStorageServiceCompactClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+
+	rs, err := client.Client.(*TMediaStorageService.TMediaStorageServiceClient).GetListData(context.Background(), listkey)
+	defer client.BackToPool()
+	if err != nil || rs == nil || len(rs.ListDatas) == 0 {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	return rs.ListDatas, nil
 }
 func (m *tmediastorageservice) handlerEventChangeEndpoint(ep *GoEndpointBackendManager.EndPoint) {
 	m.host = ep.Host

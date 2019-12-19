@@ -13,12 +13,11 @@ func Test() {
 		log.Println("err", err)
 		return
 	}
-	for f, mapquality := range r.Value.MapFormatQualityInfo {
-		log.Println("Format", f)
-		log.Println("Value", mapquality)
-		for q, filestatusurl := range mapquality {
-			log.Println("quality", q)
-			log.Println("filestatusurl", filestatusurl)
+	log.Println("status", *r.Value.Status)
+	for i := 0; i < len(r.Value.PosterUrls); i++ {
+		for k, v := range r.Value.PosterUrls[i] {
+			log.Println("k=", k)
+			log.Println("v=", *v.FileUrl)
 		}
 	}
 }
