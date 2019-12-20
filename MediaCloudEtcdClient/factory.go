@@ -1,6 +1,6 @@
 package MediaCloudEtcdClient
 
-func NewPubProfileClient(ahost, aport string) MediaCloudClientIf {
+func NewMediaCloudEtcdClient(ahost, aport string) MediaCloudClientIf {
 
 	return &mediacloudclient{
 		host: ahost,
