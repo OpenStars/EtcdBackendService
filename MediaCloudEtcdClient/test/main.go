@@ -7,7 +7,7 @@ import (
 )
 
 func Test() {
-	mediacloudclient := MediaCloudEtcdClient.NewPubProfileClient("10.60.68.100", "9210")
+	mediacloudclient := MediaCloudEtcdClient.NewMediaCloudEtcdClient("10.60.68.100", "9210")
 	r, err := mediacloudclient.GetMediaInfo("9b5323711834f16aa825", "c486c2a5c1fb1f0f1071c29593f2f260", "cbba01983addd3838acc")
 	if err != nil {
 		log.Println("err", err)
