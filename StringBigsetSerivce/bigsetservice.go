@@ -96,7 +96,7 @@ func (m *StringBigsetService) GetTotalCount(bskey generic.TStringKey) (int64, er
 	defer client.BackToPool()
 
 	if r <= 0 {
-		return -1, errors.New("StringBigsetSerice: " + m.sid + " bigset key don't have any item")
+		return 0, nil
 	}
 	return r, nil
 
@@ -152,8 +152,12 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	defer client.BackToPool()
-	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil || len(rs.Items.Items) == 0 {
+	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+	}
+
+	if len(rs.Items.Items) == 0 {
+		return []*generic.TItem{}, nil
 	}
 	return rs.Items.Items, nil
 }
@@ -209,8 +213,11 @@ func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromK
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	defer client.BackToPool()
-	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil || len(rs.Items.Items) == 0 {
+	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+	}
+	if len(rs.Items.Items) == 0 {
+		return []*generic.TItem{}, nil
 	}
 	return rs.Items.Items, nil
 }
