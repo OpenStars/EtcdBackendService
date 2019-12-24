@@ -222,6 +222,27 @@ func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromK
 	return rs.Items.Items, nil
 }
 
+func (m *StringBigsetService) BsGetSliceFromItemR(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error) {
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSliceFromItemR(context.Background(), bskey, fromKey, count)
+	if err != nil {
+		// client = transports.NewGetBsGenericClient(m.host, m.port)
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+	}
+	defer client.BackToPool()
+	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+	}
+	if len(rs.Items.Items) == 0 {
+		return []*generic.TItem{}, nil
+	}
+	return rs.Items.Items, nil
+}
+
 func (m *StringBigsetService) handlerEventChangeEndpoint(ep *GoEndpointBackendManager.EndPoint) {
 	m.host = ep.Host
 	m.port = ep.Port
