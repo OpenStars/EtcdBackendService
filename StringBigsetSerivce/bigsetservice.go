@@ -121,6 +121,22 @@ func (m *StringBigsetService) GetBigSetInfoByName(bskey generic.TStringKey) (*ge
 	return rs.Info, nil
 
 }
+
+func (m *StringBigsetService) RemoveAll(bskey generic.TStringKey) error {
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).RemoveAll(context.Background(), bskey)
+	if err != nil {
+		// client = transports.NewGetBsGenericClient(m.host, m.port)
+		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+	log.Println("BsRemoveAll rs", rs)
+	return nil
+}
 func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*generic.TStringBigSetInfo, error) {
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
