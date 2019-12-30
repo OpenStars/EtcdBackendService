@@ -9,8 +9,9 @@
 package TReportStorageService
 
 import (
-	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 	"log"
+
+	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 func NewTReportStorageService(serviceID string, etcdServers []string,

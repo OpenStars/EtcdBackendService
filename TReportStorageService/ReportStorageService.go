@@ -12,13 +12,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+
 	"github.com/OpenStars/Common"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 	bs "github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	"github.com/OpenStars/backendclients/go/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
 	"github.com/OpenStars/backendclients/go/treportstorageservice/thrift/gen-go/OpenStars/Common/TReportStorageService"
 	thriftpool "github.com/OpenStars/thriftpoolv2"
-	"log"
 
 	transportBigset "github.com/OpenStars/backendclients/go/bigset/transports"
 	transportPostService "github.com/OpenStars/backendclients/go/tpoststorageservice/transports"
@@ -46,7 +47,7 @@ func (m *reportStorageService) handlerEventChangeEndpoint(ep *GoEndpointBackendM
 }
 
 func makeBigsetKey(id int64) []byte {
-	return []byte (string(id))
+	return []byte(string(id))
 }
 
 /* ==================================== END PRIVATE ============================================================== */
@@ -70,7 +71,7 @@ func (m *reportStorageService) GetReportById(idReport int64) (*TReportStorageSer
 			return &result, nil
 		} else if err != nil {
 			return nil, errors.New("Backend service:" + m.sid + " err:" + err.Error())
-		}else {
+		} else {
 			return nil, errors.New("Backend service:" + m.sid + " key not found")
 		}
 	}
@@ -130,7 +131,7 @@ func (m *reportStorageService) GetAll(idReport []int64) ([]*TReportStorageServic
 	if client != nil {
 		defer client.BackToPool()
 
-		var results [] *TReportStorageService.TReportItem
+		var results []*TReportStorageService.TReportItem
 		for i := 0; i < len(idReport); i++ {
 			bsKey := makeBigsetKey(idReport[i])
 			res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsGetItem(
@@ -150,7 +151,7 @@ func (m *reportStorageService) GetAll(idReport []int64) ([]*TReportStorageServic
 	}
 	return nil, errors.New("Cannot connect to bigset database: " + m.sid + "host: " + m.hostBigset + "port: " + m.portBigset)
 }
-func (m *reportStorageService) GetAllFromStartReportId(idReport int64, count int32) ([]*TReportStorageService.TReportItem, error){
+func (m *reportStorageService) GetAllFromStartReportId(idReport int64, count int32) ([]*TReportStorageService.TReportItem, error) {
 	client := m.getBigsetDatabaseClient()
 	bsKey := makeBigsetKey(idReport)
 	if client != nil {
@@ -164,7 +165,7 @@ func (m *reportStorageService) GetAllFromStartReportId(idReport int64, count int
 
 		if res != nil && err == nil {
 			if res.IsSetItems() {
-				var results [] *TReportStorageService.TReportItem
+				var results []*TReportStorageService.TReportItem
 				for _, item := range res.GetItems().Items {
 					var result TReportStorageService.TReportItem
 					result.FromBytes(item.Value)
@@ -178,7 +179,7 @@ func (m *reportStorageService) GetAllFromStartReportId(idReport int64, count int
 	}
 	return nil, errors.New("Cannot connect to bigset database: " + m.sid + "host: " + m.hostBigset + "port: " + m.portBigset)
 }
-func (m *reportStorageService) GetAllFromPosition(start int32, count int32) ([]*TReportStorageService.TReportItem, error){
+func (m *reportStorageService) GetAllFromPosition(start int32, count int32) ([]*TReportStorageService.TReportItem, error) {
 	client := m.getBigsetDatabaseClient()
 	if client != nil {
 		defer client.BackToPool()
@@ -191,7 +192,7 @@ func (m *reportStorageService) GetAllFromPosition(start int32, count int32) ([]*
 
 		if res != nil && err == nil {
 			if res.IsSetItems() {
-				var results [] *TReportStorageService.TReportItem
+				var results []*TReportStorageService.TReportItem
 				for _, item := range res.GetItems().Items {
 					var result TReportStorageService.TReportItem
 					result.FromBytes(item.Value)
@@ -223,6 +224,9 @@ func (m *reportStorageService) GetPostById(idPost int64) (*TPostStorageService.T
 		}
 	}
 	return nil, errors.New("Cannot connect to backend service: " + m.sid + "host: " + m.hostEtcd + "port: " + m.portEtcd)
+}
+func (m *reportStorageService) CheckReportByPostAndUId(idPost int64, uId int64) (bool, error) {
+	return false, nil
 }
 
 /* ==================================== END PUBLISH ============================================================== */
