@@ -184,7 +184,7 @@ func (m *reportStorageService) GetAllFromPosition(start int32, count int32) ([]*
 	if client != nil {
 		defer client.BackToPool()
 
-		res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsGetSlice(
+		res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsGetSliceR(
 			context.Background(),
 			bs.TStringKey(Common.REPORT_APP_ID),
 			start,
