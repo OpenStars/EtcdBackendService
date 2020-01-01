@@ -17,4 +17,5 @@ type StringBigsetServiceIf interface {
 	BsGetSliceFromItem(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error)
 	BsGetSliceFromItemR(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error)
 	RemoveAll(bskey generic.TStringKey) error
+	BsGetSliceR(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error)
 }
