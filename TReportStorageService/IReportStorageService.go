@@ -21,5 +21,7 @@ type IReportStorageService interface {
 	GetAllFromStartReportId(idReport int64, count int32) ([]*TReportStorageService.TReportItem, error)
 	GetAllFromPosition(start int32, count int32) ([]*TReportStorageService.TReportItem, error)
 	GetPostById(idPost int64) (*TPostStorageService.TPostItem, error)
-	CheckReportByPostAndUId(idPost int64, uId int64) (bool, error)
+	CheckReportByPostAndUId(idPost int64, uId int64) (*bool, error)
+	CheckReportByCommentAndUId(idComment int64, uId int64) (*bool, error)
+	GetAllUnProcessReport(start int32, count int32)([]*TReportStorageService.TReportItem, error)
 }
