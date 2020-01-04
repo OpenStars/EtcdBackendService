@@ -49,6 +49,9 @@ func (m *reportStorageService) handlerEventChangeEndpoint(ep *GoEndpointBackendM
 func makeBigsetKey(id int64) []byte {
 	return []byte(string(id))
 }
+func makeBigsetKey2(id int64, id2 int64) []byte {
+	return []byte(string(id) + "-" + string(id2))
+}
 
 /* ==================================== END PRIVATE ============================================================== */
 /* ==================================== PUBLISH FUNCTION ========================================================= */
@@ -80,6 +83,7 @@ func (m *reportStorageService) GetReportById(idReport int64) (*TReportStorageSer
 func (m *reportStorageService) PutReport(idReport int64, data *TReportStorageService.TReportItem) error {
 	client := m.getBigsetDatabaseClient()
 	bsKey := makeBigsetKey(idReport)
+
 	if client != nil {
 		defer client.BackToPool()
 
@@ -96,7 +100,34 @@ func (m *reportStorageService) PutReport(idReport int64, data *TReportStorageSer
 				var oldItem TReportStorageService.TReportItem
 				oldItem.FromBytes(res.GetOldItem().Value)
 
-				fmt.Println("Update old item: ", res, " value: ", oldItem.ToBytes())
+				fmt.Println("Update old item: ", res, " value: ", oldItem.ReportId)
+			}
+
+			if data.CommentId != nil {
+				commentBSKey := makeBigsetKey2(*data.CommentId, data.UID)
+				res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsPutItem(
+					context.Background(),
+					bs.TStringKey(Common.REPORT_BY_COMMENT_ID),
+					&bs.TItem{
+						Key:   commentBSKey,
+						Value: data.ToBytes(),
+					})
+				if res == nil || res.Error != bs.TErrorCode_EGood || err != nil {
+					fmt.Println("Cannot put report data with comment id: ", *data.CommentId)
+				}
+			} else {
+				postBSKey := makeBigsetKey2(*data.PostId, data.UID)
+				res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsPutItem(
+					context.Background(),
+					bs.TStringKey(Common.REPORT_BY_POST_ID),
+					&bs.TItem{
+						Key:   postBSKey,
+						Value: data.ToBytes(),
+					})
+
+				if res == nil || res.Error != bs.TErrorCode_EGood || err != nil {
+					fmt.Println("Cannot put report data with post id: ", *data.PostId)
+				}
 			}
 			return nil
 		} else if err != nil {
@@ -225,8 +256,89 @@ func (m *reportStorageService) GetPostById(idPost int64) (*TPostStorageService.T
 	}
 	return nil, errors.New("Cannot connect to backend service: " + m.sid + "host: " + m.hostEtcd + "port: " + m.portEtcd)
 }
-func (m *reportStorageService) CheckReportByPostAndUId(idPost int64, uId int64) (bool, error) {
-	return false, nil
+func (m *reportStorageService) CheckReportByPostAndUId(idPost int64, uId int64) (*bool, error) {
+	client := m.getBigsetDatabaseClient()
+	bsKey := makeBigsetKey2(idPost, uId)
+	if client != nil {
+		defer client.BackToPool()
+
+		res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsGetItem(
+			context.Background(),
+			bs.TStringKey(Common.REPORT_BY_POST_ID),
+			bs.TItemKey(bsKey))
+		fmt.Println("Get result: ", res, " with err: ", err)
+		result := res.Item != nil
+		if res != nil && err == nil {
+			return &result, nil
+		} else if err != nil {
+			return nil, err
+		} else {
+			result = false
+			return &result, nil
+		}
+	}
+	return nil, errors.New("Cannot connect to bigset database: " + m.sid + "host: " + m.hostBigset + "port: " + m.portBigset)
+}
+func (m *reportStorageService) CheckReportByCommentAndUId(idComment int64, uId int64) (*bool, error) {
+	client := m.getBigsetDatabaseClient()
+	bsKey := makeBigsetKey2(idComment, uId)
+	if client != nil {
+		defer client.BackToPool()
+
+		res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsGetItem(
+			context.Background(),
+			bs.TStringKey(Common.REPORT_BY_COMMENT_ID),
+			bs.TItemKey(bsKey))
+		fmt.Println("Get result: ", res, " with err: ", err)
+
+		result := res.Item != nil
+		if res != nil && err == nil {
+			return &result, nil
+		} else if err != nil {
+			return nil, err
+		} else {
+			result = false
+			return &result, nil
+		}
+	}
+	return nil, errors.New("Cannot connect to bigset database: " + m.sid + "host: " + m.hostBigset + "port: " + m.portBigset)
+}
+func (m *reportStorageService) GetAllUnProcessReport(start int32, count int32) ([]*TReportStorageService.TReportItem, error) {
+	client := m.getBigsetDatabaseClient()
+	if client != nil {
+		defer client.BackToPool()
+
+		res, err := client.Client.(*bs.TStringBigSetKVServiceClient).BsGetSliceR(
+			context.Background(),
+			bs.TStringKey(Common.REPORT_APP_ID),
+			start,
+			99999999)
+
+		if res != nil && err == nil {
+			if res.IsSetItems() {
+				var results []*TReportStorageService.TReportItem
+				var countIndex int32 = 0
+				for _, item := range res.GetItems().Items {
+					var result TReportStorageService.TReportItem
+					result.FromBytes(item.Value)
+					if result.Action == 0 {
+						if countIndex < start {
+							countIndex++
+						} else {
+							results = append(results, &result)
+						}
+						if int32(len(results)) == count {
+							break
+						}
+					}
+				}
+				return results, nil
+			}
+		} else {
+			return nil, err
+		}
+	}
+	return nil, errors.New("Cannot connect to bigset database: " + m.sid + "host: " + m.hostBigset + "port: " + m.portBigset)
 }
 
 /* ==================================== END PUBLISH ============================================================== */
