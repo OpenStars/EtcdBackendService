@@ -63,19 +63,24 @@ func (m *tmediastorageservice) RemoveData(key int64) error {
 	return err
 }
 
-func (m *tmediastorageservice) GetListDatas(listkey []TMediaStorageService.TKey) (r []*TMediaStorageService.TMediaItem, err error) {
+func (m *tmediastorageservice) GetListData(listkey []int64) (r []*TMediaStorageService.TMediaItem, err error) {
 	client := transports.GetTMediaStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
+	var listTkey []TMediaStorageService.TKey
+	for _, key := range listkey {
+		listTkey = append(listTkey, TMediaStorageService.TKey(key))
+	}
+	rs, err := client.Client.(*TMediaStorageService.TMediaStorageServiceClient).GetListData(context.Background(), listTkey)
 
-	rs, err := client.Client.(*TMediaStorageService.TMediaStorageServiceClient).GetListData(context.Background(), listkey)
-	defer client.BackToPool()
 	if err != nil || rs == nil || len(rs.ListDatas) == 0 {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
+	defer client.BackToPool()
 	return rs.ListDatas, nil
 }
+
 func (m *tmediastorageservice) handlerEventChangeEndpoint(ep *GoEndpointBackendManager.EndPoint) {
 	m.host = ep.Host
 	m.port = ep.Port
