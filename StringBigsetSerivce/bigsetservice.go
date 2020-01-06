@@ -84,14 +84,14 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 func (m *StringBigsetService) GetTotalCount(bskey generic.TStringKey) (int64, error) {
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
-		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+		return 0, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetTotalCount(context.Background(), bskey)
 
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
-		return -1, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		return 0, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	defer client.BackToPool()
 
