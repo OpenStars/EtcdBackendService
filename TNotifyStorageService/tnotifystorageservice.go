@@ -36,6 +36,9 @@ func (m *tnotifytorageservice) GetData(key int64) (*TNotifyStorageService.TNotif
 	if r.ErrorCode != TNotifyStorageService.TErrorCode_EGood {
 		return nil, errors.New("Backend service:" + m.sid + " err:" + r.ErrorCode.String())
 	}
+	if r.Data.Key == 0 {
+		return nil, errors.New("Not found")
+	}
 	return r.Data, nil
 }
 
@@ -83,7 +86,13 @@ func (m *tnotifytorageservice) GetListDatas(listkey []int64) ([]*TNotifyStorageS
 	if r.ErrorCode != TNotifyStorageService.TErrorCode_EGood {
 		return nil, errors.New("Backend service:" + m.sid + " err:" + r.ErrorCode.String())
 	}
-	return r.Datass, nil
+	var checklist []*TNotifyStorageService.TNotifyItem
+	for _, item := range r.Datass {
+		if item.Key != 0 {
+			checklist = append(checklist, item)
+		}
+	}
+	return checklist, nil
 }
 func (m *tnotifytorageservice) handlerEventChangeEndpoint(ep *GoEndpointBackendManager.EndPoint) {
 	m.host = ep.Host
