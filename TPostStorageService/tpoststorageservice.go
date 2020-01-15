@@ -69,11 +69,11 @@ func (m *tpoststorageservice) GetListDatas(listkey []int64) ([]*TPostStorageServ
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	defer client.BackToPool()
 	r, err := client.Client.(*TPostStorageService.TPostStorageServiceClient).GetListDatas(context.Background(), tlistkeys)
 	if err != nil {
 		return nil, errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
+	defer client.BackToPool()
 	if r.ListDatas == nil || len(r.ListDatas) == 0 {
 		return nil, errors.New("Backend service:" + m.sid + " list key not found")
 	}

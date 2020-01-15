@@ -23,6 +23,7 @@ func (m *pubprofileclient) GetProfileByUID(uid int64) (r *pubprofile.ProfileData
 	if err != nil {
 		return nil, errors.New("Backend service err:" + err.Error())
 	}
+
 	defer client.BackToPool()
 
 	return r, nil
