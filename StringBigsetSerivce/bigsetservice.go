@@ -71,7 +71,7 @@ func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, start
 		return nil, -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 	
-	r, err = client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(context.Background(), bskey, startKey, endKey)
+	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(context.Background(), bskey, startKey, endKey)
 	if err != nil{
 		return nil, -1, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
@@ -84,13 +84,13 @@ func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, start
 		if end > int64(len(r.Items.Items)) {
 			end = int64(len(r.Items.Items))
 		}
-		total = int64(len(r.Items.Items))
+		total := int64(len(r.Items.Items))
 		r.Items.Items = r.Items.Items[begin:end]
 
 		return r.Items.Items, total, nil
 	}
 
-	return
+	return nil, 0, nil
 }
 
 func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generic.TItemKey) (*generic.TItem, error) {
