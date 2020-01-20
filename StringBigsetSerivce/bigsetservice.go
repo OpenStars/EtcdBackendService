@@ -63,6 +63,36 @@ func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey ge
 	return rs.Items.Items, nil
 }
 
+// BsRangeQueryByPage get >= startkey && <= endkey có chia page theo begin and end
+func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, startKey, endKey generic.TItemKey, begin, end int64) ([]*generic.TItem, int64, error) {
+	client := transports.GetBsGenericClient(m.host, m.port)
+
+	if client == nil || client.Client == nil {
+		return nil, -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	
+	r, err = client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(context.Background(), bskey, startKey, endKey)
+	if err != nil{
+		return nil, -1, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+	}
+	defer client.BackToPool()
+
+	if r.Items != nil && r.Items.Items != nil && len(r.Items.Items) > 0 { // pagination
+		if begin < 0 {
+			begin = 0
+		}
+		if end > int64(len(r.Items.Items)) {
+			end = int64(len(r.Items.Items))
+		}
+		total = int64(len(r.Items.Items))
+		r.Items.Items = r.Items.Items[begin:end]
+
+		return r.Items.Items, total, nil
+	}
+
+	return
+}
+
 func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generic.TItemKey) (*generic.TItem, error) {
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
