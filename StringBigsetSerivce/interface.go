@@ -5,6 +5,8 @@ import (
 )
 
 type StringBigsetServiceIf interface {
+	TotalStringKeyCount() (r int64, err error)
+	GetListKey(fromIndex int64, count int32) ([]string, error)
 	BsPutItem(bskey generic.TStringKey, item *generic.TItem) error
 	BsGetItem(bskey generic.TStringKey, itemkey generic.TItemKey) (*generic.TItem, error)
 	GetTotalCount(bskey generic.TStringKey) (int64, error)

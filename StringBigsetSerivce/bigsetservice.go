@@ -22,13 +22,48 @@ type StringBigsetService struct {
 	epm  GoEndpointBackendManager.EndPointManagerIf
 }
 
+func (m *StringBigsetService) TotalStringKeyCount() (r int64, err error) {
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return 0, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	r, err = client.Client.(*generic.TStringBigSetKVServiceClient).TotalStringKeyCount(context.Background())
+
+	if err != nil {
+		// client = transports.NewGetBsGenericClient(m.host, m.port)
+		return 0, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+	}
+	defer client.BackToPool()
+
+	return r, nil
+}
+
+func (m *StringBigsetService) GetListKey(fromIndex int64, count int32) ([]string, error) {
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetListKey(context.Background(), fromIndex, count)
+
+	if err != nil {
+		// client = transports.NewGetBsGenericClient(m.host, m.port)
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+	}
+	defer client.BackToPool()
+
+	var listKey []string
+	for _, item := range r {
+		listKey = append(listKey, string(item))
+	}
+	return listKey, nil
+}
+
 func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.TItem) error {
 
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
 	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsPutItem(context.Background(), bskey, item)
 
 	if err != nil {
@@ -70,9 +105,9 @@ func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, start
 	if client == nil || client.Client == nil {
 		return nil, -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	
+
 	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(context.Background(), bskey, startKey, endKey)
-	if err != nil{
+	if err != nil {
 		return nil, -1, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	defer client.BackToPool()
