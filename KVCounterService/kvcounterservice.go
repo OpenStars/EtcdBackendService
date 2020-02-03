@@ -27,13 +27,28 @@ func (m *KVCounterService) GetValue(genname string) (int64, error) {
 	}
 
 	r, err := client.Client.(*KVStepCounter.KVStepCounterServiceClient).GetValue(context.Background(), genname)
-
 	if err != nil {
 		return -1, errors.New("KVCounterService: " + m.sid + " error: " + err.Error())
 	}
 	defer client.BackToPool()
 	return r, nil
 
+}
+
+func (m *KVCounterService) GetCurrentValue(genname string) (int64, error) {
+
+	client := transports.GetKVCounterCompactClient(m.host, m.port)
+
+	if client == nil || client.Client == nil {
+		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+
+	r, err := client.Client.(*KVStepCounter.KVStepCounterServiceClient).GetCurrentValue(context.Background(), genname)
+	if err != nil {
+		return -1, errors.New("KVCounterService: " + m.sid + " error: " + err.Error())
+	}
+	defer client.BackToPool()
+	return r, nil
 }
 
 func (m *KVCounterService) GetStepValue(genname string, step int64) (int64, error) {
