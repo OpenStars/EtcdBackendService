@@ -1,4 +1,4 @@
-package StringBigsetSerivce
+package StringBigsetService
 
 import (
 	"github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"

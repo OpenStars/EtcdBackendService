@@ -1,4 +1,4 @@
-package StringBigsetSerivce
+package StringBigsetService
 
 import (
 	"context"
