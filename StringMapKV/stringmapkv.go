@@ -53,14 +53,15 @@ func (m *stringMapKV) PutData(key, value string) error {
 }
 
 func (m *stringMapKV) DeleteKey(key string) error {
-	client := transports.GetStringMapKVServiceCompactClient(m.host, m.port)
-	if client == nil || client.Client == nil {
-		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
-	}
+	return nil
+	// client := transports.GetStringMapKVServiceCompactClient(m.host, m.port)
+	// if client == nil || client.Client == nil {
+	// 	return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	// }
 
-	_, err := client.Client.(*StringMapKV.StringMapKVServiceClient).DeleteData(context.Background(), StringMapKV.TKey(key))
-	defer client.BackToPool()
-	return err
+	// _, err := client.Client.(*StringMapKV.StringMapKVServiceClient).DeleteData(context.Background(), StringMapKV.TKey(key))
+	// defer client.BackToPool()
+	// return err
 }
 
 func (m *stringMapKV) handlerEventChangeEndpoint(ep *GoEndpointBackendManager.EndPoint) {
