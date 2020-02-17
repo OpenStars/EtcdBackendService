@@ -5,9 +5,9 @@ import (
 	"errors"
 	"log"
 
+	"github.com/OpenStars/EtcdBackendService/SimpleSessionService/simplesession/thrift/gen-go/simplesession"
+	"github.com/OpenStars/EtcdBackendService/SimpleSessionService/simplesession/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
-	"github.com/OpenStars/backendclients/go/simplesession/thrift/gen-go/simplesession"
-	"github.com/OpenStars/backendclients/go/simplesession/transports"
 )
 
 type simpleSessionClient struct {

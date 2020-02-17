@@ -3,7 +3,7 @@ package transports
 import (
 	"github.com/apache/thrift/lib/go/thrift"
 
-	ss "github.com/OpenStars/backendclients/go/simplesession/thrift/gen-go/simplesession"
+	ss "github.com/OpenStars/EtcdBackendService/SimpleSessionService/simplesession/thrift/gen-go/simplesession"
 	thriftpool "github.com/OpenStars/thriftpoolv2"
 )
 
