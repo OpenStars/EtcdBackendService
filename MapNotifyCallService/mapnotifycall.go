@@ -5,9 +5,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/OpenStars/backendclients/go/mapnoitfycall/thrift/gen-go/OpenStars/Common/MapNotifyCallKV"
-	"github.com/OpenStars/backendclients/go/mapnoitfycall/transports"
-
+	"github.com/OpenStars/EtcdBackendService/MapNotifyCallService/mapnoitfycall/thrift/gen-go/OpenStars/Common/MapNotifyCallKV"
+	"github.com/OpenStars/EtcdBackendService/MapNotifyCallService/mapnoitfycall/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 

@@ -1,8 +1,6 @@
 package TMediaStorageService
 
-import (
-	"github.com/OpenStars/backendclients/go/tmediastorageservice/thrift/gen-go/OpenStars/Common/TMediaStorageService"
-)
+import "github.com/OpenStars/EtcdBackendService/TMediaStorageService/tmediastorageservice/thrift/gen-go/OpenStars/Common/TMediaStorageService"
 
 type TMediaStorageServiceIf interface {
 	GetData(idmedia int64) (*TMediaStorageService.TMediaItem, error)

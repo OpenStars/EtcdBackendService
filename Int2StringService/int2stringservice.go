@@ -5,9 +5,9 @@ import (
 	"errors"
 	"log"
 
+	"github.com/OpenStars/EtcdBackendService/Int2StringService/i2skv/thrift/gen-go/OpenStars/Common/I2SKV"
+	"github.com/OpenStars/EtcdBackendService/Int2StringService/i2skv/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
-	"github.com/OpenStars/backendclients/go/i2skv/thrift/gen-go/OpenStars/Common/I2SKV"
-	"github.com/OpenStars/backendclients/go/i2skv/transports"
 )
 
 type Int2StringService struct {

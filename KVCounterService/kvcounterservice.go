@@ -5,9 +5,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/OpenStars/backendclients/go/kvcounter/thrift/gen-go/OpenStars/Counters/KVStepCounter"
-	"github.com/OpenStars/backendclients/go/kvcounter/transports"
-
+	"github.com/OpenStars/EtcdBackendService/KVCounterService/kvcounter/thrift/gen-go/OpenStars/Counters/KVStepCounter"
+	"github.com/OpenStars/EtcdBackendService/KVCounterService/kvcounter/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 

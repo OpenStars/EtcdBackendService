@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	"github.com/OpenStars/backendclients/go/bigset/transports"
@@ -27,7 +28,9 @@ func (m *StringBigsetService) TotalStringKeyCount() (r int64, err error) {
 	if client == nil || client.Client == nil {
 		return 0, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	r, err = client.Client.(*generic.TStringBigSetKVServiceClient).TotalStringKeyCount(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	r, err = client.Client.(*generic.TStringBigSetKVServiceClient).TotalStringKeyCount(ctx)
 
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
@@ -43,7 +46,9 @@ func (m *StringBigsetService) GetListKey(fromIndex int64, count int32) ([]string
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetListKey(context.Background(), fromIndex, count)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetListKey(ctx, fromIndex, count)
 
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
@@ -64,7 +69,9 @@ func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsPutItem(context.Background(), bskey, item)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsPutItem(ctx, bskey, item)
 
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
@@ -84,8 +91,9 @@ func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey ge
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(context.Background(), bskey, startKey, endKey)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(ctx, bskey, startKey, endKey)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
@@ -105,8 +113,9 @@ func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, start
 	if client == nil || client.Client == nil {
 		return nil, -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(context.Background(), bskey, startKey, endKey)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRangeQuery(ctx, bskey, startKey, endKey)
 	if err != nil {
 		return nil, -1, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
@@ -133,8 +142,9 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetItem(context.Background(), bskey, itemkey)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetItem(ctx, bskey, itemkey)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -151,8 +161,9 @@ func (m *StringBigsetService) GetTotalCount(bskey generic.TStringKey) (int64, er
 	if client == nil || client.Client == nil {
 		return 0, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetTotalCount(context.Background(), bskey)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetTotalCount(ctx, bskey)
 
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
@@ -172,8 +183,9 @@ func (m *StringBigsetService) GetBigSetInfoByName(bskey generic.TStringKey) (*ge
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetBigSetInfoByName(context.Background(), bskey)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).GetBigSetInfoByName(ctx, bskey)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -192,8 +204,9 @@ func (m *StringBigsetService) RemoveAll(bskey generic.TStringKey) error {
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).RemoveAll(context.Background(), bskey)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).RemoveAll(ctx, bskey)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -207,8 +220,9 @@ func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*gen
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).CreateStringBigSet(context.Background(), bskey)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).CreateStringBigSet(ctx, bskey)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -226,8 +240,9 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSlice(context.Background(), bskey, fromPos, count)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSlice(ctx, bskey, fromPos, count)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
@@ -248,8 +263,9 @@ func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int3
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSliceR(context.Background(), bskey, fromPos, count)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSliceR(ctx, bskey, fromPos, count)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
@@ -270,8 +286,9 @@ func (m *StringBigsetService) BsRemoveItem(bskey generic.TStringKey, itemkey gen
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	ok, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRemoveItem(context.Background(), bskey, itemkey)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	ok, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRemoveItem(ctx, bskey, itemkey)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
@@ -292,7 +309,9 @@ func (m *StringBigsetService) BsMultiPut(bskey generic.TStringKey, lsItems []*ge
 	itemset := &generic.TItemSet{
 		Items: lsItems,
 	}
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsMultiPut(context.Background(), bskey, itemset, false, false)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsMultiPut(ctx, bskey, itemset, false, false)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
@@ -309,8 +328,9 @@ func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromK
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSliceFromItem(context.Background(), bskey, fromKey, count)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSliceFromItem(ctx, bskey, fromKey, count)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
@@ -330,8 +350,9 @@ func (m *StringBigsetService) BsGetSliceFromItemR(bskey generic.TStringKey, from
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
-
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSliceFromItemR(context.Background(), bskey, fromKey, count)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsGetSliceFromItemR(ctx, bskey, fromKey, count)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())

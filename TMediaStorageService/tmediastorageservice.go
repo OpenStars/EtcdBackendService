@@ -5,9 +5,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/OpenStars/backendclients/go/tmediastorageservice/thrift/gen-go/OpenStars/Common/TMediaStorageService"
-	"github.com/OpenStars/backendclients/go/tmediastorageservice/transports"
-
+	"github.com/OpenStars/EtcdBackendService/TMediaStorageService/tmediastorageservice/thrift/gen-go/OpenStars/Common/TMediaStorageService"
+	"github.com/OpenStars/EtcdBackendService/TMediaStorageService/tmediastorageservice/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 

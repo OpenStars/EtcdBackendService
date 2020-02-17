@@ -14,11 +14,13 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/OpenStars/EtcdBackendService/TReportStorageService/treportstorageservice/thrift/gen-go/OpenStars/Common/TReportStorageService"
+
 	"github.com/OpenStars/Common"
+	"github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 	bs "github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
-	"github.com/OpenStars/backendclients/go/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
-	"github.com/OpenStars/backendclients/go/treportstorageservice/thrift/gen-go/OpenStars/Common/TReportStorageService"
+
 	thriftpool "github.com/OpenStars/thriftpoolv2"
 
 	transportBigset "github.com/OpenStars/backendclients/go/bigset/transports"

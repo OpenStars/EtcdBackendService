@@ -1,6 +1,6 @@
 package Int64BigsetService
 
-import "github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
+import "github.com/OpenStars/EtcdBackendService/Int64BigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 
 type Int64BigsetServiceIf interface {
 	PutItem(bskey generic.TKey, item *generic.TItem) error

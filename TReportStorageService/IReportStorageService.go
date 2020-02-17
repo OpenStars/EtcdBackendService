@@ -9,8 +9,8 @@
 package TReportStorageService
 
 import (
-	"github.com/OpenStars/backendclients/go/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
-	"github.com/OpenStars/backendclients/go/treportstorageservice/thrift/gen-go/OpenStars/Common/TReportStorageService"
+	"github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
+	"github.com/OpenStars/EtcdBackendService/TReportStorageService/treportstorageservice/thrift/gen-go/OpenStars/Common/TReportStorageService"
 )
 
 type IReportStorageService interface {
