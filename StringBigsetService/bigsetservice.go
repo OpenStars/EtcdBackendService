@@ -7,9 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
-	"github.com/OpenStars/backendclients/go/bigset/transports"
-
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 

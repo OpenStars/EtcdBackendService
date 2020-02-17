@@ -5,7 +5,7 @@ import (
 
 	"fmt"
 
-	"github.com/OpenStars/backendclients/go/tcommentstorageservice/thrift/gen-go/OpenStars/Common/TCommentStorageService"
+	"github.com/OpenStars/EtcdBackendService/TCommentStorageService/tcommentstorageservice/thrift/gen-go/OpenStars/Common/TCommentStorageService"
 	"github.com/OpenStars/thriftpoolv2"
 	"github.com/apache/thrift/lib/go/thrift"
 )

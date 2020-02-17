@@ -1,6 +1,6 @@
 package TCommentStorageService
 
-import "github.com/OpenStars/backendclients/go/tcommentstorageservice/thrift/gen-go/OpenStars/Common/TCommentStorageService"
+import "github.com/OpenStars/EtcdBackendService/TCommentStorageService/tcommentstorageservice/thrift/gen-go/OpenStars/Common/TCommentStorageService"
 
 type TCommentStorageServiceIf interface {
 	GetData(idcomment int64) (*TCommentStorageService.TCommentItem, error)
