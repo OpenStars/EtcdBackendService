@@ -3,7 +3,7 @@ package transports
 import (
 	"log"
 
-	"github.com/OpenStars/backendclients/go/tpubprofileservice/thrift/gen-go/openstars/pubprofile"
+	"github.com/OpenStars/EtcdBackendService/tpubprofileservice/thrift/gen-go/openstars/pubprofile"
 
 	"github.com/OpenStars/thriftpoolv2"
 	"github.com/apache/thrift/lib/go/thrift"

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/OpenStars/backendclients/go/tpubprofileservice/thrift/gen-go/openstars/pubprofile"
-	"github.com/OpenStars/backendclients/go/tpubprofileservice/transports"
+	"github.com/OpenStars/EtcdBackendService/tpubprofileservice/thrift/gen-go/openstars/pubprofile"
+	"github.com/OpenStars/EtcdBackendService/tpubprofileservice/transports"
 )
 
 type pubprofileclient struct {

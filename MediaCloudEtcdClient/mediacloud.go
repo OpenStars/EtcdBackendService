@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/OpenStars/backendclients/go/tmediacloudservice/thrift/gen-go/openstars/mcloud"
-	_ "github.com/OpenStars/backendclients/go/tmediacloudservice/thrift/gen-go/openstars/mcloud"
-	"github.com/OpenStars/backendclients/go/tmediacloudservice/transports"
+	"github.com/OpenStars/EtcdBackendService/MediaCloudEtcdClient/tmediacloudservice/thrift/gen-go/openstars/mcloud"
+
+	"github.com/OpenStars/EtcdBackendService/MediaCloudEtcdClient/tmediacloudservice/transports"
 )
 
 type mediacloudclient struct {

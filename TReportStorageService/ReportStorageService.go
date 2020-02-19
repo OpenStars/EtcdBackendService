@@ -9,6 +9,13 @@
 package TReportStorageService
 
 import (
+	bs "github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
+	transportBigset "github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/transports"
+	transportPostService "github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/transports"
+
+	// transportPostService "github.com/backendclients/go/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
+
+	// "github.com/OpenStars/EtcdBackendService/Int64BigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	"context"
 	"errors"
 	"fmt"
@@ -18,13 +25,13 @@ import (
 
 	"github.com/OpenStars/Common"
 	"github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
+
+	// transportPostService "github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
-	bs "github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
 
 	thriftpool "github.com/OpenStars/thriftpoolv2"
-
-	transportBigset "github.com/OpenStars/backendclients/go/bigset/transports"
-	transportPostService "github.com/OpenStars/backendclients/go/tpoststorageservice/transports"
+	// transportBigset "github.com/OpenStars/backendclients/go/bigset/transports"
+	// transportPostService "github.com/OpenStars/backendclients/go/tpoststorageservice/transports"
 )
 
 type reportStorageService struct {
