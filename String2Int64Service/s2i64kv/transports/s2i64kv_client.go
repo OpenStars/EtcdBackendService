@@ -5,7 +5,7 @@ import (
 
 	"github.com/apache/thrift/lib/go/thrift"
 
-	"github.com/OpenStars/backendclients/go/s2i64kv/thrift/gen-go/OpenStars/Common/S2I64KV"
+	"github.com/OpenStars/EtcdBackendService/String2Int64Service/s2i64kv/thrift/gen-go/OpenStars/Common/S2I64KV"
 	thriftpool "github.com/OpenStars/thriftpoolv2"
 )
 
