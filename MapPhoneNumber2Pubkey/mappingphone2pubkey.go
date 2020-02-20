@@ -5,10 +5,9 @@ import (
 	"errors"
 	"log"
 
+	"github.com/OpenStars/EtcdBackendService/MapPhoneNumber2Pubkey/mapphone2pubkey/thrift/gen-go/OpenStars/Common/MapPhoneNumberPubkeyKV"
+	"github.com/OpenStars/EtcdBackendService/MapPhoneNumber2Pubkey/mapphone2pubkey/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
-	"github.com/OpenStars/backendclients/go/mapphone2pubkey/thrift/gen-go/OpenStars/Common/MapPhoneNumberPubkeyKV"
-
-	"github.com/OpenStars/backendclients/go/mapphone2pubkey/transports"
 )
 
 type MappingPhone2PubkeyServiceModel struct {
