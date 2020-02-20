@@ -5,9 +5,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/OpenStars/backendclients/go/s2i64kv/thrift/gen-go/OpenStars/Common/S2I64KV"
-	"github.com/OpenStars/backendclients/go/s2i64kv/transports"
-
+	"github.com/OpenStars/EtcdBackendService/String2Int64Service/s2i64kv/thrift/gen-go/OpenStars/Common/S2I64KV"
+	"github.com/OpenStars/EtcdBackendService/String2Int64Service/s2i64kv/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
