@@ -1,7 +1,7 @@
 package transports
 
 import (
-	"github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
+	"github.com/OpenStars/EtcdBackendService/Int64BigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	thriftpool "github.com/OpenStars/thriftpoolv2"
 	"github.com/apache/thrift/lib/go/thrift"
 )
