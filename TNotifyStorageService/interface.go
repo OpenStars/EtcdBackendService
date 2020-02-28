@@ -1,6 +1,8 @@
 package TNotifyStorageService
 
-import "github.com/OpenStars/backendclients/go/tnotifystorageservice/thrift/gen-go/OpenStars/Common/TNotifyStorageService"
+import (
+	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService/tnotifystorageservice/thrift/gen-go/OpenStars/Common/TNotifyStorageService"
+)
 
 type TNotifyStorageServiceIf interface {
 	GetData(idnotify int64) (*TNotifyStorageService.TNotifyItem, error)

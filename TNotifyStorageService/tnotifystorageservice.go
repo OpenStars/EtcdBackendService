@@ -5,10 +5,9 @@ import (
 	"errors"
 	"log"
 
-	"github.com/OpenStars/backendclients/go/tnotifystorageservice/thrift/gen-go/OpenStars/Common/TNotifyStorageService"
-	"github.com/OpenStars/backendclients/go/tnotifystorageservice/transports"
-	"github.com/OpenStars/backendclients/go/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
-
+	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService/tnotifystorageservice/thrift/gen-go/OpenStars/Common/TNotifyStorageService"
+	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService/tnotifystorageservice/transports"
+	"github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
