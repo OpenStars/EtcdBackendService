@@ -19,11 +19,28 @@ struct ProfileData {
   16: map<string,string> extend;
   17: list<string> image;
   18:i64 lastModified;
+}
 
+enum TErrorCode {
+    EGood = 0,
+    ENotFound = -1,
+    EUnknown = -2 ,
+    EDataExisted = -3,
+    EFailed = -4
+}
+
+struct TErrorCodeResult {
+    1:i64 ecode
+    2:string message
+}
+
+struct ResponseProfile {
+  1:ProfileData profileData;
+  2:TErrorCodeResult errorData;
 }
 
 service PubProfileService {
-  ProfileData GetProfileByPubkey(1:string pubkey);
-	ProfileData GetProfileByUID(1: i64 uid);
+  ResponseProfile GetProfileByPubkey(1:string pubkey);
+	ResponseProfile GetProfileByUID(1: i64 uid);
 }
 

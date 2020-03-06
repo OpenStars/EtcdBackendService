@@ -7,6 +7,8 @@ import(
 	"bytes"
 	"context"
 	"reflect"
+	"database/sql/driver"
+	"errors"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
 )
@@ -18,6 +20,68 @@ var _ = context.Background
 var _ = reflect.DeepEqual
 var _ = bytes.Equal
 
+type TErrorCode int64
+const (
+  TErrorCode_EGood TErrorCode = 0
+  TErrorCode_ENotFound TErrorCode = -1
+  TErrorCode_EUnknown TErrorCode = -2
+  TErrorCode_EDataExisted TErrorCode = -3
+  TErrorCode_EFailed TErrorCode = -4
+)
+
+func (p TErrorCode) String() string {
+  switch p {
+  case TErrorCode_EGood: return "EGood"
+  case TErrorCode_ENotFound: return "ENotFound"
+  case TErrorCode_EUnknown: return "EUnknown"
+  case TErrorCode_EDataExisted: return "EDataExisted"
+  case TErrorCode_EFailed: return "EFailed"
+  }
+  return "<UNSET>"
+}
+
+func TErrorCodeFromString(s string) (TErrorCode, error) {
+  switch s {
+  case "EGood": return TErrorCode_EGood, nil 
+  case "ENotFound": return TErrorCode_ENotFound, nil 
+  case "EUnknown": return TErrorCode_EUnknown, nil 
+  case "EDataExisted": return TErrorCode_EDataExisted, nil 
+  case "EFailed": return TErrorCode_EFailed, nil 
+  }
+  return TErrorCode(0), fmt.Errorf("not a valid TErrorCode string")
+}
+
+
+func TErrorCodePtr(v TErrorCode) *TErrorCode { return &v }
+
+func (p TErrorCode) MarshalText() ([]byte, error) {
+return []byte(p.String()), nil
+}
+
+func (p *TErrorCode) UnmarshalText(text []byte) error {
+q, err := TErrorCodeFromString(string(text))
+if (err != nil) {
+return err
+}
+*p = q
+return nil
+}
+
+func (p *TErrorCode) Scan(value interface{}) error {
+v, ok := value.(int64)
+if !ok {
+return errors.New("Scan value is not int64")
+}
+*p = TErrorCode(v)
+return nil
+}
+
+func (p * TErrorCode) Value() (driver.Value, error) {
+  if p == nil {
+    return nil, nil
+  }
+return int64(*p), nil
+}
 // Attributes:
 //  - Pubkey
 //  - DisplayName
@@ -771,13 +835,281 @@ func (p *ProfileData) String() string {
   return fmt.Sprintf("ProfileData(%+v)", *p)
 }
 
+// Attributes:
+//  - Ecode
+//  - Message
+type TErrorCodeResult_ struct {
+  Ecode int64 `thrift:"ecode,1" db:"ecode" json:"ecode"`
+  Message string `thrift:"message,2" db:"message" json:"message"`
+}
+
+func NewTErrorCodeResult_() *TErrorCodeResult_ {
+  return &TErrorCodeResult_{}
+}
+
+
+func (p *TErrorCodeResult_) GetEcode() int64 {
+  return p.Ecode
+}
+
+func (p *TErrorCodeResult_) GetMessage() string {
+  return p.Message
+}
+func (p *TErrorCodeResult_) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 1:
+      if fieldTypeId == thrift.I64 {
+        if err := p.ReadField1(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 2:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField2(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *TErrorCodeResult_)  ReadField1(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadI64(); err != nil {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.Ecode = v
+}
+  return nil
+}
+
+func (p *TErrorCodeResult_)  ReadField2(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Message = v
+}
+  return nil
+}
+
+func (p *TErrorCodeResult_) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("TErrorCodeResult"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField1(oprot); err != nil { return err }
+    if err := p.writeField2(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *TErrorCodeResult_) writeField1(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("ecode", thrift.I64, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:ecode: ", p), err) }
+  if err := oprot.WriteI64(int64(p.Ecode)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.ecode (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:ecode: ", p), err) }
+  return err
+}
+
+func (p *TErrorCodeResult_) writeField2(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("message", thrift.STRING, 2); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:message: ", p), err) }
+  if err := oprot.WriteString(string(p.Message)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.message (2) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:message: ", p), err) }
+  return err
+}
+
+func (p *TErrorCodeResult_) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("TErrorCodeResult_(%+v)", *p)
+}
+
+// Attributes:
+//  - ProfileData
+//  - ErrorData
+type ResponseProfile struct {
+  ProfileData *ProfileData `thrift:"profileData,1" db:"profileData" json:"profileData"`
+  ErrorData *TErrorCodeResult_ `thrift:"errorData,2" db:"errorData" json:"errorData"`
+}
+
+func NewResponseProfile() *ResponseProfile {
+  return &ResponseProfile{}
+}
+
+var ResponseProfile_ProfileData_DEFAULT *ProfileData
+func (p *ResponseProfile) GetProfileData() *ProfileData {
+  if !p.IsSetProfileData() {
+    return ResponseProfile_ProfileData_DEFAULT
+  }
+return p.ProfileData
+}
+var ResponseProfile_ErrorData_DEFAULT *TErrorCodeResult_
+func (p *ResponseProfile) GetErrorData() *TErrorCodeResult_ {
+  if !p.IsSetErrorData() {
+    return ResponseProfile_ErrorData_DEFAULT
+  }
+return p.ErrorData
+}
+func (p *ResponseProfile) IsSetProfileData() bool {
+  return p.ProfileData != nil
+}
+
+func (p *ResponseProfile) IsSetErrorData() bool {
+  return p.ErrorData != nil
+}
+
+func (p *ResponseProfile) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 1:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField1(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 2:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField2(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *ResponseProfile)  ReadField1(iprot thrift.TProtocol) error {
+  p.ProfileData = &ProfileData{}
+  if err := p.ProfileData.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.ProfileData), err)
+  }
+  return nil
+}
+
+func (p *ResponseProfile)  ReadField2(iprot thrift.TProtocol) error {
+  p.ErrorData = &TErrorCodeResult_{}
+  if err := p.ErrorData.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.ErrorData), err)
+  }
+  return nil
+}
+
+func (p *ResponseProfile) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("ResponseProfile"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField1(oprot); err != nil { return err }
+    if err := p.writeField2(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *ResponseProfile) writeField1(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("profileData", thrift.STRUCT, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:profileData: ", p), err) }
+  if err := p.ProfileData.Write(oprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ProfileData), err)
+  }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:profileData: ", p), err) }
+  return err
+}
+
+func (p *ResponseProfile) writeField2(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("errorData", thrift.STRUCT, 2); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:errorData: ", p), err) }
+  if err := p.ErrorData.Write(oprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ErrorData), err)
+  }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:errorData: ", p), err) }
+  return err
+}
+
+func (p *ResponseProfile) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("ResponseProfile(%+v)", *p)
+}
+
 type PubProfileService interface {
   // Parameters:
   //  - Pubkey
-  GetProfileByPubkey(ctx context.Context, pubkey string) (r *ProfileData, err error)
+  GetProfileByPubkey(ctx context.Context, pubkey string) (r *ResponseProfile, err error)
   // Parameters:
   //  - UID
-  GetProfileByUID(ctx context.Context, uid int64) (r *ProfileData, err error)
+  GetProfileByUID(ctx context.Context, uid int64) (r *ResponseProfile, err error)
 }
 
 type PubProfileServiceClient struct {
@@ -807,7 +1139,7 @@ func (p *PubProfileServiceClient) Client_() thrift.TClient {
 }
 // Parameters:
 //  - Pubkey
-func (p *PubProfileServiceClient) GetProfileByPubkey(ctx context.Context, pubkey string) (r *ProfileData, err error) {
+func (p *PubProfileServiceClient) GetProfileByPubkey(ctx context.Context, pubkey string) (r *ResponseProfile, err error) {
   var _args3 PubProfileServiceGetProfileByPubkeyArgs
   _args3.Pubkey = pubkey
   var _result4 PubProfileServiceGetProfileByPubkeyResult
@@ -819,7 +1151,7 @@ func (p *PubProfileServiceClient) GetProfileByPubkey(ctx context.Context, pubkey
 
 // Parameters:
 //  - UID
-func (p *PubProfileServiceClient) GetProfileByUID(ctx context.Context, uid int64) (r *ProfileData, err error) {
+func (p *PubProfileServiceClient) GetProfileByUID(ctx context.Context, uid int64) (r *ResponseProfile, err error) {
   var _args5 PubProfileServiceGetProfileByUIDArgs
   _args5.UID = uid
   var _result6 PubProfileServiceGetProfileByUIDResult
@@ -890,7 +1222,7 @@ func (p *pubProfileServiceProcessorGetProfileByPubkey) Process(ctx context.Conte
 
   iprot.ReadMessageEnd()
   result := PubProfileServiceGetProfileByPubkeyResult{}
-var retval *ProfileData
+var retval *ResponseProfile
   var err2 error
   if retval, err2 = p.handler.GetProfileByPubkey(ctx, args.Pubkey); err2 != nil {
     x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetProfileByPubkey: " + err2.Error())
@@ -938,7 +1270,7 @@ func (p *pubProfileServiceProcessorGetProfileByUID) Process(ctx context.Context,
 
   iprot.ReadMessageEnd()
   result := PubProfileServiceGetProfileByUIDResult{}
-var retval *ProfileData
+var retval *ResponseProfile
   var err2 error
   if retval, err2 = p.handler.GetProfileByUID(ctx, args.UID); err2 != nil {
     x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetProfileByUID: " + err2.Error())
@@ -1065,15 +1397,15 @@ func (p *PubProfileServiceGetProfileByPubkeyArgs) String() string {
 // Attributes:
 //  - Success
 type PubProfileServiceGetProfileByPubkeyResult struct {
-  Success *ProfileData `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *ResponseProfile `thrift:"success,0" db:"success" json:"success,omitempty"`
 }
 
 func NewPubProfileServiceGetProfileByPubkeyResult() *PubProfileServiceGetProfileByPubkeyResult {
   return &PubProfileServiceGetProfileByPubkeyResult{}
 }
 
-var PubProfileServiceGetProfileByPubkeyResult_Success_DEFAULT *ProfileData
-func (p *PubProfileServiceGetProfileByPubkeyResult) GetSuccess() *ProfileData {
+var PubProfileServiceGetProfileByPubkeyResult_Success_DEFAULT *ResponseProfile
+func (p *PubProfileServiceGetProfileByPubkeyResult) GetSuccess() *ResponseProfile {
   if !p.IsSetSuccess() {
     return PubProfileServiceGetProfileByPubkeyResult_Success_DEFAULT
   }
@@ -1122,7 +1454,7 @@ func (p *PubProfileServiceGetProfileByPubkeyResult) Read(iprot thrift.TProtocol)
 }
 
 func (p *PubProfileServiceGetProfileByPubkeyResult)  ReadField0(iprot thrift.TProtocol) error {
-  p.Success = &ProfileData{}
+  p.Success = &ResponseProfile{}
   if err := p.Success.Read(iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
   }
@@ -1256,15 +1588,15 @@ func (p *PubProfileServiceGetProfileByUIDArgs) String() string {
 // Attributes:
 //  - Success
 type PubProfileServiceGetProfileByUIDResult struct {
-  Success *ProfileData `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *ResponseProfile `thrift:"success,0" db:"success" json:"success,omitempty"`
 }
 
 func NewPubProfileServiceGetProfileByUIDResult() *PubProfileServiceGetProfileByUIDResult {
   return &PubProfileServiceGetProfileByUIDResult{}
 }
 
-var PubProfileServiceGetProfileByUIDResult_Success_DEFAULT *ProfileData
-func (p *PubProfileServiceGetProfileByUIDResult) GetSuccess() *ProfileData {
+var PubProfileServiceGetProfileByUIDResult_Success_DEFAULT *ResponseProfile
+func (p *PubProfileServiceGetProfileByUIDResult) GetSuccess() *ResponseProfile {
   if !p.IsSetSuccess() {
     return PubProfileServiceGetProfileByUIDResult_Success_DEFAULT
   }
@@ -1313,7 +1645,7 @@ func (p *PubProfileServiceGetProfileByUIDResult) Read(iprot thrift.TProtocol) er
 }
 
 func (p *PubProfileServiceGetProfileByUIDResult)  ReadField0(iprot thrift.TProtocol) error {
-  p.Success = &ProfileData{}
+  p.Success = &ResponseProfile{}
   if err := p.Success.Read(iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
   }
