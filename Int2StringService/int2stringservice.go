@@ -19,6 +19,7 @@ type Int2StringService struct {
 
 func (m *Int2StringService) PutData(key int64, value string) error {
 	client := transports.GetTI2StringServiceCompactClient(m.host, m.port)
+	defer client.BackToPool()
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to model")
 	}
@@ -28,11 +29,11 @@ func (m *Int2StringService) PutData(key int64, value string) error {
 		Value: value,
 	}
 	_, err := client.Client.(*I2SKV.TI2StringServiceClient).PutData(context.Background(), tkey, tvalue)
-
 	if err != nil {
+		client.SetLostConnections()
 		return errors.New("Int2StringService sid:" + m.sid + " addresss: " + m.host + ":" + m.port + " err: " + err.Error())
 	}
-	defer client.BackToPool()
+
 	return nil
 
 }
@@ -42,13 +43,13 @@ func (m *Int2StringService) GetData(key int64) (string, error) {
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
 	}
-
+	defer client.BackToPool()
 	tkey := I2SKV.TKey(key)
 	r, err := client.Client.(*I2SKV.TI2StringServiceClient).GetData(context.Background(), tkey)
 	if err != nil {
+		client.SetLostConnections()
 		return "", errors.New("Int2StringService sid:" + m.sid + " addresss: " + m.host + ":" + m.port + " err: " + err.Error())
 	}
-	defer client.BackToPool()
 
 	if r.Data == nil || r.ErrorCode != I2SKV.TErrorCode_EGood || r.Data.Value == "" {
 		return "", errors.New("Int2StringService sid:" + m.sid + " addresss: " + m.host + ":" + m.port + " err: " + r.ErrorCode.String())

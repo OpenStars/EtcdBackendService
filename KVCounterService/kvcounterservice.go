@@ -20,16 +20,17 @@ type KVCounterService struct {
 func (m *KVCounterService) GetValue(genname string) (int64, error) {
 
 	client := transports.GetKVCounterCompactClient(m.host, m.port)
-
+	defer client.BackToPool()
 	if client == nil || client.Client == nil {
 		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*KVStepCounter.KVStepCounterServiceClient).GetValue(context.Background(), genname)
 	if err != nil {
+		client.SetLostConnections()
 		return -1, errors.New("KVCounterService: " + m.sid + " error: " + err.Error())
 	}
-	defer client.BackToPool()
+
 	return r, nil
 
 }
@@ -37,32 +38,32 @@ func (m *KVCounterService) GetValue(genname string) (int64, error) {
 func (m *KVCounterService) GetCurrentValue(genname string) (int64, error) {
 
 	client := transports.GetKVCounterCompactClient(m.host, m.port)
-
+	defer client.BackToPool()
 	if client == nil || client.Client == nil {
 		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*KVStepCounter.KVStepCounterServiceClient).GetCurrentValue(context.Background(), genname)
 	if err != nil {
+		client.SetLostConnections()
 		return -1, errors.New("KVCounterService: " + m.sid + " error: " + err.Error())
 	}
-	defer client.BackToPool()
 	return r, nil
 }
 
 func (m *KVCounterService) GetStepValue(genname string, step int64) (int64, error) {
 	client := transports.GetKVCounterCompactClient(m.host, m.port)
-
+	defer client.BackToPool()
 	if client == nil || client.Client == nil {
 		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*KVStepCounter.KVStepCounterServiceClient).GetStepValue(context.Background(), genname, step)
 	if err != nil {
+		client.SetLostConnections()
 		// client = transports.NewGetKVCounterCompactClient(m.host, m.port)
 		return -1, errors.New("KVCounterService: " + m.sid + " error: " + err.Error())
 	}
-	defer client.BackToPool()
 
 	return r, nil
 }
@@ -70,15 +71,17 @@ func (m *KVCounterService) GetStepValue(genname string, step int64) (int64, erro
 func (m *KVCounterService) CreateGenerator(genname string) (int32, error) {
 
 	client := transports.GetKVCounterCompactClient(m.host, m.port)
+	defer client.BackToPool()
 	if client == nil || client.Client == nil {
 		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*KVStepCounter.KVStepCounterServiceClient).CreateGenerator(context.Background(), genname)
 	if err != nil {
+		client.SetLostConnections()
 		return -1, errors.New("KVCounterService: " + m.sid + " error: " + err.Error())
 	}
-	defer client.BackToPool()
+
 	return r, nil
 
 }
