@@ -3,6 +3,7 @@ package StringBigsetService
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -138,6 +139,7 @@ func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, start
 
 func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generic.TItemKey) (*generic.TItem, error) {
 	client := transports.GetBsGenericClient(m.host, m.port)
+	fmt.Printf("[BsGetItem] get client host = %s, %s, key = %s, %s \n", m.host, m.port, bskey, itemkey)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}

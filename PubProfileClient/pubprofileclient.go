@@ -19,14 +19,14 @@ func (m *pubprofileclient) GetProfileByUID(uid int64) (r *pubprofile.ProfileData
 		return nil, errors.New("Can not connect to backend service host: " + m.host + " port: " + m.port)
 	}
 
-	r, err = client.Client.(*pubprofile.PubProfileServiceClient).GetProfileByUID(context.Background(), uid)
+	resp, err := client.Client.(*pubprofile.PubProfileServiceClient).GetProfileByUID(context.Background(), uid)
 	if err != nil {
 		return nil, errors.New("Backend service err:" + err.Error())
 	}
 
 	defer client.BackToPool()
 
-	return r, nil
+	return resp.ProfileData, nil
 }
 
 func (m *pubprofileclient) GetProfileByPubkey(pubkey string) (r *pubprofile.ProfileData, err error) {
@@ -35,11 +35,11 @@ func (m *pubprofileclient) GetProfileByPubkey(pubkey string) (r *pubprofile.Prof
 		return nil, errors.New("Can not connect to backend service host: " + m.host + " port: " + m.port)
 	}
 
-	r, err = client.Client.(*pubprofile.PubProfileServiceClient).GetProfileByPubkey(context.Background(), pubkey)
+	resp, err := client.Client.(*pubprofile.PubProfileServiceClient).GetProfileByPubkey(context.Background(), pubkey)
 	if err != nil {
 		return nil, errors.New("Backend service err:" + err.Error())
 	}
 	defer client.BackToPool()
 
-	return r, nil
+	return resp.ProfileData, nil
 }

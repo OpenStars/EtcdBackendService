@@ -23,8 +23,8 @@ func Usage() {
   fmt.Fprintln(os.Stderr, "Usage of ", os.Args[0], " [-h host:port] [-u url] [-f[ramed]] function [arg1 [arg2...]]:")
   flag.PrintDefaults()
   fmt.Fprintln(os.Stderr, "\nFunctions:")
-  fmt.Fprintln(os.Stderr, "  ProfileData GetProfileByPubkey(string pubkey)")
-  fmt.Fprintln(os.Stderr, "  ProfileData GetProfileByUID(i64 uid)")
+  fmt.Fprintln(os.Stderr, "  ResponseProfile GetProfileByPubkey(string pubkey)")
+  fmt.Fprintln(os.Stderr, "  ResponseProfile GetProfileByUID(i64 uid)")
   fmt.Fprintln(os.Stderr)
   os.Exit(0)
 }
