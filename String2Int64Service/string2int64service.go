@@ -48,12 +48,12 @@ func (m *String2Int64Service) GetData(key string) (int64, error) {
 	tkey := S2I64KV.TKey(key)
 	r, err := client.Client.(*S2I64KV.TString2I64KVServiceClient).GetData(context.Background(), tkey)
 	if err != nil {
-
+		client.SetLostConnections()
 		return -1, errors.New("String2Int64Service sid: " + m.sid + " address: " + m.host + ":" + m.port + " err: " + err.Error())
 	}
 
 	if r.Data == nil || r.ErrorCode != S2I64KV.TErrorCode_EGood || r.Data.Value <= 0 {
-		client.SetLostConnections()
+
 		return -1, errors.New("Can not found key")
 	}
 	return r.Data.Value, nil
