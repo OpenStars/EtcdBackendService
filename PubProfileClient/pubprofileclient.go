@@ -3,6 +3,7 @@ package PubProfileClient
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/OpenStars/EtcdBackendService/tpubprofileservice/thrift/gen-go/openstars/pubprofile"
 	"github.com/OpenStars/EtcdBackendService/tpubprofileservice/transports"
@@ -26,7 +27,11 @@ func (m *pubprofileclient) GetProfileByUID(uid int64) (r *pubprofile.ProfileData
 
 	defer client.BackToPool()
 
-	return resp.ProfileData, nil
+	if resp != nil {
+		fmt.Println(resp.ProfileData)
+		return resp.ProfileData, nil
+	}
+	return nil, errors.New("Get data nil")
 }
 
 func (m *pubprofileclient) GetProfileByPubkey(pubkey string) (r *pubprofile.ProfileData, err error) {
@@ -41,5 +46,8 @@ func (m *pubprofileclient) GetProfileByPubkey(pubkey string) (r *pubprofile.Prof
 	}
 	defer client.BackToPool()
 
-	return resp.ProfileData, nil
+	if resp != nil {
+		return resp.ProfileData, nil
+	}
+	return nil, errors.New("Get data nil")
 }
