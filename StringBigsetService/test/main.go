@@ -1,31 +1,39 @@
 package main
 
 import (
+	"TrustKeys/SocialNetworks/Account/UIDService/client"
 	"TrustKeys/SocialNetworks/Centerhub/model/share"
 	"TrustKeys/SocialNetworks/Centerhub/util"
 	"log"
 
-	"github.com/OpenStars/EtcdBackendSerivce/StringBigsetSerivce"
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService"
+
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
-	"github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
 )
 
 func TestSV() {
-	svClient := StringBigsetSerivce.NewStringBigsetServiceModel("/aa/bb", []string{"127.0.0.1:2379"},
+	svClient := StringBigsetService.NewStringBigsetServiceModel("/trustkeys/socialnetwork/newsfeed/stringbs", []string{"10.60.1.20:2379"},
 		GoEndpointBackendManager.EndPoint{
 			Host:      "10.60.68.102",
 			Port:      "20517",
 			ServiceID: "/aa/bb",
 		})
 
-	lsItem, err := svClient.BsGetSlice(generic.TStringKey(share.UIDPostPrefix+util.PadingZerors(911)), 2, 5)
+	uidservice := client.NewUIDServiceClient("10.60.68.103", "12010")
+	uid, err := uidservice.GetUIDByPubkey("02898dd812414d661b7b9c0dee015ef6e3a92c943cfb64e838f14ff093ad9dd93f")
+	if err != nil {
+		log.Println("err ", err)
+		return
+	}
+	lsItem, err := svClient.BsGetSlice(generic.TStringKey(share.NewsFeedPrefix+util.PadingZerors(uid)), 0, 1000)
 	if err != nil {
 		log.Println("err", err)
 		return
 	}
 	// log.Println("total", total)
 	for _, item := range lsItem {
-		log.Println(string(item.Key))
+		log.Println("postID", string(item.Key))
 	}
 
 	// for i := 0; i < 30; i++ {
