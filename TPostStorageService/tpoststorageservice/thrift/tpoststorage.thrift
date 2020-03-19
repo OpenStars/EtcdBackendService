@@ -1,6 +1,6 @@
-namespace cpp OpenStars.Common.TPostStorageService
-namespace go OpenStars.Common.TPostStorageService
-namespace java OpenStars.Common.TPostStorageService
+namespace cpp OpenStars.EtcdBackendService.TPostStorageService
+namespace go OpenStars.EtcdBackendService.TPostStorageService
+namespace java OpenStars.EtcdBackendService.TPostStorageService
 
 typedef i64 TKey
 
