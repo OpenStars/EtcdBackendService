@@ -59,24 +59,24 @@ func (m *String2Int64Service) GetData(key string) (int64, error) {
 	return r.Data.Value, nil
 }
 
-func (m *String2Int64Service) CasData(key string, value int64) (bool, error) {
+func (m *String2Int64Service) CasData(key string, value int64) (sucess bool, oldvalue int64, err error) {
 	client := transports.GetS2I64CompactClient(m.host, m.port)
 	defer client.BackToPool()
 	if client == nil || client.Client == nil {
-		return false, errors.New("Can not connect to model")
+		return false, -1, errors.New("Can not connect to model")
 	}
 
 	var aCas = &S2I64KV.TCasValue{OldValue: 0, NewValue_: value}
 	r, err := client.Client.(*S2I64KV.TString2I64KVServiceClient).CasData(context.Background(), S2I64KV.TKey(key), aCas)
 	if err != nil {
-		return false, errors.New("String2Int64Service sid: " + m.sid + " address: " + m.host + ":" + m.port + " err: " + err.Error())
+		return false, -1, errors.New("String2Int64Service sid: " + m.sid + " address: " + m.host + ":" + m.port + " err: " + err.Error())
 	}
 	defer client.BackToPool()
 
 	if r != nil && r.GetOldValue() == 0 {
-		return true, nil
+		return true, value, nil
 	}
-	return false, nil
+	return false, r.GetOldValue(), nil
 }
 
 func (m *String2Int64Service) handleEventChangeEndpoint(ep *GoEndpointBackendManager.EndPoint) {
