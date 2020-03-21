@@ -19,7 +19,7 @@ type String2Int64Service struct {
 
 func (m *String2Int64Service) PutData(key string, value int64) error {
 	client := transports.GetS2I64CompactClient(m.host, m.port)
-	defer client.BackToPool()
+
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to model")
 	}
@@ -32,9 +32,9 @@ func (m *String2Int64Service) PutData(key string, value int64) error {
 	_, err := client.Client.(*S2I64KV.TString2I64KVServiceClient).PutData(context.Background(), tkey, tvalue)
 
 	if err != nil {
-		client.SetLostConnections()
 		return errors.New("String2Int64Service sid: " + m.sid + " address: " + m.host + ":" + m.port + " err: " + err.Error())
 	}
+	defer client.BackToPool()
 	return nil
 }
 
@@ -57,6 +57,26 @@ func (m *String2Int64Service) GetData(key string) (int64, error) {
 		return -1, errors.New("Can not found key")
 	}
 	return r.Data.Value, nil
+}
+
+func (m *String2Int64Service) CasData(key string, value int64) (bool, error) {
+	client := transports.GetS2I64CompactClient(m.host, m.port)
+	defer client.BackToPool()
+	if client == nil || client.Client == nil {
+		return false, errors.New("Can not connect to model")
+	}
+
+	var aCas = &S2I64KV.TCasValue{OldValue: 0, NewValue_: value}
+	r, err := client.Client.(*S2I64KV.TString2I64KVServiceClient).CasData(context.Background(), S2I64KV.TKey(key), aCas)
+	if err != nil {
+		return false, errors.New("String2Int64Service sid: " + m.sid + " address: " + m.host + ":" + m.port + " err: " + err.Error())
+	}
+	defer client.BackToPool()
+
+	if r != nil && r.GetOldValue() == 0 {
+		return true, nil
+	}
+	return false, nil
 }
 
 func (m *String2Int64Service) handleEventChangeEndpoint(ep *GoEndpointBackendManager.EndPoint) {
