@@ -61,7 +61,6 @@ func (m *String2Int64Service) GetData(key string) (int64, error) {
 
 func (m *String2Int64Service) CasData(key string, value int64) (sucess bool, oldvalue int64, err error) {
 	client := transports.GetS2I64CompactClient(m.host, m.port)
-	defer client.BackToPool()
 	if client == nil || client.Client == nil {
 		return false, -1, errors.New("Can not connect to model")
 	}
