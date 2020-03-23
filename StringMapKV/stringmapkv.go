@@ -5,21 +5,31 @@ import (
 	"errors"
 	"log"
 
-	"github.com/OpenStars/backendclients/go/stringmapkv/thrift/gen-go/OpenStars/Common/StringMapKV"
-
-	"github.com/OpenStars/backendclients/go/stringmapkv/transports"
+	"github.com/OpenStars/EtcdBackendService/StringMapKV/stringmapkv/thrift/gen-go/OpenStars/Common/StringMapKV"
+	"github.com/OpenStars/EtcdBackendService/StringMapKV/stringmapkv/transports"
+	"github.com/OpenStars/GoEndpointManager"
 
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type stringMapKV struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *stringMapKV) GetData(key string) (string, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetStringMapKVServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -39,6 +49,15 @@ func (m *stringMapKV) GetData(key string) (string, error) {
 	return r.Data.Value, nil
 }
 func (m *stringMapKV) PutData(key, value string) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetStringMapKVServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)

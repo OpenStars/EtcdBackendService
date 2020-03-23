@@ -15,6 +15,7 @@ type mediacloudclient struct {
 }
 
 func (m *mediacloudclient) GetMediaInfo(appId string, appKey string, mediaId string) (r *mcloud.TMCMediaInfoResult_, err error) {
+
 	client := transports.GetMediaCloudServiceBinaryClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service host: " + m.host + " port: " + m.port)

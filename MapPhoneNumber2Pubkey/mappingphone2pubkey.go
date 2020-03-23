@@ -7,17 +7,30 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/MapPhoneNumber2Pubkey/mapphone2pubkey/thrift/gen-go/OpenStars/Common/MapPhoneNumberPubkeyKV"
 	"github.com/OpenStars/EtcdBackendService/MapPhoneNumber2Pubkey/mapphone2pubkey/transports"
+	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type MappingPhone2PubkeyServiceModel struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *MappingPhone2PubkeyServiceModel) PutData(pubkey string, phonenumber string) error {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMapPhoneNumberPubkeyKVServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to model")
@@ -32,6 +45,17 @@ func (m *MappingPhone2PubkeyServiceModel) PutData(pubkey string, phonenumber str
 }
 
 func (m *MappingPhone2PubkeyServiceModel) GetPhoneNumberByPubkey(pubkey string) (string, error) {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMapPhoneNumberPubkeyKVServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
@@ -49,6 +73,17 @@ func (m *MappingPhone2PubkeyServiceModel) GetPhoneNumberByPubkey(pubkey string) 
 }
 
 func (m *MappingPhone2PubkeyServiceModel) GetPubkeyByPhoneNumber(phonenumber string) (string, error) {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMapPhoneNumberPubkeyKVServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
@@ -71,25 +106,44 @@ func (m *MappingPhone2PubkeyServiceModel) handlerEventChangeEndpoint(ep *GoEndpo
 	log.Println("Change config endpoint serviceID", ep.ServiceID, m.host, ":", m.port)
 }
 
-func NewMappingPhone2Pubkey(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) MappingPhoneNumber2PubkeyServiceIf {
-	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
-	err, ep := aepm.GetEndPoint()
+func NewMappingPhone2Pubkey(serviceID string, etcdServers []string, defaultEndpoint GoEndpointBackendManager.EndPoint) MappingPhoneNumber2PubkeyServiceIf {
+	// aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
+	// err, ep := aepm.GetEndPoint()
+	// if err != nil {
+	// 	// log.Println("Load endpoit ", serviceID, "err", err.Error())
+	// 	log.Println("Init Local MappingPhone2Pubkey sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+	// 	return &MappingPhone2PubkeyServiceModel{
+	// 		host: defaultEnpoint.Host,
+	// 		port: defaultEnpoint.Port,
+	// 		sid:  defaultEnpoint.ServiceID,
+	// 	}
+	// }
+	// sv := &MappingPhone2PubkeyServiceModel{
+	// 	host: ep.Host,
+	// 	port: ep.Port,
+	// 	sid:  ep.ServiceID,
+	// }
+	// go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
+	// sv.epm = aepm
+	// log.Println("Init From Etcd MappingPhone2Pubkey sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	// return sv
+
+	mapphone2pub := &MappingPhone2PubkeyServiceModel{
+		host:        defaultEndpoint.Host,
+		port:        defaultEndpoint.Port,
+		sid:         defaultEndpoint.ServiceID,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+	}
+
+	if mapphone2pub.etcdManager == nil {
+		return nil
+	}
+	err := mapphone2pub.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpoint.Host, defaultEndpoint.Port)
 	if err != nil {
-		// log.Println("Load endpoit ", serviceID, "err", err.Error())
-		log.Println("Init Local MappingPhone2Pubkey sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
-		return &MappingPhone2PubkeyServiceModel{
-			host: defaultEnpoint.Host,
-			port: defaultEnpoint.Port,
-			sid:  defaultEnpoint.ServiceID,
-		}
+		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
 	}
-	sv := &MappingPhone2PubkeyServiceModel{
-		host: ep.Host,
-		port: ep.Port,
-		sid:  ep.ServiceID,
-	}
-	go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
-	sv.epm = aepm
-	log.Println("Init From Etcd MappingPhone2Pubkey sid:", sv.sid, "host:", sv.host, "port:", sv.port)
-	return sv
+	mapphone2pub.etcdManager.GetAllEndpoint(serviceID)
+	return mapphone2pub
+
 }

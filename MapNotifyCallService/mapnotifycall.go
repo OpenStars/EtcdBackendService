@@ -7,17 +7,30 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/MapNotifyCallService/mapnoitfycall/thrift/gen-go/OpenStars/Common/MapNotifyCallKV"
 	"github.com/OpenStars/EtcdBackendService/MapNotifyCallService/mapnoitfycall/transports"
+	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type mapnotifycallservice struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *mapnotifycallservice) PutData(pubkey string, token string) error {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMapNotifyCallKVServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to model")
@@ -29,6 +42,17 @@ func (m *mapnotifycallservice) PutData(pubkey string, token string) error {
 }
 
 func (m *mapnotifycallservice) GetTokenByPubkey(pubkey string) (string, error) {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMapNotifyCallKVServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
@@ -46,6 +70,17 @@ func (m *mapnotifycallservice) GetTokenByPubkey(pubkey string) (string, error) {
 }
 
 func (m *mapnotifycallservice) GetPubkeyByToken(token string) (string, error) {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMapNotifyCallKVServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to model")
@@ -68,25 +103,41 @@ func (m *mapnotifycallservice) handlerEventChangeEndpoint(ep *GoEndpointBackendM
 	log.Println("Change config endpoint serviceID", ep.ServiceID, m.host, ":", m.port)
 }
 
-func NewMapNotifyCallService(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) MapNotifyCallServiceIf {
-	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
-	err, ep := aepm.GetEndPoint()
-	if err != nil {
-		// log.Println("Load endpoit ", serviceID, "err", err.Error())
-		log.Println("Init Local MapNotifyCall sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
-		return &mapnotifycallservice{
-			host: defaultEnpoint.Host,
-			port: defaultEnpoint.Port,
-			sid:  defaultEnpoint.ServiceID,
-		}
-	}
+func NewMapNotifyCallService(serviceID string, etcdServers []string, defaultEndpoint GoEndpointBackendManager.EndPoint) MapNotifyCallServiceIf {
+	// aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
+	// err, ep := aepm.GetEndPoint()
+	// if err != nil {
+	// 	// log.Println("Load endpoit ", serviceID, "err", err.Error())
+	// 	log.Println("Init Local MapNotifyCall sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+	// 	return &mapnotifycallservice{
+	// 		host: defaultEnpoint.Host,
+	// 		port: defaultEnpoint.Port,
+	// 		sid:  defaultEnpoint.ServiceID,
+	// 	}
+	// }
+	// sv := &mapnotifycallservice{
+	// 	host: ep.Host,
+	// 	port: ep.Port,
+	// 	sid:  ep.ServiceID,
+	// }
+	// go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
+	// sv.epm = aepm
+	// log.Println("Init From Etcd MapNoitfyCall sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	// return sv
 	sv := &mapnotifycallservice{
-		host: ep.Host,
-		port: ep.Port,
-		sid:  ep.ServiceID,
+		host:        defaultEndpoint.Host,
+		port:        defaultEndpoint.Port,
+		sid:         serviceID,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
 	}
-	go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
-	sv.epm = aepm
-	log.Println("Init From Etcd MapNoitfyCall sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	if sv.etcdManager == nil {
+		return nil
+	}
+	err := sv.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpoint.Host, defaultEndpoint.Port)
+	if err != nil {
+		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
+	}
+	sv.etcdManager.GetAllEndpoint(serviceID)
 	return sv
 }

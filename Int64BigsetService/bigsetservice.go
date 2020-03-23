@@ -7,17 +7,28 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/Int64BigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	"github.com/OpenStars/EtcdBackendService/Int64BigsetService/bigset/transports"
+	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type Int64BigsetService struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *Int64BigsetService) PutItem(bskey generic.TKey, item *generic.TItem) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 
 	client := transports.GetIBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
@@ -38,6 +49,16 @@ func (m *Int64BigsetService) PutItem(bskey generic.TKey, item *generic.TItem) er
 }
 
 func (m *Int64BigsetService) GetItem(bskey generic.TKey, itemkey generic.TItemKey) (*generic.TItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetIBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -55,6 +76,16 @@ func (m *Int64BigsetService) GetItem(bskey generic.TKey, itemkey generic.TItemKe
 }
 
 func (m *Int64BigsetService) GetTotalCount(bskey generic.TKey) (int64, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetIBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return -1, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -74,6 +105,16 @@ func (m *Int64BigsetService) GetTotalCount(bskey generic.TKey) (int64, error) {
 }
 
 func (m *Int64BigsetService) GetSlice(bskey generic.TKey, fromPos int32, count int32) ([]*generic.TItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetIBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -94,6 +135,16 @@ func (m *Int64BigsetService) GetSlice(bskey generic.TKey, fromPos int32, count i
 }
 
 func (m *Int64BigsetService) MultiPut(bskey generic.TKey, lsItems []*generic.TItem) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetIBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -120,6 +171,16 @@ func (m *Int64BigsetService) handlerEventChangeEndpoint(ep *GoEndpointBackendMan
 }
 
 func (m *Int64BigsetService) RemoveItem(bskey generic.TKey, itemkey generic.TItemKey) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetIBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -133,6 +194,16 @@ func (m *Int64BigsetService) RemoveItem(bskey generic.TKey, itemkey generic.TIte
 	return nil
 }
 func (m *Int64BigsetService) RangeQuery(bskey generic.TKey, startKey generic.TItemKey, endKey generic.TItemKey) ([]*generic.TItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetIBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -146,25 +217,42 @@ func (m *Int64BigsetService) RangeQuery(bskey generic.TKey, startKey generic.TIt
 	return rs.Items.Items, nil
 }
 
-func NewIntBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) Int64BigsetServiceIf {
-	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
-	err, ep := aepm.GetEndPoint()
+func NewIntBigsetServiceModel(serviceID string, etcdServers []string, defaultEndpoint GoEndpointBackendManager.EndPoint) Int64BigsetServiceIf {
+	// aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
+	// err, ep := aepm.GetEndPoint()
+	// if err != nil {
+	// 	// log.Println("Load endpoit ", serviceID, "err", err.Error())
+	// 	log.Println("Init Local Int64BigsetService sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+	// 	return &Int64BigsetService{
+	// 		host: defaultEnpoint.Host,
+	// 		port: defaultEnpoint.Port,
+	// 		sid:  defaultEnpoint.ServiceID,
+	// 	}
+	// }
+	// sv := &Int64BigsetService{
+	// 	host: ep.Host,
+	// 	port: ep.Port,
+	// 	sid:  ep.ServiceID,
+	// }
+	// go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
+	// sv.epm = aepm
+	// log.Println("Init From Etcd Int64BigsetService sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	// return sv
+	i64bigset := &Int64BigsetService{
+		host:        defaultEndpoint.Host,
+		port:        defaultEndpoint.Port,
+		sid:         defaultEndpoint.ServiceID,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+	}
+	if i64bigset.etcdManager == nil {
+		return nil
+	}
+	err := i64bigset.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpoint.Host, defaultEndpoint.Port)
 	if err != nil {
-		// log.Println("Load endpoit ", serviceID, "err", err.Error())
-		log.Println("Init Local Int64BigsetService sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
-		return &Int64BigsetService{
-			host: defaultEnpoint.Host,
-			port: defaultEnpoint.Port,
-			sid:  defaultEnpoint.ServiceID,
-		}
+		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
 	}
-	sv := &Int64BigsetService{
-		host: ep.Host,
-		port: ep.Port,
-		sid:  ep.ServiceID,
-	}
-	go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
-	sv.epm = aepm
-	log.Println("Init From Etcd Int64BigsetService sid:", sv.sid, "host:", sv.host, "port:", sv.port)
-	return sv
+	i64bigset.etcdManager.GetAllEndpoint(serviceID)
+	return i64bigset
+
 }

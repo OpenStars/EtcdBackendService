@@ -4,10 +4,9 @@ import (
 	// "github.com/OpenStars/backendclients/go//gen-go/OpenStars/Common/StringMapKV" //Todo: Fix this
 	"fmt"
 
-	"github.com/apache/thrift/lib/go/thrift"
-
-	"github.com/OpenStars/backendclients/go/stringmapkv/thrift/gen-go/OpenStars/Common/StringMapKV"
+	"github.com/OpenStars/EtcdBackendService/StringMapKV/stringmapkv/thrift/gen-go/OpenStars/Common/StringMapKV"
 	thriftpool "github.com/OpenStars/thriftpoolv2"
+	"github.com/apache/thrift/lib/go/thrift"
 )
 
 var (

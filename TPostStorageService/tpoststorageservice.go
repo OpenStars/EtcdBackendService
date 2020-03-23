@@ -7,17 +7,28 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
 	"github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/transports"
+	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type tpoststorageservice struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *tpoststorageservice) GetData(key int64) (*TPostStorageService.TPostItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetTPostStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -38,6 +49,15 @@ func (m *tpoststorageservice) GetData(key int64) (*TPostStorageService.TPostItem
 }
 
 func (m *tpoststorageservice) PutData(key int64, data *TPostStorageService.TPostItem) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetTPostStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -51,6 +71,15 @@ func (m *tpoststorageservice) PutData(key int64, data *TPostStorageService.TPost
 	return nil
 }
 func (m *tpoststorageservice) RemoveData(key int64) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetTPostStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -60,6 +89,15 @@ func (m *tpoststorageservice) RemoveData(key int64) error {
 	return err
 }
 func (m *tpoststorageservice) GetListDatas(listkey []int64) ([]*TPostStorageService.TPostItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	var tlistkeys []TPostStorageService.TKey
 	for i := 0; i < len(listkey); i++ {
 		tlistkeys = append(tlistkeys, TPostStorageService.TKey(listkey[i]))
