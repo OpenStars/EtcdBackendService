@@ -376,6 +376,7 @@ func (m *StringBigsetService) handlerEventChangeEndpoint(ep *GoEndpointBackendMa
 
 func NewStringBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) StringBigsetServiceIf {
 	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
+
 	err, ep := aepm.GetEndPoint()
 	if err != nil {
 		log.Println("Init Local StringBigsetSerivce sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
