@@ -3,29 +3,18 @@ package main
 import (
 	"log"
 
-	tmediastorageclient "github.com/OpenStars/EtcdBackendSerivce/TMediaStorageService"
-	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
-	"github.com/OpenStars/backendclients/go/tmediastorageservice/thrift/gen-go/OpenStars/Common/TMediaStorageService"
+	tmediastorageclient "github.com/OpenStars/EtcdBackendService/TMediaStorageService"
 )
 
-func TestPut() {
-	mediaclient := tmediastorageclient.NewTMediaStorageService("/test/", []string{"127.0.0.1:2379"}, GoEndpointBackendManager.EndPoint{
-		Host: "10.60.68.102",
-		Port: "8973",
-		// Host:      "127.0.0.1",
-		// Port:      "8883",
-		ServiceID: "/test/",
-	})
-	err := mediaclient.PutData(1, &TMediaStorageService.TMediaItem{
-		Idmedia: 1,
-		URL:     "http://testurl.html",
-	})
+func TestGet() {
+	mediaclient := tmediastorageclient.NewTMediaStorageService2("/test/", []string{"10.60.1.20:2379"}, "10.60.68.102", "8973")
+	data, err := mediaclient.GetData(22294)
 	if err != nil {
-		log.Println(err)
+		log.Println("err", err)
 		return
 	}
-	log.Println("oke")
+	log.Println("data", data)
 }
 func main() {
-	TestPut()
+	TestGet()
 }

@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/OpenStars/GoEndpointManager"
+
 	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/transports"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
@@ -17,14 +19,27 @@ var reconnect = true
 var mureconnect sync.Mutex
 
 type StringBigsetService struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *StringBigsetService) TotalStringKeyCount() (r int64, err error) {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
+
 	if client == nil || client.Client == nil {
 		return 0, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
@@ -42,6 +57,17 @@ func (m *StringBigsetService) TotalStringKeyCount() (r int64, err error) {
 }
 
 func (m *StringBigsetService) GetListKey(fromIndex int64, count int32) ([]string, error) {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -64,6 +90,15 @@ func (m *StringBigsetService) GetListKey(fromIndex int64, count int32) ([]string
 }
 
 func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.TItem) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
@@ -87,6 +122,17 @@ func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.
 }
 
 func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey generic.TItemKey, endKey generic.TItemKey) ([]*generic.TItem, error) {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -108,6 +154,16 @@ func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey ge
 
 // BsRangeQueryByPage get >= startkey && <= endkey có chia page theo begin and end
 func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, startKey, endKey generic.TItemKey, begin, end int64) ([]*generic.TItem, int64, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 
 	if client == nil || client.Client == nil {
@@ -138,6 +194,16 @@ func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, start
 }
 
 func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generic.TItemKey) (*generic.TItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	fmt.Printf("[BsGetItem] get client host = %s, %s, key = %s, %s \n", m.host, m.port, bskey, itemkey)
 	if client == nil || client.Client == nil {
@@ -158,6 +224,16 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 }
 
 func (m *StringBigsetService) GetTotalCount(bskey generic.TStringKey) (int64, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return 0, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -180,6 +256,16 @@ func (m *StringBigsetService) GetTotalCount(bskey generic.TStringKey) (int64, er
 }
 
 func (m *StringBigsetService) GetBigSetInfoByName(bskey generic.TStringKey) (*generic.TStringBigSetInfo, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -201,6 +287,16 @@ func (m *StringBigsetService) GetBigSetInfoByName(bskey generic.TStringKey) (*ge
 }
 
 func (m *StringBigsetService) RemoveAll(bskey generic.TStringKey) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -217,6 +313,16 @@ func (m *StringBigsetService) RemoveAll(bskey generic.TStringKey) error {
 	return nil
 }
 func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*generic.TStringBigSetInfo, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -237,6 +343,16 @@ func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*gen
 }
 
 func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -260,6 +376,16 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 }
 
 func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -283,6 +409,16 @@ func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int3
 }
 
 func (m *StringBigsetService) BsRemoveItem(bskey generic.TStringKey, itemkey generic.TItemKey) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -302,6 +438,16 @@ func (m *StringBigsetService) BsRemoveItem(bskey generic.TStringKey, itemkey gen
 }
 
 func (m *StringBigsetService) BsMultiPut(bskey generic.TStringKey, lsItems []*generic.TItem) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -325,6 +471,16 @@ func (m *StringBigsetService) BsMultiPut(bskey generic.TStringKey, lsItems []*ge
 }
 
 func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -347,6 +503,16 @@ func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromK
 }
 
 func (m *StringBigsetService) BsGetSliceFromItemR(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -375,15 +541,52 @@ func (m *StringBigsetService) handlerEventChangeEndpoint(ep *GoEndpointBackendMa
 }
 
 func NewStringBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) StringBigsetServiceIf {
-	aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
+	// aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
+	// err, ep := aepm.GetEndPoint()
+	stringbs := &StringBigsetService{
+		host:        defaultEnpoint.Host,
+		port:        defaultEnpoint.Port,
+		sid:         defaultEnpoint.ServiceID,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+	}
+	if stringbs.etcdManager == nil {
+		return nil
+	}
+	err := stringbs.etcdManager.SetDefaultEntpoint(serviceID, defaultEnpoint.Host, defaultEnpoint.Port)
+	if err != nil {
+		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
+	}
+	// stringbs.etcdManager.GetAllEndpoint(serviceID)
+	return stringbs
+	// if err != nil {
+	// 	log.Println("Init Local StringBigsetSerivce sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+	// 	return &StringBigsetService{
+	// 		host: defaultEnpoint.Host,
+	// 		port: defaultEnpoint.Port,
+	// 		sid:  defaultEnpoint.ServiceID,
+	// 	}
+	// }
+	// sv := &StringBigsetService{
+	// 	host: ep.Host,
+	// 	port: ep.Port,
+	// 	sid:  ep.ServiceID,
+	// }
+	// go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
+	// sv.epm = aepm
+	// log.Println("Init From Etcd StringBigsetSerivce sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	// return sv
+}
 
+func NewStringBigsetServiceModel2(etcdEndpoints []string, sid string, defaultEndpointsHost string, defaultEndpointPort string) StringBigsetServiceIf {
+	aepm := GoEndpointBackendManager.NewEndPointManager(etcdEndpoints, sid)
 	err, ep := aepm.GetEndPoint()
 	if err != nil {
-		log.Println("Init Local StringBigsetSerivce sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+		log.Println("Init Local StringBigsetSerivce sid:", sid, "host:", defaultEndpointsHost+":"+defaultEndpointPort)
 		return &StringBigsetService{
-			host: defaultEnpoint.Host,
-			port: defaultEnpoint.Port,
-			sid:  defaultEnpoint.ServiceID,
+			host: defaultEndpointsHost,
+			port: defaultEndpointPort,
+			sid:  sid,
 		}
 	}
 	sv := &StringBigsetService{

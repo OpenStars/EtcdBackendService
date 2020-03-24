@@ -8,17 +8,29 @@ import (
 	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService/tnotifystorageservice/thrift/gen-go/OpenStars/Common/TNotifyStorageService"
 	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService/tnotifystorageservice/transports"
 	"github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
+	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type tnotifytorageservice struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *tnotifytorageservice) GetData(key int64) (*TNotifyStorageService.TNotifyItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTNotifyStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -42,6 +54,16 @@ func (m *tnotifytorageservice) GetData(key int64) (*TNotifyStorageService.TNotif
 }
 
 func (m *tnotifytorageservice) PutData(key int64, data *TNotifyStorageService.TNotifyItem) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTNotifyStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -56,6 +78,16 @@ func (m *tnotifytorageservice) PutData(key int64, data *TNotifyStorageService.TN
 }
 
 func (m *tnotifytorageservice) RemoveData(key int64) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTNotifyStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -66,6 +98,15 @@ func (m *tnotifytorageservice) RemoveData(key int64) error {
 }
 
 func (m *tnotifytorageservice) GetListDatas(listkey []int64) ([]*TNotifyStorageService.TNotifyItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	var tlistkeys []TPostStorageService.TKey
 	for i := 0; i < len(listkey); i++ {
 		tlistkeys = append(tlistkeys, TPostStorageService.TKey(listkey[i]))

@@ -7,17 +7,28 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/TCommentStorageService/tcommentstorageservice/thrift/gen-go/OpenStars/Common/TCommentStorageService"
 	"github.com/OpenStars/EtcdBackendService/TCommentStorageService/tcommentstorageservice/transports"
+	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type tcommentstorageservice struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *tcommentstorageservice) GetData(key int64) (*TCommentStorageService.TCommentItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetTCommentStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -38,6 +49,15 @@ func (m *tcommentstorageservice) GetData(key int64) (*TCommentStorageService.TCo
 }
 
 func (m *tcommentstorageservice) PutData(key int64, data *TCommentStorageService.TCommentItem) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetTCommentStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -52,6 +72,16 @@ func (m *tcommentstorageservice) PutData(key int64, data *TCommentStorageService
 }
 
 func (m *tcommentstorageservice) RemoveData(key int64) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTCommentStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -61,6 +91,15 @@ func (m *tcommentstorageservice) RemoveData(key int64) error {
 	return err
 }
 func (m *tcommentstorageservice) GetListDatas(listkey []int64) ([]*TCommentStorageService.TCommentItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	var tlistkeys []TCommentStorageService.TKey
 	for i := 0; i < len(listkey); i++ {
 		tlistkeys = append(tlistkeys, TCommentStorageService.TKey(listkey[i]))

@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"github.com/apache/thrift/lib/go/thrift"
-	"OpenStars/Common/TPostStorageService"
+	"OpenStars/EtcdBackendService/TPostStorageService"
 )
 
 var _ = TPostStorageService.GoUnusedProtection__

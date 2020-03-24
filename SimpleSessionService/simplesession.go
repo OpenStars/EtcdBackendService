@@ -7,14 +7,16 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/SimpleSessionService/simplesession/thrift/gen-go/simplesession"
 	"github.com/OpenStars/EtcdBackendService/SimpleSessionService/simplesession/transports"
+	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type simpleSessionClient struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *simpleSessionClient) GetSession(sskey string) (*simplesession.TUserSessionInfo, error) {

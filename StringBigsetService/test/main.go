@@ -1,32 +1,63 @@
 package main
 
 import (
-	"TrustKeys/SocialNetworks/Centerhub/model/share"
-	"TrustKeys/SocialNetworks/Centerhub/util"
 	"log"
 
-	"github.com/OpenStars/EtcdBackendSerivce/StringBigsetSerivce"
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService"
+
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
-	"github.com/OpenStars/backendclients/go/bigset/thrift/gen-go/openstars/core/bigset/generic"
 )
 
 func TestSV() {
-	svClient := StringBigsetSerivce.NewStringBigsetServiceModel("/aa/bb", []string{"127.0.0.1:2379"},
+	svClient := StringBigsetService.NewStringBigsetServiceModel("/trustkeys/socialnetwork/followuser/stringbs", []string{"10.60.1.20:2379"},
 		GoEndpointBackendManager.EndPoint{
-			Host:      "10.60.68.102",
-			Port:      "20517",
+			Host:      "10.110.69.96",
+			Port:      "20507",
 			ServiceID: "/aa/bb",
 		})
-
-	lsItem, err := svClient.BsGetSlice(generic.TStringKey(share.UIDPostPrefix+util.PadingZerors(911)), 2, 5)
+	total, err := svClient.TotalStringKeyCount()
+	lsKey, err := svClient.GetListKey(0, int32(total))
 	if err != nil {
-		log.Println("err", err)
-		return
+		log.Fatalln("GetListKey err", err)
 	}
+	for _, key := range lsKey {
+		log.Println("key", key)
+	}
+	// uidservice := client.NewUIDServiceClient("10.60.68.103", "12010")
+	// uid, err := uidservice.GetUIDByPubkey("02898dd812414d661b7b9c0dee015ef6e3a92c943cfb64e838f14ff093ad9dd93f")
+	// if err != nil {
+	// 	log.Println("err ", err)
+	// 	return
+	// }
+
+	// lsItem, err := svClient.BsGetSlice(generic.TStringKey(share.NewsFeedPrefix+util.PadingZerors(uid)), 0, 780)
+	// if err != nil {
+	// 	log.Println("err", err)
+	// 	return
+	// }
+
+	// total, err := svClient.GetTotalCount(generic.TStringKey(share.NewsFeedPrefix + util.PadingZerors(uid)))
+	// log.Println("bskey", string(generic.TStringKey(share.NewsFeedPrefix+util.PadingZerors(uid))))
+	// if err != nil {
+	// 	log.Println("Total err", err)
+	// 	return
+	// }
+	// lsItem, err := svClient.BsGetSlice(generic.TStringKey(share.NewsFeedPrefix+util.PadingZerors(uid)), 0, int32(total))
+	// for i := 0; i < len(lsItem); i++ {
+	// 	log.Println("key", string(lsItem[i].Key))
+	// }
 	// log.Println("total", total)
-	for _, item := range lsItem {
-		log.Println(string(item.Key))
-	}
+	// log.Println("total", total)
+	// for i := int32(0); i < int32(total); i++ {
+	// 	lsItem, err := svClient.BsGetSlice(generic.TStringKey(share.NewsFeedPrefix+util.PadingZerors(uid)), i, 1)
+	// 	if err != nil {
+	// 		log.Println("GetItemkey", i, "err", err)
+	// 	}
+	// 	for _, item := range lsItem {
+	// 		log.Println("postID", string(item.Key))
+	// 	}
+
+	// }
 
 	// for i := 0; i < 30; i++ {
 	// 	item := &generic.TItem{

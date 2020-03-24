@@ -7,17 +7,28 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/TMediaStorageService/tmediastorageservice/thrift/gen-go/OpenStars/Common/TMediaStorageService"
 	"github.com/OpenStars/EtcdBackendService/TMediaStorageService/tmediastorageservice/transports"
+	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type tmediastorageservice struct {
-	host string
-	port string
-	sid  string
-	epm  GoEndpointBackendManager.EndPointManagerIf
+	host        string
+	port        string
+	sid         string
+	epm         GoEndpointBackendManager.EndPointManagerIf
+	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
 func (m *tmediastorageservice) GetData(key int64) (*TMediaStorageService.TMediaItem, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetTMediaStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -38,6 +49,17 @@ func (m *tmediastorageservice) GetData(key int64) (*TMediaStorageService.TMediaI
 }
 
 func (m *tmediastorageservice) PutData(key int64, data *TMediaStorageService.TMediaItem) error {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMediaStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -52,6 +74,17 @@ func (m *tmediastorageservice) PutData(key int64, data *TMediaStorageService.TMe
 }
 
 func (m *tmediastorageservice) RemoveData(key int64) error {
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMediaStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -63,6 +96,16 @@ func (m *tmediastorageservice) RemoveData(key int64) error {
 }
 
 func (m *tmediastorageservice) GetListData(listkey []int64) (r []*TMediaStorageService.TMediaItem, err error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
 	client := transports.GetTMediaStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
