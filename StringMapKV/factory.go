@@ -43,6 +43,6 @@ func NewStringMapKV(serviceID string, etcdServers []string, defaultEndpoint GoEn
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	strinmapkv.etcdManager.GetAllEndpoint(serviceID)
+	// strinmapkv.etcdManager.GetAllEndpoint(serviceID)
 	return strinmapkv
 }

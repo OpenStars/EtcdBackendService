@@ -154,6 +154,6 @@ func NewString2Int64Service(serviceID string, etcdServers []string, defaultEndpo
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	s2isv.etcdManager.GetAllEndpoint(serviceID)
+	// s2isv.etcdManager.GetAllEndpoint(serviceID)
 	return s2isv
 }

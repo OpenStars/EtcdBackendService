@@ -43,6 +43,6 @@ func NewTNotifyStorageService(serviceID string, etcdServers []string, defaultEnd
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	notifysv.etcdManager.GetAllEndpoint(serviceID)
+	// notifysv.etcdManager.GetAllEndpoint(serviceID)
 	return notifysv
 }

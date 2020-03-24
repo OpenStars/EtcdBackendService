@@ -43,7 +43,7 @@ func NewSimpleSessionClient(serviceID string, etcdServers []string, defaultEndpo
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	sessionsv.etcdManager.GetAllEndpoint(serviceID)
+	// sessionsv.etcdManager.GetAllEndpoint(serviceID)
 	return sessionsv
 
 }

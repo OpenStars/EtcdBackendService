@@ -42,6 +42,6 @@ func NewTPostStorageService(serviceID string, etcdServers []string, defaultEndpo
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	postsv.etcdManager.GetAllEndpoint(serviceID)
+	// postsv.etcdManager.GetAllEndpoint(serviceID)
 	return postsv
 }

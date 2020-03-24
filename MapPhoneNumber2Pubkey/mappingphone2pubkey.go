@@ -143,7 +143,7 @@ func NewMappingPhone2Pubkey(serviceID string, etcdServers []string, defaultEndpo
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	mapphone2pub.etcdManager.GetAllEndpoint(serviceID)
+	// mapphone2pub.etcdManager.GetAllEndpoint(serviceID)
 	return mapphone2pub
 
 }

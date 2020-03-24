@@ -165,6 +165,6 @@ func NewKVCounterServiceModel(serviceID string, etcdServers []string, defaultEnp
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	kvcounter.etcdManager.GetAllEndpoint(serviceID)
+	// kvcounter.etcdManager.GetAllEndpoint(serviceID)
 	return kvcounter
 }

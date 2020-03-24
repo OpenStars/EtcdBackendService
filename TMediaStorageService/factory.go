@@ -43,7 +43,7 @@ func NewTMediaStorageService(serviceID string, etcdServers []string, defaultEndp
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	mediasv.etcdManager.GetAllEndpoint(serviceID)
+	// mediasv.etcdManager.GetAllEndpoint(serviceID)
 	return mediasv
 }
 

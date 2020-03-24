@@ -138,6 +138,6 @@ func NewMapNotifyCallService(serviceID string, etcdServers []string, defaultEndp
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	sv.etcdManager.GetAllEndpoint(serviceID)
+	// sv.etcdManager.GetAllEndpoint(serviceID)
 	return sv
 }

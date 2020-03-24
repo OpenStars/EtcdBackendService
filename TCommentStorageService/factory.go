@@ -43,6 +43,6 @@ func NewTCommentStorageService(serviceID string, etcdServers []string, defaultEn
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	commentsv.etcdManager.GetAllEndpoint(serviceID)
+	// commentsv.etcdManager.GetAllEndpoint(serviceID)
 	return commentsv
 }

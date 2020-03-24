@@ -252,7 +252,7 @@ func NewIntBigsetServiceModel(serviceID string, etcdServers []string, defaultEnd
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
 	}
-	i64bigset.etcdManager.GetAllEndpoint(serviceID)
+	// i64bigset.etcdManager.GetAllEndpoint(serviceID)
 	return i64bigset
 
 }
