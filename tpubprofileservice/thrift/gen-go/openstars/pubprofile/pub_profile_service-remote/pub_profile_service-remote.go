@@ -25,6 +25,8 @@ func Usage() {
   fmt.Fprintln(os.Stderr, "\nFunctions:")
   fmt.Fprintln(os.Stderr, "  ResponseProfile GetProfileByPubkey(string pubkey)")
   fmt.Fprintln(os.Stderr, "  ResponseProfile GetProfileByUID(i64 uid)")
+  fmt.Fprintln(os.Stderr, "  ResponseBool UpdateProfileByUID(i64 uid, ProfileData profileUpdate)")
+  fmt.Fprintln(os.Stderr, "  ResponseBool UpdateProfileByPubkey(string pubkey, ProfileData profileUpdate)")
   fmt.Fprintln(os.Stderr)
   os.Exit(0)
 }
@@ -161,13 +163,71 @@ func main() {
       fmt.Fprintln(os.Stderr, "GetProfileByUID requires 1 args")
       flag.Usage()
     }
-    argvalue0, err10 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err10 != nil {
+    argvalue0, err14 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err14 != nil {
       Usage()
       return
     }
     value0 := argvalue0
     fmt.Print(client.GetProfileByUID(context.Background(), value0))
+    fmt.Print("\n")
+    break
+  case "UpdateProfileByUID":
+    if flag.NArg() - 1 != 2 {
+      fmt.Fprintln(os.Stderr, "UpdateProfileByUID requires 2 args")
+      flag.Usage()
+    }
+    argvalue0, err15 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err15 != nil {
+      Usage()
+      return
+    }
+    value0 := argvalue0
+    arg16 := flag.Arg(2)
+    mbTrans17 := thrift.NewTMemoryBufferLen(len(arg16))
+    defer mbTrans17.Close()
+    _, err18 := mbTrans17.WriteString(arg16)
+    if err18 != nil {
+      Usage()
+      return
+    }
+    factory19 := thrift.NewTJSONProtocolFactory()
+    jsProt20 := factory19.GetProtocol(mbTrans17)
+    argvalue1 := pubprofile.NewProfileData()
+    err21 := argvalue1.Read(jsProt20)
+    if err21 != nil {
+      Usage()
+      return
+    }
+    value1 := argvalue1
+    fmt.Print(client.UpdateProfileByUID(context.Background(), value0, value1))
+    fmt.Print("\n")
+    break
+  case "UpdateProfileByPubkey":
+    if flag.NArg() - 1 != 2 {
+      fmt.Fprintln(os.Stderr, "UpdateProfileByPubkey requires 2 args")
+      flag.Usage()
+    }
+    argvalue0 := flag.Arg(1)
+    value0 := argvalue0
+    arg23 := flag.Arg(2)
+    mbTrans24 := thrift.NewTMemoryBufferLen(len(arg23))
+    defer mbTrans24.Close()
+    _, err25 := mbTrans24.WriteString(arg23)
+    if err25 != nil {
+      Usage()
+      return
+    }
+    factory26 := thrift.NewTJSONProtocolFactory()
+    jsProt27 := factory26.GetProtocol(mbTrans24)
+    argvalue1 := pubprofile.NewProfileData()
+    err28 := argvalue1.Read(jsProt27)
+    if err28 != nil {
+      Usage()
+      return
+    }
+    value1 := argvalue1
+    fmt.Print(client.UpdateProfileByPubkey(context.Background(), value0, value1))
     fmt.Print("\n")
     break
   case "":

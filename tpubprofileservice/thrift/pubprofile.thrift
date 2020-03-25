@@ -39,8 +39,14 @@ struct ResponseProfile {
   2:TErrorCodeResult errorData;
 }
 
+struct ResponseBool {
+  1:bool resp;
+  2:TErrorCodeResult errorData;
+}
+
 service PubProfileService {
   ResponseProfile GetProfileByPubkey(1:string pubkey);
 	ResponseProfile GetProfileByUID(1: i64 uid);
+  ResponseBool UpdateProfileByUID(1: i64 uid,2: ProfileData profileUpdate);
+  ResponseBool UpdateProfileByPubkey(1: string pubkey,2: ProfileData profileUpdate);
 }
-

@@ -7,8 +7,10 @@ import (
 )
 
 func Test() {
-	pubclient := PubProfileClient.NewPubProfileClient("10.60.68.102", "1805")
-	r, err := pubclient.GetProfileByPubkey("039b81844d2caaf2b32f286b70c00db4c6309a10ccb8c4804e0f7d5df6f68e1a05")
+	pubclient := PubProfileClient.NewPubProfileClient("127.0.0.1", "1805")
+	profileData, _ := pubclient.GetProfileByPubkey("0343038f99f26c910b4e0b0775d25d87ba1d57e2ef7a7fb34f777c356964bf88a2")
+	profileData.DisplayName = "Nguyễn Thị Kim Liên"
+	r, err := pubclient.UpdateProfileByPubkey("0343038f99f26c910b4e0b0775d25d87ba1d57e2ef7a7fb34f777c356964bf88a2", profileData)
 	if err != nil {
 		log.Println("err", err)
 		return

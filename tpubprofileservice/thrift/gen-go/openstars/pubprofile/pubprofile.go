@@ -1103,6 +1103,140 @@ func (p *ResponseProfile) String() string {
   return fmt.Sprintf("ResponseProfile(%+v)", *p)
 }
 
+// Attributes:
+//  - Resp
+//  - ErrorData
+type ResponseBool struct {
+  Resp bool `thrift:"resp,1" db:"resp" json:"resp"`
+  ErrorData *TErrorCodeResult_ `thrift:"errorData,2" db:"errorData" json:"errorData"`
+}
+
+func NewResponseBool() *ResponseBool {
+  return &ResponseBool{}
+}
+
+
+func (p *ResponseBool) GetResp() bool {
+  return p.Resp
+}
+var ResponseBool_ErrorData_DEFAULT *TErrorCodeResult_
+func (p *ResponseBool) GetErrorData() *TErrorCodeResult_ {
+  if !p.IsSetErrorData() {
+    return ResponseBool_ErrorData_DEFAULT
+  }
+return p.ErrorData
+}
+func (p *ResponseBool) IsSetErrorData() bool {
+  return p.ErrorData != nil
+}
+
+func (p *ResponseBool) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 1:
+      if fieldTypeId == thrift.BOOL {
+        if err := p.ReadField1(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 2:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField2(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *ResponseBool)  ReadField1(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadBool(); err != nil {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.Resp = v
+}
+  return nil
+}
+
+func (p *ResponseBool)  ReadField2(iprot thrift.TProtocol) error {
+  p.ErrorData = &TErrorCodeResult_{}
+  if err := p.ErrorData.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.ErrorData), err)
+  }
+  return nil
+}
+
+func (p *ResponseBool) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("ResponseBool"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField1(oprot); err != nil { return err }
+    if err := p.writeField2(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *ResponseBool) writeField1(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("resp", thrift.BOOL, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:resp: ", p), err) }
+  if err := oprot.WriteBool(bool(p.Resp)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.resp (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:resp: ", p), err) }
+  return err
+}
+
+func (p *ResponseBool) writeField2(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("errorData", thrift.STRUCT, 2); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:errorData: ", p), err) }
+  if err := p.ErrorData.Write(oprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ErrorData), err)
+  }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:errorData: ", p), err) }
+  return err
+}
+
+func (p *ResponseBool) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("ResponseBool(%+v)", *p)
+}
+
 type PubProfileService interface {
   // Parameters:
   //  - Pubkey
@@ -1110,6 +1244,14 @@ type PubProfileService interface {
   // Parameters:
   //  - UID
   GetProfileByUID(ctx context.Context, uid int64) (r *ResponseProfile, err error)
+  // Parameters:
+  //  - UID
+  //  - ProfileUpdate
+  UpdateProfileByUID(ctx context.Context, uid int64, profileUpdate *ProfileData) (r *ResponseBool, err error)
+  // Parameters:
+  //  - Pubkey
+  //  - ProfileUpdate
+  UpdateProfileByPubkey(ctx context.Context, pubkey string, profileUpdate *ProfileData) (r *ResponseBool, err error)
 }
 
 type PubProfileServiceClient struct {
@@ -1161,6 +1303,34 @@ func (p *PubProfileServiceClient) GetProfileByUID(ctx context.Context, uid int64
   return _result6.GetSuccess(), nil
 }
 
+// Parameters:
+//  - UID
+//  - ProfileUpdate
+func (p *PubProfileServiceClient) UpdateProfileByUID(ctx context.Context, uid int64, profileUpdate *ProfileData) (r *ResponseBool, err error) {
+  var _args7 PubProfileServiceUpdateProfileByUIDArgs
+  _args7.UID = uid
+  _args7.ProfileUpdate = profileUpdate
+  var _result8 PubProfileServiceUpdateProfileByUIDResult
+  if err = p.Client_().Call(ctx, "UpdateProfileByUID", &_args7, &_result8); err != nil {
+    return
+  }
+  return _result8.GetSuccess(), nil
+}
+
+// Parameters:
+//  - Pubkey
+//  - ProfileUpdate
+func (p *PubProfileServiceClient) UpdateProfileByPubkey(ctx context.Context, pubkey string, profileUpdate *ProfileData) (r *ResponseBool, err error) {
+  var _args9 PubProfileServiceUpdateProfileByPubkeyArgs
+  _args9.Pubkey = pubkey
+  _args9.ProfileUpdate = profileUpdate
+  var _result10 PubProfileServiceUpdateProfileByPubkeyResult
+  if err = p.Client_().Call(ctx, "UpdateProfileByPubkey", &_args9, &_result10); err != nil {
+    return
+  }
+  return _result10.GetSuccess(), nil
+}
+
 type PubProfileServiceProcessor struct {
   processorMap map[string]thrift.TProcessorFunction
   handler PubProfileService
@@ -1181,10 +1351,12 @@ func (p *PubProfileServiceProcessor) ProcessorMap() map[string]thrift.TProcessor
 
 func NewPubProfileServiceProcessor(handler PubProfileService) *PubProfileServiceProcessor {
 
-  self7 := &PubProfileServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
-  self7.processorMap["GetProfileByPubkey"] = &pubProfileServiceProcessorGetProfileByPubkey{handler:handler}
-  self7.processorMap["GetProfileByUID"] = &pubProfileServiceProcessorGetProfileByUID{handler:handler}
-return self7
+  self11 := &PubProfileServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
+  self11.processorMap["GetProfileByPubkey"] = &pubProfileServiceProcessorGetProfileByPubkey{handler:handler}
+  self11.processorMap["GetProfileByUID"] = &pubProfileServiceProcessorGetProfileByUID{handler:handler}
+  self11.processorMap["UpdateProfileByUID"] = &pubProfileServiceProcessorUpdateProfileByUID{handler:handler}
+  self11.processorMap["UpdateProfileByPubkey"] = &pubProfileServiceProcessorUpdateProfileByPubkey{handler:handler}
+return self11
 }
 
 func (p *PubProfileServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -1195,12 +1367,12 @@ func (p *PubProfileServiceProcessor) Process(ctx context.Context, iprot, oprot t
   }
   iprot.Skip(thrift.STRUCT)
   iprot.ReadMessageEnd()
-  x8 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
+  x12 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
   oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-  x8.Write(oprot)
+  x12.Write(oprot)
   oprot.WriteMessageEnd()
   oprot.Flush(ctx)
-  return false, x8
+  return false, x12
 
 }
 
@@ -1283,6 +1455,102 @@ var retval *ResponseProfile
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetProfileByUID", thrift.REPLY, seqId); err2 != nil {
+    err = err2
+  }
+  if err2 = result.Write(oprot); err == nil && err2 != nil {
+    err = err2
+  }
+  if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+    err = err2
+  }
+  if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+    err = err2
+  }
+  if err != nil {
+    return
+  }
+  return true, err
+}
+
+type pubProfileServiceProcessorUpdateProfileByUID struct {
+  handler PubProfileService
+}
+
+func (p *pubProfileServiceProcessorUpdateProfileByUID) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := PubProfileServiceUpdateProfileByUIDArgs{}
+  if err = args.Read(iprot); err != nil {
+    iprot.ReadMessageEnd()
+    x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+    oprot.WriteMessageBegin("UpdateProfileByUID", thrift.EXCEPTION, seqId)
+    x.Write(oprot)
+    oprot.WriteMessageEnd()
+    oprot.Flush(ctx)
+    return false, err
+  }
+
+  iprot.ReadMessageEnd()
+  result := PubProfileServiceUpdateProfileByUIDResult{}
+var retval *ResponseBool
+  var err2 error
+  if retval, err2 = p.handler.UpdateProfileByUID(ctx, args.UID, args.ProfileUpdate); err2 != nil {
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing UpdateProfileByUID: " + err2.Error())
+    oprot.WriteMessageBegin("UpdateProfileByUID", thrift.EXCEPTION, seqId)
+    x.Write(oprot)
+    oprot.WriteMessageEnd()
+    oprot.Flush(ctx)
+    return true, err2
+  } else {
+    result.Success = retval
+}
+  if err2 = oprot.WriteMessageBegin("UpdateProfileByUID", thrift.REPLY, seqId); err2 != nil {
+    err = err2
+  }
+  if err2 = result.Write(oprot); err == nil && err2 != nil {
+    err = err2
+  }
+  if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+    err = err2
+  }
+  if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+    err = err2
+  }
+  if err != nil {
+    return
+  }
+  return true, err
+}
+
+type pubProfileServiceProcessorUpdateProfileByPubkey struct {
+  handler PubProfileService
+}
+
+func (p *pubProfileServiceProcessorUpdateProfileByPubkey) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := PubProfileServiceUpdateProfileByPubkeyArgs{}
+  if err = args.Read(iprot); err != nil {
+    iprot.ReadMessageEnd()
+    x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+    oprot.WriteMessageBegin("UpdateProfileByPubkey", thrift.EXCEPTION, seqId)
+    x.Write(oprot)
+    oprot.WriteMessageEnd()
+    oprot.Flush(ctx)
+    return false, err
+  }
+
+  iprot.ReadMessageEnd()
+  result := PubProfileServiceUpdateProfileByPubkeyResult{}
+var retval *ResponseBool
+  var err2 error
+  if retval, err2 = p.handler.UpdateProfileByPubkey(ctx, args.Pubkey, args.ProfileUpdate); err2 != nil {
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing UpdateProfileByPubkey: " + err2.Error())
+    oprot.WriteMessageBegin("UpdateProfileByPubkey", thrift.EXCEPTION, seqId)
+    x.Write(oprot)
+    oprot.WriteMessageEnd()
+    oprot.Flush(ctx)
+    return true, err2
+  } else {
+    result.Success = retval
+}
+  if err2 = oprot.WriteMessageBegin("UpdateProfileByPubkey", thrift.REPLY, seqId); err2 != nil {
     err = err2
   }
   if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -1683,6 +1951,474 @@ func (p *PubProfileServiceGetProfileByUIDResult) String() string {
     return "<nil>"
   }
   return fmt.Sprintf("PubProfileServiceGetProfileByUIDResult(%+v)", *p)
+}
+
+// Attributes:
+//  - UID
+//  - ProfileUpdate
+type PubProfileServiceUpdateProfileByUIDArgs struct {
+  UID int64 `thrift:"uid,1" db:"uid" json:"uid"`
+  ProfileUpdate *ProfileData `thrift:"profileUpdate,2" db:"profileUpdate" json:"profileUpdate"`
+}
+
+func NewPubProfileServiceUpdateProfileByUIDArgs() *PubProfileServiceUpdateProfileByUIDArgs {
+  return &PubProfileServiceUpdateProfileByUIDArgs{}
+}
+
+
+func (p *PubProfileServiceUpdateProfileByUIDArgs) GetUID() int64 {
+  return p.UID
+}
+var PubProfileServiceUpdateProfileByUIDArgs_ProfileUpdate_DEFAULT *ProfileData
+func (p *PubProfileServiceUpdateProfileByUIDArgs) GetProfileUpdate() *ProfileData {
+  if !p.IsSetProfileUpdate() {
+    return PubProfileServiceUpdateProfileByUIDArgs_ProfileUpdate_DEFAULT
+  }
+return p.ProfileUpdate
+}
+func (p *PubProfileServiceUpdateProfileByUIDArgs) IsSetProfileUpdate() bool {
+  return p.ProfileUpdate != nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDArgs) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 1:
+      if fieldTypeId == thrift.I64 {
+        if err := p.ReadField1(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 2:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField2(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDArgs)  ReadField1(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadI64(); err != nil {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.UID = v
+}
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDArgs)  ReadField2(iprot thrift.TProtocol) error {
+  p.ProfileUpdate = &ProfileData{}
+  if err := p.ProfileUpdate.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.ProfileUpdate), err)
+  }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDArgs) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("UpdateProfileByUID_args"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField1(oprot); err != nil { return err }
+    if err := p.writeField2(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDArgs) writeField1(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("uid", thrift.I64, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:uid: ", p), err) }
+  if err := oprot.WriteI64(int64(p.UID)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.uid (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:uid: ", p), err) }
+  return err
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDArgs) writeField2(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("profileUpdate", thrift.STRUCT, 2); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:profileUpdate: ", p), err) }
+  if err := p.ProfileUpdate.Write(oprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ProfileUpdate), err)
+  }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:profileUpdate: ", p), err) }
+  return err
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDArgs) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("PubProfileServiceUpdateProfileByUIDArgs(%+v)", *p)
+}
+
+// Attributes:
+//  - Success
+type PubProfileServiceUpdateProfileByUIDResult struct {
+  Success *ResponseBool `thrift:"success,0" db:"success" json:"success,omitempty"`
+}
+
+func NewPubProfileServiceUpdateProfileByUIDResult() *PubProfileServiceUpdateProfileByUIDResult {
+  return &PubProfileServiceUpdateProfileByUIDResult{}
+}
+
+var PubProfileServiceUpdateProfileByUIDResult_Success_DEFAULT *ResponseBool
+func (p *PubProfileServiceUpdateProfileByUIDResult) GetSuccess() *ResponseBool {
+  if !p.IsSetSuccess() {
+    return PubProfileServiceUpdateProfileByUIDResult_Success_DEFAULT
+  }
+return p.Success
+}
+func (p *PubProfileServiceUpdateProfileByUIDResult) IsSetSuccess() bool {
+  return p.Success != nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDResult) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 0:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField0(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDResult)  ReadField0(iprot thrift.TProtocol) error {
+  p.Success = &ResponseBool{}
+  if err := p.Success.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
+  }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDResult) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("UpdateProfileByUID_result"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField0(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDResult) writeField0(oprot thrift.TProtocol) (err error) {
+  if p.IsSetSuccess() {
+    if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
+    if err := p.Success.Write(oprot); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
+    }
+    if err := oprot.WriteFieldEnd(); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
+  }
+  return err
+}
+
+func (p *PubProfileServiceUpdateProfileByUIDResult) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("PubProfileServiceUpdateProfileByUIDResult(%+v)", *p)
+}
+
+// Attributes:
+//  - Pubkey
+//  - ProfileUpdate
+type PubProfileServiceUpdateProfileByPubkeyArgs struct {
+  Pubkey string `thrift:"pubkey,1" db:"pubkey" json:"pubkey"`
+  ProfileUpdate *ProfileData `thrift:"profileUpdate,2" db:"profileUpdate" json:"profileUpdate"`
+}
+
+func NewPubProfileServiceUpdateProfileByPubkeyArgs() *PubProfileServiceUpdateProfileByPubkeyArgs {
+  return &PubProfileServiceUpdateProfileByPubkeyArgs{}
+}
+
+
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs) GetPubkey() string {
+  return p.Pubkey
+}
+var PubProfileServiceUpdateProfileByPubkeyArgs_ProfileUpdate_DEFAULT *ProfileData
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs) GetProfileUpdate() *ProfileData {
+  if !p.IsSetProfileUpdate() {
+    return PubProfileServiceUpdateProfileByPubkeyArgs_ProfileUpdate_DEFAULT
+  }
+return p.ProfileUpdate
+}
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs) IsSetProfileUpdate() bool {
+  return p.ProfileUpdate != nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 1:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField1(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 2:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField2(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs)  ReadField1(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.Pubkey = v
+}
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs)  ReadField2(iprot thrift.TProtocol) error {
+  p.ProfileUpdate = &ProfileData{}
+  if err := p.ProfileUpdate.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.ProfileUpdate), err)
+  }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("UpdateProfileByPubkey_args"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField1(oprot); err != nil { return err }
+    if err := p.writeField2(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs) writeField1(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("pubkey", thrift.STRING, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:pubkey: ", p), err) }
+  if err := oprot.WriteString(string(p.Pubkey)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.pubkey (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:pubkey: ", p), err) }
+  return err
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs) writeField2(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("profileUpdate", thrift.STRUCT, 2); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:profileUpdate: ", p), err) }
+  if err := p.ProfileUpdate.Write(oprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ProfileUpdate), err)
+  }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:profileUpdate: ", p), err) }
+  return err
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyArgs) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("PubProfileServiceUpdateProfileByPubkeyArgs(%+v)", *p)
+}
+
+// Attributes:
+//  - Success
+type PubProfileServiceUpdateProfileByPubkeyResult struct {
+  Success *ResponseBool `thrift:"success,0" db:"success" json:"success,omitempty"`
+}
+
+func NewPubProfileServiceUpdateProfileByPubkeyResult() *PubProfileServiceUpdateProfileByPubkeyResult {
+  return &PubProfileServiceUpdateProfileByPubkeyResult{}
+}
+
+var PubProfileServiceUpdateProfileByPubkeyResult_Success_DEFAULT *ResponseBool
+func (p *PubProfileServiceUpdateProfileByPubkeyResult) GetSuccess() *ResponseBool {
+  if !p.IsSetSuccess() {
+    return PubProfileServiceUpdateProfileByPubkeyResult_Success_DEFAULT
+  }
+return p.Success
+}
+func (p *PubProfileServiceUpdateProfileByPubkeyResult) IsSetSuccess() bool {
+  return p.Success != nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyResult) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 0:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField0(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyResult)  ReadField0(iprot thrift.TProtocol) error {
+  p.Success = &ResponseBool{}
+  if err := p.Success.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
+  }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyResult) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("UpdateProfileByPubkey_result"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField0(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyResult) writeField0(oprot thrift.TProtocol) (err error) {
+  if p.IsSetSuccess() {
+    if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
+    if err := p.Success.Write(oprot); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
+    }
+    if err := oprot.WriteFieldEnd(); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
+  }
+  return err
+}
+
+func (p *PubProfileServiceUpdateProfileByPubkeyResult) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("PubProfileServiceUpdateProfileByPubkeyResult(%+v)", *p)
 }
 
 
