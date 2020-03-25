@@ -27,8 +27,11 @@ func (m *pubprofileclient) GetProfileByUID(uid int64) (r *pubprofile.ProfileData
 
 	defer client.BackToPool()
 
-	if resp != nil {
+	if resp != nil && resp.ProfileData != nil {
 		fmt.Println(resp.ProfileData)
+		if resp.ProfileData.Pubkey == "" && resp.ProfileData.DisplayName == "" && resp.ProfileData.LastModified == 0 {
+			return nil, errors.New("Profile not existed")
+		}
 		return resp.ProfileData, nil
 	}
 	return nil, errors.New("Get data nil")
@@ -46,7 +49,10 @@ func (m *pubprofileclient) GetProfileByPubkey(pubkey string) (r *pubprofile.Prof
 	}
 	defer client.BackToPool()
 
-	if resp != nil {
+	if resp != nil && resp.ProfileData != nil {
+		if resp.ProfileData.Pubkey == "" && resp.ProfileData.DisplayName == "" && resp.ProfileData.LastModified == 0 {
+			return nil, errors.New("Profile not existed")
+		}
 		return resp.ProfileData, nil
 	}
 	return nil, errors.New("Get data nil")
