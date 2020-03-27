@@ -20,6 +20,15 @@ type simpleSessionClient struct {
 }
 
 func (m *simpleSessionClient) GetSession(sskey string) (*simplesession.TUserSessionInfo, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -37,6 +46,15 @@ func (m *simpleSessionClient) GetSession(sskey string) (*simplesession.TUserSess
 }
 
 func (m *simpleSessionClient) CreateSession(uid int64) (string, error) {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return "", errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -59,6 +77,15 @@ func (m *simpleSessionClient) CreateSession(uid int64) (string, error) {
 }
 
 func (m *simpleSessionClient) RemoveSession(sskey string) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
