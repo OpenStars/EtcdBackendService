@@ -3,7 +3,6 @@ package StringBigsetService
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -90,6 +89,7 @@ func (m *StringBigsetService) GetListKey(fromIndex int64, count int32) ([]string
 }
 
 func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.TItem) error {
+
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -99,7 +99,7 @@ func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.
 			m.port = p
 		}
 	}
-
+	// log.Println("BsPutItem host", m.host+":"+m.port)
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
@@ -205,7 +205,7 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 	}
 
 	client := transports.GetBsGenericClient(m.host, m.port)
-	fmt.Printf("[BsGetItem] get client host = %s, %s, key = %s, %s \n", m.host, m.port, bskey, itemkey)
+	// fmt.Printf("[BsGetItem] get client host = %s, %s, key = %s, %s \n", m.host, m.port, bskey, itemkey)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}

@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
-
 	"github.com/OpenStars/EtcdBackendService/StringBigsetService"
 
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
@@ -13,16 +11,17 @@ import (
 func TestSV() {
 	svClient := StringBigsetService.NewStringBigsetServiceModel("/test/", []string{"10.60.1.20:2379"},
 		GoEndpointBackendManager.EndPoint{
-			Host:      "10.60.1.20",
-			Port:      "18408",
+			Host:      "10.60.68.103",
+			Port:      "20507",
 			ServiceID: "/aa/bb",
 		})
 
-	lsItems, err := svClient.BsGetSlice(generic.TStringKey("02ea252935dfc60ed6c882897ee0a52b6ac30fa5fa7570344317e6a5e6ef52a87f"), 0, 1)
+	total, err := svClient.TotalStringKeyCount()
+	// lsItems, err := svClient.TotalStringKeyCount(generic.TStringKey("02ea252935dfc60ed6c882897ee0a52b6ac30fa5fa7570344317e6a5e6ef52a87f"), 0, 1)
 	if err != nil {
 		log.Println("err", err)
 	}
-	log.Println("item", string(lsItems[0].Key), "value", string(lsItems[0].Value))
+	log.Println("totala", total)
 	// total, err := svClient.TotalStringKeyCount()
 	// lsKey, err := svClient.GetListKey(0, int32(total))
 	// if err != nil {
