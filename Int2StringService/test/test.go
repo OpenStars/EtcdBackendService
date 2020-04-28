@@ -1,17 +1,18 @@
 package main
 
 import (
-	"github.com/OpenStars/EtcdBackendSerivce/StringBigsetSerivce"
+	"log"
 
-	"github.com/OpenStars/EtcdBackendSerivce/Int2StringService"
-	"github.com/OpenStars/EtcdBackendSerivce/String2Int64Service"
+	"github.com/OpenStars/EtcdBackendService/Int2StringService"
+	"github.com/OpenStars/EtcdBackendService/String2Int64Service"
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 type Server struct {
 	int2string   Int2StringService.Int2StringServiceIf
 	string2int   String2Int64Service.String2Int64ServiceIf
-	stringbigset StringBigsetSerivce.StringBigsetServiceIf
+	stringbigset StringBigsetService.StringBigsetServiceIf
 }
 
 func (s *Server) Run() {
@@ -28,11 +29,25 @@ func TestStringBigset() {
 		Host:      "127.0.0.1",
 		Port:      "8883",
 	}
-	ai2s := StringBigsetSerivce.NewStringBigsetServiceModel(sid, etcd, defaultEp)
+	ai2s := StringBigsetService.NewStringBigsetServiceModel(sid, etcd, defaultEp)
 	sv := &Server{
 		stringbigset: ai2s,
 	}
 	sv.Run()
+}
+
+func TestI64() {
+	sv := Int2StringService.NewInt2StringService("/test/", []string{"10.60.1.20:2379"}, GoEndpointBackendManager.EndPoint{
+		Host:      "10.110.1.21",
+		Port:      "37183",
+		ServiceID: "/test/",
+	})
+	err := sv.PutData(64, "sonlh")
+	data, err := sv.GetData(64)
+	if err != nil {
+		log.Println("err", err)
+	}
+	log.Println("data", data)
 }
 
 func TestString2Int() {
@@ -69,5 +84,6 @@ func main() {
 	// TestInt2String()
 	// TestString2Int()
 
-	TestStringBigset()
+	// TestStringBigset()
+	TestI64()
 }

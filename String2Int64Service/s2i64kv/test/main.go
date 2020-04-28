@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/OpenStars/backendclients/go/s2skv/thrift/gen-go/OpenStars/Common/S2SKV"
-	"github.com/OpenStars/backendclients/go/s2skv/transports"
+	"github.com/OpenStars/EtcdBackendService/String2Int64Service"
+	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
+
+	"github.com/OpenStars/EtcdBackendService/s2skv/thrift/gen-go/OpenStars/Common/S2SKV"
+	"github.com/OpenStars/EtcdBackendService/s2skv/transports"
 )
 
 func TestPutPubkey2Uid() {
@@ -25,7 +28,7 @@ func TestPutPubkey2Uid() {
 }
 
 func TestGetPubkey2Uid() {
-	client := transports.GetS2SCompactClient("127.0.0.1", "8883")
+	client := transports.GetS2SCompactClient("10.110.1.21", "37173")
 	if client == nil || client.Client == nil {
 		log.Println("Model cannot connect to backend")
 		return
@@ -82,10 +85,24 @@ func TestGetAddress2Pubkey() {
 	}
 	fmt.Println("rs:", rs)
 }
+func TestService() {
+	testservice := String2Int64Service.NewString2Int64Service("/test/", []string{"10.60.1.20:2379"}, GoEndpointBackendManager.EndPoint{
+		Host:      "10.110.1.21",
+		Port:      "37173",
+		ServiceID: "/test",
+	})
+	err := testservice.PutData("sonlh", 64)
+	uid, err := testservice.GetData("sonlh")
+	if err != nil {
+		log.Println("err", err)
+	}
+	log.Println("uid", uid)
+}
 func main() {
 	// TestGetPubkey2Uid()
 	// TestPutPubkey2Uid()
 	// TestGetUid2Pubkey()
 	//TestPutAddress2Uid()
-	TestGetAddress2Pubkey()
+	// TestGetAddress2Pubkey()
+	TestService()
 }
