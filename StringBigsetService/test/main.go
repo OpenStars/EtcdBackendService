@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
+
 	"github.com/OpenStars/EtcdBackendService/StringBigsetService"
 
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
@@ -12,11 +14,11 @@ func TestSV() {
 	svClient := StringBigsetService.NewStringBigsetServiceModel("/test/", []string{"10.60.1.20:2379"},
 		GoEndpointBackendManager.EndPoint{
 			Host:      "10.60.68.103",
-			Port:      "20507",
+			Port:      "20407",
 			ServiceID: "/aa/bb",
 		})
 
-	total, err := svClient.TotalStringKeyCount()
+	total, err := svClient.GetTotalCount(generic.TStringKey("SYSTEM_USER_ACTIVE"))
 	// lsItems, err := svClient.TotalStringKeyCount(generic.TStringKey("02ea252935dfc60ed6c882897ee0a52b6ac30fa5fa7570344317e6a5e6ef52a87f"), 0, 1)
 	if err != nil {
 		log.Println("err", err)

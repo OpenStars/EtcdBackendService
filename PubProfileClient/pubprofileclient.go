@@ -3,7 +3,6 @@ package PubProfileClient
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/OpenStars/EtcdBackendService/tpubprofileservice/thrift/gen-go/openstars/pubprofile"
 	"github.com/OpenStars/EtcdBackendService/tpubprofileservice/transports"
@@ -28,7 +27,7 @@ func (m *pubprofileclient) GetProfileByUID(uid int64) (r *pubprofile.ProfileData
 	defer client.BackToPool()
 
 	if resp != nil && resp.ProfileData != nil {
-		fmt.Println(resp.ProfileData)
+
 		if resp.ProfileData.Pubkey == "" && resp.ProfileData.DisplayName == "" && resp.ProfileData.LastModified == 0 {
 			return nil, errors.New("Profile not existed")
 		}

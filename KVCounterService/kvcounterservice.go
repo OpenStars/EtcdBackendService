@@ -158,11 +158,51 @@ func NewKVCounterServiceModel(serviceID string, etcdServers []string, defaultEnp
 	}
 
 	if kvcounter.etcdManager == nil {
-		return nil
+		return kvcounter
 	}
 	err := kvcounter.etcdManager.SetDefaultEntpoint(serviceID, defaultEnpoint.Host, defaultEnpoint.Port)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
+	}
+	// kvcounter.etcdManager.GetAllEndpoint(serviceID)
+	return kvcounter
+}
+
+func NewKVCounterServiceModel2(etcdServers []string, sid, defaultHost, defaultPort string) KVCounterServiceIf {
+	// aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
+	// err, ep := aepm.GetEndPoint()
+	// if err != nil {
+	// 	// log.Println("Load endpoit ", serviceID, "err", err.Error())
+	// 	log.Println("Init Local KVCounterService sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+	// 	return &KVCounterService{
+	// 		host: defaultEnpoint.Host,
+	// 		port: defaultEnpoint.Port,
+	// 		sid:  defaultEnpoint.ServiceID,
+	// 	}
+	// }
+	// sv := &KVCounterService{
+	// 	host: ep.Host,
+	// 	port: ep.Port,
+	// 	sid:  ep.ServiceID,
+	// }
+	// go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
+	// sv.epm = aepm
+	// log.Println("Init From Etcd KVCounterService sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	// return sv
+	kvcounter := &KVCounterService{
+		host:        defaultHost,
+		port:        defaultPort,
+		sid:         sid,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+	}
+
+	if kvcounter.etcdManager == nil {
+		return kvcounter
+	}
+	err := kvcounter.etcdManager.SetDefaultEntpoint(sid, defaultHost, defaultPort)
+	if err != nil {
+		log.Println("SetDefaultEndpoint sid", sid, "err", err)
 		return nil
 	}
 	// kvcounter.etcdManager.GetAllEndpoint(serviceID)
