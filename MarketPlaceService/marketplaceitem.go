@@ -42,7 +42,7 @@ func (m *marketplaceitemservice) GetData(key int64) (*MarketPlace.TMarketPlaceIt
 	}
 
 	defer client.BackToPool()
-	if r.Data == nil {
+	if r.Data == nil || r.Data.ID == 0 {
 		return nil, errors.New("Backend service:" + m.sid + " key not found")
 	}
 	if r.ErrorCode != MarketPlace.TErrorCode_EGood {
