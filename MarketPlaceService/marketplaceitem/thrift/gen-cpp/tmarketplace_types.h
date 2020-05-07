@@ -106,7 +106,7 @@ void swap(TMediaItem &a, TMediaItem &b);
 std::ostream& operator<<(std::ostream& out, const TMediaItem& obj);
 
 typedef struct _TMarketPlaceItem__isset {
-  _TMarketPlaceItem__isset() : ID(false), title(false), price(false), listMediaItems(false), category(false), subfeatures(false), descriptions(false), uid(false), count(false), isdelivery(false), tags(false), timestamps(false) {}
+  _TMarketPlaceItem__isset() : ID(false), title(false), price(false), listMediaItems(false), category(false), subfeatures(false), descriptions(false), uid(false), count(false), isdelivery(false), tags(false), timestamps(false), location(false) {}
   bool ID :1;
   bool title :1;
   bool price :1;
@@ -119,6 +119,7 @@ typedef struct _TMarketPlaceItem__isset {
   bool isdelivery :1;
   bool tags :1;
   bool timestamps :1;
+  bool location :1;
 } _TMarketPlaceItem__isset;
 
 class TMarketPlaceItem : public virtual ::apache::thrift::TBase {
@@ -126,7 +127,7 @@ class TMarketPlaceItem : public virtual ::apache::thrift::TBase {
 
   TMarketPlaceItem(const TMarketPlaceItem&);
   TMarketPlaceItem& operator=(const TMarketPlaceItem&);
-  TMarketPlaceItem() : ID(0), title(), price(0), category(0), descriptions(), uid(0), count(0), isdelivery(0), timestamps(0) {
+  TMarketPlaceItem() : ID(0), title(), price(0), category(0), descriptions(), uid(0), count(0), isdelivery(0), timestamps(0), location() {
   }
 
   virtual ~TMarketPlaceItem() throw();
@@ -142,6 +143,7 @@ class TMarketPlaceItem : public virtual ::apache::thrift::TBase {
   bool isdelivery;
   std::vector<std::string>  tags;
   int64_t timestamps;
+  std::string location;
 
   _TMarketPlaceItem__isset __isset;
 
@@ -169,6 +171,8 @@ class TMarketPlaceItem : public virtual ::apache::thrift::TBase {
 
   void __set_timestamps(const int64_t val);
 
+  void __set_location(const std::string& val);
+
   bool operator == (const TMarketPlaceItem & rhs) const
   {
     if (!(ID == rhs.ID))
@@ -194,6 +198,8 @@ class TMarketPlaceItem : public virtual ::apache::thrift::TBase {
     if (!(tags == rhs.tags))
       return false;
     if (!(timestamps == rhs.timestamps))
+      return false;
+    if (!(location == rhs.location))
       return false;
     return true;
   }

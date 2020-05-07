@@ -265,6 +265,10 @@ void TMarketPlaceItem::__set_tags(const std::vector<std::string> & val) {
 void TMarketPlaceItem::__set_timestamps(const int64_t val) {
   this->timestamps = val;
 }
+
+void TMarketPlaceItem::__set_location(const std::string& val) {
+  this->location = val;
+}
 std::ostream& operator<<(std::ostream& out, const TMarketPlaceItem& obj)
 {
   obj.printTo(out);
@@ -428,6 +432,14 @@ uint32_t TMarketPlaceItem::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 13:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->location);
+          this->__isset.location = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -518,6 +530,10 @@ uint32_t TMarketPlaceItem::write(::apache::thrift::protocol::TProtocol* oprot) c
   xfer += oprot->writeI64(this->timestamps);
   xfer += oprot->writeFieldEnd();
 
+  xfer += oprot->writeFieldBegin("location", ::apache::thrift::protocol::T_STRING, 13);
+  xfer += oprot->writeString(this->location);
+  xfer += oprot->writeFieldEnd();
+
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -537,6 +553,7 @@ void swap(TMarketPlaceItem &a, TMarketPlaceItem &b) {
   swap(a.isdelivery, b.isdelivery);
   swap(a.tags, b.tags);
   swap(a.timestamps, b.timestamps);
+  swap(a.location, b.location);
   swap(a.__isset, b.__isset);
 }
 
@@ -553,6 +570,7 @@ TMarketPlaceItem::TMarketPlaceItem(const TMarketPlaceItem& other30) {
   isdelivery = other30.isdelivery;
   tags = other30.tags;
   timestamps = other30.timestamps;
+  location = other30.location;
   __isset = other30.__isset;
 }
 TMarketPlaceItem& TMarketPlaceItem::operator=(const TMarketPlaceItem& other31) {
@@ -568,6 +586,7 @@ TMarketPlaceItem& TMarketPlaceItem::operator=(const TMarketPlaceItem& other31) {
   isdelivery = other31.isdelivery;
   tags = other31.tags;
   timestamps = other31.timestamps;
+  location = other31.location;
   __isset = other31.__isset;
   return *this;
 }
@@ -586,6 +605,7 @@ void TMarketPlaceItem::printTo(std::ostream& out) const {
   out << ", " << "isdelivery=" << to_string(isdelivery);
   out << ", " << "tags=" << to_string(tags);
   out << ", " << "timestamps=" << to_string(timestamps);
+  out << ", " << "location=" << to_string(location);
   out << ")";
 }
 

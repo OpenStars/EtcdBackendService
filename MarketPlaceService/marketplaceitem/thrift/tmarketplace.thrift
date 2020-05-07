@@ -31,6 +31,7 @@ struct TMarketPlaceItem{
     10: bool isdelivery,
     11: list<string> tags,
     12: i64 timestamps,
+    13: string location,
 }
 
 typedef TMarketPlaceItem TData

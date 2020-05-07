@@ -362,6 +362,7 @@ func (p *TMediaItem) String() string {
 //  - Isdelivery
 //  - Tags
 //  - Timestamps
+//  - Location
 type TMarketPlaceItem struct {
 	ID             int64             `thrift:"ID,1" db:"ID" json:"ID"`
 	Title          string            `thrift:"title,2" db:"title" json:"title"`
@@ -375,6 +376,7 @@ type TMarketPlaceItem struct {
 	Isdelivery     bool              `thrift:"isdelivery,10" db:"isdelivery" json:"isdelivery"`
 	Tags           []string          `thrift:"tags,11" db:"tags" json:"tags"`
 	Timestamps     int64             `thrift:"timestamps,12" db:"timestamps" json:"timestamps"`
+	Location       string            `thrift:"location,13" db:"location" json:"location"`
 }
 
 func NewTMarketPlaceItem() *TMarketPlaceItem {
@@ -427,6 +429,10 @@ func (p *TMarketPlaceItem) GetTags() []string {
 
 func (p *TMarketPlaceItem) GetTimestamps() int64 {
 	return p.Timestamps
+}
+
+func (p *TMarketPlaceItem) GetLocation() string {
+	return p.Location
 }
 func (p *TMarketPlaceItem) Read(iprot thrift.TProtocol) error {
 	if _, err := iprot.ReadStructBegin(); err != nil {
@@ -555,6 +561,16 @@ func (p *TMarketPlaceItem) Read(iprot thrift.TProtocol) error {
 		case 12:
 			if fieldTypeId == thrift.I64 {
 				if err := p.ReadField12(iprot); err != nil {
+					return err
+				}
+			} else {
+				if err := iprot.Skip(fieldTypeId); err != nil {
+					return err
+				}
+			}
+		case 13:
+			if fieldTypeId == thrift.STRING {
+				if err := p.ReadField13(iprot); err != nil {
 					return err
 				}
 			} else {
@@ -728,6 +744,15 @@ func (p *TMarketPlaceItem) ReadField12(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *TMarketPlaceItem) ReadField13(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return thrift.PrependError("error reading field 13: ", err)
+	} else {
+		p.Location = v
+	}
+	return nil
+}
+
 func (p *TMarketPlaceItem) Write(oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin("TMarketPlaceItem"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
@@ -767,6 +792,9 @@ func (p *TMarketPlaceItem) Write(oprot thrift.TProtocol) error {
 			return err
 		}
 		if err := p.writeField12(oprot); err != nil {
+			return err
+		}
+		if err := p.writeField13(oprot); err != nil {
 			return err
 		}
 	}
@@ -958,6 +986,19 @@ func (p *TMarketPlaceItem) writeField12(oprot thrift.TProtocol) (err error) {
 	}
 	if err := oprot.WriteFieldEnd(); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 12:timestamps: ", p), err)
+	}
+	return err
+}
+
+func (p *TMarketPlaceItem) writeField13(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("location", thrift.STRING, 13); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 13:location: ", p), err)
+	}
+	if err := oprot.WriteString(string(p.Location)); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T.location (13) field write error: ", p), err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 13:location: ", p), err)
 	}
 	return err
 }
