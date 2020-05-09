@@ -15,7 +15,8 @@ const indexString = `
 		"number_of_replicas": 0
 	},
 	"mappings":{
-		
+		"_doc": {
+		}
 	}
 }`
 
@@ -31,9 +32,8 @@ func NewESClient(url, indexName, typeName string) ESClientServiceIf {
 		indexName: indexName,
 		typeName:  typeName,
 	}
-
-	// make index if not existed
 	es.checkExistedIndex(indexString)
+
 	return es
 }
 
