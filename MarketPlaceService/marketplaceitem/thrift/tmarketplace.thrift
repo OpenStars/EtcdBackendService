@@ -18,6 +18,11 @@ struct TMediaItem{
     4:map<string,string> extend,
 }
 
+struct TLocation {
+    1:double latitude,
+    2:double longitude,
+    3:map<string,string> extend,
+}
 struct TMarketPlaceItem{
     1: i64 ID,
     2: string title,
@@ -31,7 +36,7 @@ struct TMarketPlaceItem{
     10: bool isdelivery,
     11: list<string> tags,
     12: i64 timestamps,
-    13: string location,
+    13: TLocation location,
 }
 
 typedef TMarketPlaceItem TData

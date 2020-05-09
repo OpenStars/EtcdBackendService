@@ -223,6 +223,162 @@ void TMediaItem::printTo(std::ostream& out) const {
 }
 
 
+TLocation::~TLocation() noexcept {
+}
+
+
+void TLocation::__set_latitude(const double val) {
+  this->latitude = val;
+}
+
+void TLocation::__set_longitude(const double val) {
+  this->longitude = val;
+}
+
+void TLocation::__set_extend(const std::map<std::string, std::string> & val) {
+  this->extend = val;
+}
+std::ostream& operator<<(std::ostream& out, const TLocation& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t TLocation::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_DOUBLE) {
+          xfer += iprot->readDouble(this->latitude);
+          this->__isset.latitude = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_DOUBLE) {
+          xfer += iprot->readDouble(this->longitude);
+          this->__isset.longitude = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->extend.clear();
+            uint32_t _size10;
+            ::apache::thrift::protocol::TType _ktype11;
+            ::apache::thrift::protocol::TType _vtype12;
+            xfer += iprot->readMapBegin(_ktype11, _vtype12, _size10);
+            uint32_t _i14;
+            for (_i14 = 0; _i14 < _size10; ++_i14)
+            {
+              std::string _key15;
+              xfer += iprot->readString(_key15);
+              std::string& _val16 = this->extend[_key15];
+              xfer += iprot->readString(_val16);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.extend = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t TLocation::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("TLocation");
+
+  xfer += oprot->writeFieldBegin("latitude", ::apache::thrift::protocol::T_DOUBLE, 1);
+  xfer += oprot->writeDouble(this->latitude);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("longitude", ::apache::thrift::protocol::T_DOUBLE, 2);
+  xfer += oprot->writeDouble(this->longitude);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("extend", ::apache::thrift::protocol::T_MAP, 3);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->extend.size()));
+    std::map<std::string, std::string> ::const_iterator _iter17;
+    for (_iter17 = this->extend.begin(); _iter17 != this->extend.end(); ++_iter17)
+    {
+      xfer += oprot->writeString(_iter17->first);
+      xfer += oprot->writeString(_iter17->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(TLocation &a, TLocation &b) {
+  using ::std::swap;
+  swap(a.latitude, b.latitude);
+  swap(a.longitude, b.longitude);
+  swap(a.extend, b.extend);
+  swap(a.__isset, b.__isset);
+}
+
+TLocation::TLocation(const TLocation& other18) {
+  latitude = other18.latitude;
+  longitude = other18.longitude;
+  extend = other18.extend;
+  __isset = other18.__isset;
+}
+TLocation& TLocation::operator=(const TLocation& other19) {
+  latitude = other19.latitude;
+  longitude = other19.longitude;
+  extend = other19.extend;
+  __isset = other19.__isset;
+  return *this;
+}
+void TLocation::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "TLocation(";
+  out << "latitude=" << to_string(latitude);
+  out << ", " << "longitude=" << to_string(longitude);
+  out << ", " << "extend=" << to_string(extend);
+  out << ")";
+}
+
+
 TMarketPlaceItem::~TMarketPlaceItem() noexcept {
 }
 
@@ -275,7 +431,7 @@ void TMarketPlaceItem::__set_timestamps(const int64_t val) {
   this->timestamps = val;
 }
 
-void TMarketPlaceItem::__set_location(const std::string& val) {
+void TMarketPlaceItem::__set_location(const TLocation& val) {
   this->location = val;
 }
 std::ostream& operator<<(std::ostream& out, const TMarketPlaceItem& obj)
@@ -334,14 +490,14 @@ uint32_t TMarketPlaceItem::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->listMediaItems.clear();
-            uint32_t _size10;
-            ::apache::thrift::protocol::TType _etype13;
-            xfer += iprot->readListBegin(_etype13, _size10);
-            this->listMediaItems.resize(_size10);
-            uint32_t _i14;
-            for (_i14 = 0; _i14 < _size10; ++_i14)
+            uint32_t _size20;
+            ::apache::thrift::protocol::TType _etype23;
+            xfer += iprot->readListBegin(_etype23, _size20);
+            this->listMediaItems.resize(_size20);
+            uint32_t _i24;
+            for (_i24 = 0; _i24 < _size20; ++_i24)
             {
-              xfer += this->listMediaItems[_i14].read(iprot);
+              xfer += this->listMediaItems[_i24].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -362,17 +518,17 @@ uint32_t TMarketPlaceItem::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->subfeatures.clear();
-            uint32_t _size15;
-            ::apache::thrift::protocol::TType _ktype16;
-            ::apache::thrift::protocol::TType _vtype17;
-            xfer += iprot->readMapBegin(_ktype16, _vtype17, _size15);
-            uint32_t _i19;
-            for (_i19 = 0; _i19 < _size15; ++_i19)
+            uint32_t _size25;
+            ::apache::thrift::protocol::TType _ktype26;
+            ::apache::thrift::protocol::TType _vtype27;
+            xfer += iprot->readMapBegin(_ktype26, _vtype27, _size25);
+            uint32_t _i29;
+            for (_i29 = 0; _i29 < _size25; ++_i29)
             {
-              std::string _key20;
-              xfer += iprot->readString(_key20);
-              std::string& _val21 = this->subfeatures[_key20];
-              xfer += iprot->readString(_val21);
+              std::string _key30;
+              xfer += iprot->readString(_key30);
+              std::string& _val31 = this->subfeatures[_key30];
+              xfer += iprot->readString(_val31);
             }
             xfer += iprot->readMapEnd();
           }
@@ -417,14 +573,14 @@ uint32_t TMarketPlaceItem::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->tags.clear();
-            uint32_t _size22;
-            ::apache::thrift::protocol::TType _etype25;
-            xfer += iprot->readListBegin(_etype25, _size22);
-            this->tags.resize(_size22);
-            uint32_t _i26;
-            for (_i26 = 0; _i26 < _size22; ++_i26)
+            uint32_t _size32;
+            ::apache::thrift::protocol::TType _etype35;
+            xfer += iprot->readListBegin(_etype35, _size32);
+            this->tags.resize(_size32);
+            uint32_t _i36;
+            for (_i36 = 0; _i36 < _size32; ++_i36)
             {
-              xfer += iprot->readString(this->tags[_i26]);
+              xfer += iprot->readString(this->tags[_i36]);
             }
             xfer += iprot->readListEnd();
           }
@@ -442,8 +598,8 @@ uint32_t TMarketPlaceItem::read(::apache::thrift::protocol::TProtocol* iprot) {
         }
         break;
       case 13:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->location);
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->location.read(iprot);
           this->__isset.location = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -481,10 +637,10 @@ uint32_t TMarketPlaceItem::write(::apache::thrift::protocol::TProtocol* oprot) c
   xfer += oprot->writeFieldBegin("listMediaItems", ::apache::thrift::protocol::T_LIST, 4);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->listMediaItems.size()));
-    std::vector<TMediaItem> ::const_iterator _iter27;
-    for (_iter27 = this->listMediaItems.begin(); _iter27 != this->listMediaItems.end(); ++_iter27)
+    std::vector<TMediaItem> ::const_iterator _iter37;
+    for (_iter37 = this->listMediaItems.begin(); _iter37 != this->listMediaItems.end(); ++_iter37)
     {
-      xfer += (*_iter27).write(oprot);
+      xfer += (*_iter37).write(oprot);
     }
     xfer += oprot->writeListEnd();
   }
@@ -497,11 +653,11 @@ uint32_t TMarketPlaceItem::write(::apache::thrift::protocol::TProtocol* oprot) c
   xfer += oprot->writeFieldBegin("subfeatures", ::apache::thrift::protocol::T_MAP, 6);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->subfeatures.size()));
-    std::map<std::string, std::string> ::const_iterator _iter28;
-    for (_iter28 = this->subfeatures.begin(); _iter28 != this->subfeatures.end(); ++_iter28)
+    std::map<std::string, std::string> ::const_iterator _iter38;
+    for (_iter38 = this->subfeatures.begin(); _iter38 != this->subfeatures.end(); ++_iter38)
     {
-      xfer += oprot->writeString(_iter28->first);
-      xfer += oprot->writeString(_iter28->second);
+      xfer += oprot->writeString(_iter38->first);
+      xfer += oprot->writeString(_iter38->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -526,10 +682,10 @@ uint32_t TMarketPlaceItem::write(::apache::thrift::protocol::TProtocol* oprot) c
   xfer += oprot->writeFieldBegin("tags", ::apache::thrift::protocol::T_LIST, 11);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->tags.size()));
-    std::vector<std::string> ::const_iterator _iter29;
-    for (_iter29 = this->tags.begin(); _iter29 != this->tags.end(); ++_iter29)
+    std::vector<std::string> ::const_iterator _iter39;
+    for (_iter39 = this->tags.begin(); _iter39 != this->tags.end(); ++_iter39)
     {
-      xfer += oprot->writeString((*_iter29));
+      xfer += oprot->writeString((*_iter39));
     }
     xfer += oprot->writeListEnd();
   }
@@ -539,8 +695,8 @@ uint32_t TMarketPlaceItem::write(::apache::thrift::protocol::TProtocol* oprot) c
   xfer += oprot->writeI64(this->timestamps);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("location", ::apache::thrift::protocol::T_STRING, 13);
-  xfer += oprot->writeString(this->location);
+  xfer += oprot->writeFieldBegin("location", ::apache::thrift::protocol::T_STRUCT, 13);
+  xfer += this->location.write(oprot);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -566,37 +722,37 @@ void swap(TMarketPlaceItem &a, TMarketPlaceItem &b) {
   swap(a.__isset, b.__isset);
 }
 
-TMarketPlaceItem::TMarketPlaceItem(const TMarketPlaceItem& other30) {
-  ID = other30.ID;
-  title = other30.title;
-  price = other30.price;
-  listMediaItems = other30.listMediaItems;
-  category = other30.category;
-  subfeatures = other30.subfeatures;
-  descriptions = other30.descriptions;
-  uid = other30.uid;
-  count = other30.count;
-  isdelivery = other30.isdelivery;
-  tags = other30.tags;
-  timestamps = other30.timestamps;
-  location = other30.location;
-  __isset = other30.__isset;
+TMarketPlaceItem::TMarketPlaceItem(const TMarketPlaceItem& other40) {
+  ID = other40.ID;
+  title = other40.title;
+  price = other40.price;
+  listMediaItems = other40.listMediaItems;
+  category = other40.category;
+  subfeatures = other40.subfeatures;
+  descriptions = other40.descriptions;
+  uid = other40.uid;
+  count = other40.count;
+  isdelivery = other40.isdelivery;
+  tags = other40.tags;
+  timestamps = other40.timestamps;
+  location = other40.location;
+  __isset = other40.__isset;
 }
-TMarketPlaceItem& TMarketPlaceItem::operator=(const TMarketPlaceItem& other31) {
-  ID = other31.ID;
-  title = other31.title;
-  price = other31.price;
-  listMediaItems = other31.listMediaItems;
-  category = other31.category;
-  subfeatures = other31.subfeatures;
-  descriptions = other31.descriptions;
-  uid = other31.uid;
-  count = other31.count;
-  isdelivery = other31.isdelivery;
-  tags = other31.tags;
-  timestamps = other31.timestamps;
-  location = other31.location;
-  __isset = other31.__isset;
+TMarketPlaceItem& TMarketPlaceItem::operator=(const TMarketPlaceItem& other41) {
+  ID = other41.ID;
+  title = other41.title;
+  price = other41.price;
+  listMediaItems = other41.listMediaItems;
+  category = other41.category;
+  subfeatures = other41.subfeatures;
+  descriptions = other41.descriptions;
+  uid = other41.uid;
+  count = other41.count;
+  isdelivery = other41.isdelivery;
+  tags = other41.tags;
+  timestamps = other41.timestamps;
+  location = other41.location;
+  __isset = other41.__isset;
   return *this;
 }
 void TMarketPlaceItem::printTo(std::ostream& out) const {
@@ -661,9 +817,9 @@ uint32_t TDataResult::read(::apache::thrift::protocol::TProtocol* iprot) {
     {
       case 1:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-          int32_t ecast32;
-          xfer += iprot->readI32(ecast32);
-          this->errorCode = (TErrorCode::type)ecast32;
+          int32_t ecast42;
+          xfer += iprot->readI32(ecast42);
+          this->errorCode = (TErrorCode::type)ecast42;
           this->__isset.errorCode = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -715,15 +871,15 @@ void swap(TDataResult &a, TDataResult &b) {
   swap(a.__isset, b.__isset);
 }
 
-TDataResult::TDataResult(const TDataResult& other33) {
-  errorCode = other33.errorCode;
-  data = other33.data;
-  __isset = other33.__isset;
+TDataResult::TDataResult(const TDataResult& other43) {
+  errorCode = other43.errorCode;
+  data = other43.data;
+  __isset = other43.__isset;
 }
-TDataResult& TDataResult::operator=(const TDataResult& other34) {
-  errorCode = other34.errorCode;
-  data = other34.data;
-  __isset = other34.__isset;
+TDataResult& TDataResult::operator=(const TDataResult& other44) {
+  errorCode = other44.errorCode;
+  data = other44.data;
+  __isset = other44.__isset;
   return *this;
 }
 void TDataResult::printTo(std::ostream& out) const {
@@ -777,9 +933,9 @@ uint32_t TListDataResult::read(::apache::thrift::protocol::TProtocol* iprot) {
     {
       case 1:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-          int32_t ecast35;
-          xfer += iprot->readI32(ecast35);
-          this->errorCode = (TErrorCode::type)ecast35;
+          int32_t ecast45;
+          xfer += iprot->readI32(ecast45);
+          this->errorCode = (TErrorCode::type)ecast45;
           this->__isset.errorCode = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -789,14 +945,14 @@ uint32_t TListDataResult::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->data.clear();
-            uint32_t _size36;
-            ::apache::thrift::protocol::TType _etype39;
-            xfer += iprot->readListBegin(_etype39, _size36);
-            this->data.resize(_size36);
-            uint32_t _i40;
-            for (_i40 = 0; _i40 < _size36; ++_i40)
+            uint32_t _size46;
+            ::apache::thrift::protocol::TType _etype49;
+            xfer += iprot->readListBegin(_etype49, _size46);
+            this->data.resize(_size46);
+            uint32_t _i50;
+            for (_i50 = 0; _i50 < _size46; ++_i50)
             {
-              xfer += this->data[_i40].read(iprot);
+              xfer += this->data[_i50].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -830,10 +986,10 @@ uint32_t TListDataResult::write(::apache::thrift::protocol::TProtocol* oprot) co
     xfer += oprot->writeFieldBegin("data", ::apache::thrift::protocol::T_LIST, 2);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->data.size()));
-      std::vector<TMarketPlaceItem> ::const_iterator _iter41;
-      for (_iter41 = this->data.begin(); _iter41 != this->data.end(); ++_iter41)
+      std::vector<TMarketPlaceItem> ::const_iterator _iter51;
+      for (_iter51 = this->data.begin(); _iter51 != this->data.end(); ++_iter51)
       {
-        xfer += (*_iter41).write(oprot);
+        xfer += (*_iter51).write(oprot);
       }
       xfer += oprot->writeListEnd();
     }
@@ -851,15 +1007,15 @@ void swap(TListDataResult &a, TListDataResult &b) {
   swap(a.__isset, b.__isset);
 }
 
-TListDataResult::TListDataResult(const TListDataResult& other42) {
-  errorCode = other42.errorCode;
-  data = other42.data;
-  __isset = other42.__isset;
+TListDataResult::TListDataResult(const TListDataResult& other52) {
+  errorCode = other52.errorCode;
+  data = other52.data;
+  __isset = other52.__isset;
 }
-TListDataResult& TListDataResult::operator=(const TListDataResult& other43) {
-  errorCode = other43.errorCode;
-  data = other43.data;
-  __isset = other43.__isset;
+TListDataResult& TListDataResult::operator=(const TListDataResult& other53) {
+  errorCode = other53.errorCode;
+  data = other53.data;
+  __isset = other53.__isset;
   return *this;
 }
 void TListDataResult::printTo(std::ostream& out) const {
