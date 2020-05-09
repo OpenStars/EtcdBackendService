@@ -350,6 +350,217 @@ func (p *TMediaItem) String() string {
 }
 
 // Attributes:
+//  - Latitude
+//  - Longitude
+//  - Extend
+type TLocation struct {
+	Latitude  float64           `thrift:"latitude,1" db:"latitude" json:"latitude"`
+	Longitude float64           `thrift:"longitude,2" db:"longitude" json:"longitude"`
+	Extend    map[string]string `thrift:"extend,3" db:"extend" json:"extend"`
+}
+
+func NewTLocation() *TLocation {
+	return &TLocation{}
+}
+
+func (p *TLocation) GetLatitude() float64 {
+	return p.Latitude
+}
+
+func (p *TLocation) GetLongitude() float64 {
+	return p.Longitude
+}
+
+func (p *TLocation) GetExtend() map[string]string {
+	return p.Extend
+}
+func (p *TLocation) Read(iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		if err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.DOUBLE {
+				if err := p.ReadField1(iprot); err != nil {
+					return err
+				}
+			} else {
+				if err := iprot.Skip(fieldTypeId); err != nil {
+					return err
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.DOUBLE {
+				if err := p.ReadField2(iprot); err != nil {
+					return err
+				}
+			} else {
+				if err := iprot.Skip(fieldTypeId); err != nil {
+					return err
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.MAP {
+				if err := p.ReadField3(iprot); err != nil {
+					return err
+				}
+			} else {
+				if err := iprot.Skip(fieldTypeId); err != nil {
+					return err
+				}
+			}
+		default:
+			if err := iprot.Skip(fieldTypeId); err != nil {
+				return err
+			}
+		}
+		if err := iprot.ReadFieldEnd(); err != nil {
+			return err
+		}
+	}
+	if err := iprot.ReadStructEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+	}
+	return nil
+}
+
+func (p *TLocation) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadDouble(); err != nil {
+		return thrift.PrependError("error reading field 1: ", err)
+	} else {
+		p.Latitude = v
+	}
+	return nil
+}
+
+func (p *TLocation) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadDouble(); err != nil {
+		return thrift.PrependError("error reading field 2: ", err)
+	} else {
+		p.Longitude = v
+	}
+	return nil
+}
+
+func (p *TLocation) ReadField3(iprot thrift.TProtocol) error {
+	_, _, size, err := iprot.ReadMapBegin()
+	if err != nil {
+		return thrift.PrependError("error reading map begin: ", err)
+	}
+	tMap := make(map[string]string, size)
+	p.Extend = tMap
+	for i := 0; i < size; i++ {
+		var _key2 string
+		if v, err := iprot.ReadString(); err != nil {
+			return thrift.PrependError("error reading field 0: ", err)
+		} else {
+			_key2 = v
+		}
+		var _val3 string
+		if v, err := iprot.ReadString(); err != nil {
+			return thrift.PrependError("error reading field 0: ", err)
+		} else {
+			_val3 = v
+		}
+		p.Extend[_key2] = _val3
+	}
+	if err := iprot.ReadMapEnd(); err != nil {
+		return thrift.PrependError("error reading map end: ", err)
+	}
+	return nil
+}
+
+func (p *TLocation) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("TLocation"); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+	}
+	if p != nil {
+		if err := p.writeField1(oprot); err != nil {
+			return err
+		}
+		if err := p.writeField2(oprot); err != nil {
+			return err
+		}
+		if err := p.writeField3(oprot); err != nil {
+			return err
+		}
+	}
+	if err := oprot.WriteFieldStop(); err != nil {
+		return thrift.PrependError("write field stop error: ", err)
+	}
+	if err := oprot.WriteStructEnd(); err != nil {
+		return thrift.PrependError("write struct stop error: ", err)
+	}
+	return nil
+}
+
+func (p *TLocation) writeField1(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("latitude", thrift.DOUBLE, 1); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:latitude: ", p), err)
+	}
+	if err := oprot.WriteDouble(float64(p.Latitude)); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T.latitude (1) field write error: ", p), err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 1:latitude: ", p), err)
+	}
+	return err
+}
+
+func (p *TLocation) writeField2(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("longitude", thrift.DOUBLE, 2); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:longitude: ", p), err)
+	}
+	if err := oprot.WriteDouble(float64(p.Longitude)); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T.longitude (2) field write error: ", p), err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 2:longitude: ", p), err)
+	}
+	return err
+}
+
+func (p *TLocation) writeField3(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("extend", thrift.MAP, 3); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:extend: ", p), err)
+	}
+	if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Extend)); err != nil {
+		return thrift.PrependError("error writing map begin: ", err)
+	}
+	for k, v := range p.Extend {
+		if err := oprot.WriteString(string(k)); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
+		}
+		if err := oprot.WriteString(string(v)); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
+		}
+	}
+	if err := oprot.WriteMapEnd(); err != nil {
+		return thrift.PrependError("error writing map end: ", err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 3:extend: ", p), err)
+	}
+	return err
+}
+
+func (p *TLocation) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("TLocation(%+v)", *p)
+}
+
+// Attributes:
 //  - ID
 //  - Title
 //  - Price
@@ -376,7 +587,7 @@ type TMarketPlaceItem struct {
 	Isdelivery     bool              `thrift:"isdelivery,10" db:"isdelivery" json:"isdelivery"`
 	Tags           []string          `thrift:"tags,11" db:"tags" json:"tags"`
 	Timestamps     int64             `thrift:"timestamps,12" db:"timestamps" json:"timestamps"`
-	Location       string            `thrift:"location,13" db:"location" json:"location"`
+	Location       *TLocation        `thrift:"location,13" db:"location" json:"location"`
 }
 
 func NewTMarketPlaceItem() *TMarketPlaceItem {
@@ -431,9 +642,18 @@ func (p *TMarketPlaceItem) GetTimestamps() int64 {
 	return p.Timestamps
 }
 
-func (p *TMarketPlaceItem) GetLocation() string {
+var TMarketPlaceItem_Location_DEFAULT *TLocation
+
+func (p *TMarketPlaceItem) GetLocation() *TLocation {
+	if !p.IsSetLocation() {
+		return TMarketPlaceItem_Location_DEFAULT
+	}
 	return p.Location
 }
+func (p *TMarketPlaceItem) IsSetLocation() bool {
+	return p.Location != nil
+}
+
 func (p *TMarketPlaceItem) Read(iprot thrift.TProtocol) error {
 	if _, err := iprot.ReadStructBegin(); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
@@ -569,7 +789,7 @@ func (p *TMarketPlaceItem) Read(iprot thrift.TProtocol) error {
 				}
 			}
 		case 13:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.STRUCT {
 				if err := p.ReadField13(iprot); err != nil {
 					return err
 				}
@@ -628,11 +848,11 @@ func (p *TMarketPlaceItem) ReadField4(iprot thrift.TProtocol) error {
 	tSlice := make([]*TMediaItem, 0, size)
 	p.ListMediaItems = tSlice
 	for i := 0; i < size; i++ {
-		_elem2 := &TMediaItem{}
-		if err := _elem2.Read(iprot); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", _elem2), err)
+		_elem4 := &TMediaItem{}
+		if err := _elem4.Read(iprot); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", _elem4), err)
 		}
-		p.ListMediaItems = append(p.ListMediaItems, _elem2)
+		p.ListMediaItems = append(p.ListMediaItems, _elem4)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return thrift.PrependError("error reading list end: ", err)
@@ -657,19 +877,19 @@ func (p *TMarketPlaceItem) ReadField6(iprot thrift.TProtocol) error {
 	tMap := make(map[string]string, size)
 	p.Subfeatures = tMap
 	for i := 0; i < size; i++ {
-		var _key3 string
+		var _key5 string
 		if v, err := iprot.ReadString(); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
-			_key3 = v
+			_key5 = v
 		}
-		var _val4 string
+		var _val6 string
 		if v, err := iprot.ReadString(); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
-			_val4 = v
+			_val6 = v
 		}
-		p.Subfeatures[_key3] = _val4
+		p.Subfeatures[_key5] = _val6
 	}
 	if err := iprot.ReadMapEnd(); err != nil {
 		return thrift.PrependError("error reading map end: ", err)
@@ -721,13 +941,13 @@ func (p *TMarketPlaceItem) ReadField11(iprot thrift.TProtocol) error {
 	tSlice := make([]string, 0, size)
 	p.Tags = tSlice
 	for i := 0; i < size; i++ {
-		var _elem5 string
+		var _elem7 string
 		if v, err := iprot.ReadString(); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
-			_elem5 = v
+			_elem7 = v
 		}
-		p.Tags = append(p.Tags, _elem5)
+		p.Tags = append(p.Tags, _elem7)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return thrift.PrependError("error reading list end: ", err)
@@ -745,10 +965,9 @@ func (p *TMarketPlaceItem) ReadField12(iprot thrift.TProtocol) error {
 }
 
 func (p *TMarketPlaceItem) ReadField13(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return thrift.PrependError("error reading field 13: ", err)
-	} else {
-		p.Location = v
+	p.Location = &TLocation{}
+	if err := p.Location.Read(iprot); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Location), err)
 	}
 	return nil
 }
@@ -991,11 +1210,11 @@ func (p *TMarketPlaceItem) writeField12(oprot thrift.TProtocol) (err error) {
 }
 
 func (p *TMarketPlaceItem) writeField13(oprot thrift.TProtocol) (err error) {
-	if err := oprot.WriteFieldBegin("location", thrift.STRING, 13); err != nil {
+	if err := oprot.WriteFieldBegin("location", thrift.STRUCT, 13); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 13:location: ", p), err)
 	}
-	if err := oprot.WriteString(string(p.Location)); err != nil {
-		return thrift.PrependError(fmt.Sprintf("%T.location (13) field write error: ", p), err)
+	if err := p.Location.Write(oprot); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Location), err)
 	}
 	if err := oprot.WriteFieldEnd(); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 13:location: ", p), err)
@@ -1253,11 +1472,11 @@ func (p *TListDataResult_) ReadField2(iprot thrift.TProtocol) error {
 	tSlice := make([]*TMarketPlaceItem, 0, size)
 	p.Data = tSlice
 	for i := 0; i < size; i++ {
-		_elem6 := &TMarketPlaceItem{}
-		if err := _elem6.Read(iprot); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", _elem6), err)
+		_elem8 := &TMarketPlaceItem{}
+		if err := _elem8.Read(iprot); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", _elem8), err)
 		}
-		p.Data = append(p.Data, _elem6)
+		p.Data = append(p.Data, _elem8)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return thrift.PrependError("error reading list end: ", err)
@@ -1362,13 +1581,13 @@ func NewTDataServiceRClient(c thrift.TClient) *TDataServiceRClient {
 // Parameters:
 //  - Key
 func (p *TDataServiceRClient) GetData(ctx context.Context, key int64) (r *TDataResult_, err error) {
-	var _args7 TDataServiceRGetDataArgs
-	_args7.Key = key
-	var _result8 TDataServiceRGetDataResult
-	if err = p.c.Call(ctx, "getData", &_args7, &_result8); err != nil {
+	var _args9 TDataServiceRGetDataArgs
+	_args9.Key = key
+	var _result10 TDataServiceRGetDataResult
+	if err = p.c.Call(ctx, "getData", &_args9, &_result10); err != nil {
 		return
 	}
-	return _result8.GetSuccess(), nil
+	return _result10.GetSuccess(), nil
 }
 
 type TDataServiceRProcessor struct {
@@ -1391,9 +1610,9 @@ func (p *TDataServiceRProcessor) ProcessorMap() map[string]thrift.TProcessorFunc
 
 func NewTDataServiceRProcessor(handler TDataServiceR) *TDataServiceRProcessor {
 
-	self9 := &TDataServiceRProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
-	self9.processorMap["getData"] = &tDataServiceRProcessorGetData{handler: handler}
-	return self9
+	self11 := &TDataServiceRProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
+	self11.processorMap["getData"] = &tDataServiceRProcessorGetData{handler: handler}
+	return self11
 }
 
 func (p *TDataServiceRProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -1406,12 +1625,12 @@ func (p *TDataServiceRProcessor) Process(ctx context.Context, iprot, oprot thrif
 	}
 	iprot.Skip(thrift.STRUCT)
 	iprot.ReadMessageEnd()
-	x10 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
+	x12 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
 	oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-	x10.Write(oprot)
+	x12.Write(oprot)
 	oprot.WriteMessageEnd()
 	oprot.Flush(ctx)
-	return false, x10
+	return false, x12
 
 }
 
@@ -1716,24 +1935,10 @@ func NewTDataServiceClient(c thrift.TClient) *TDataServiceClient {
 // Parameters:
 //  - Key
 func (p *TDataServiceClient) GetData(ctx context.Context, key int64) (r *TDataResult_, err error) {
-	var _args12 TDataServiceGetDataArgs
-	_args12.Key = key
-	var _result13 TDataServiceGetDataResult
-	if err = p.c.Call(ctx, "getData", &_args12, &_result13); err != nil {
-		return
-	}
-	return _result13.GetSuccess(), nil
-}
-
-// Parameters:
-//  - Key
-//  - Data
-func (p *TDataServiceClient) PutData(ctx context.Context, key int64, data *TMarketPlaceItem) (r TErrorCode, err error) {
-	var _args14 TDataServicePutDataArgs
+	var _args14 TDataServiceGetDataArgs
 	_args14.Key = key
-	_args14.Data = data
-	var _result15 TDataServicePutDataResult
-	if err = p.c.Call(ctx, "putData", &_args14, &_result15); err != nil {
+	var _result15 TDataServiceGetDataResult
+	if err = p.c.Call(ctx, "getData", &_args14, &_result15); err != nil {
 		return
 	}
 	return _result15.GetSuccess(), nil
@@ -1741,11 +1946,13 @@ func (p *TDataServiceClient) PutData(ctx context.Context, key int64, data *TMark
 
 // Parameters:
 //  - Key
-func (p *TDataServiceClient) RemoveData(ctx context.Context, key int64) (r TErrorCode, err error) {
-	var _args16 TDataServiceRemoveDataArgs
+//  - Data
+func (p *TDataServiceClient) PutData(ctx context.Context, key int64, data *TMarketPlaceItem) (r TErrorCode, err error) {
+	var _args16 TDataServicePutDataArgs
 	_args16.Key = key
-	var _result17 TDataServiceRemoveDataResult
-	if err = p.c.Call(ctx, "removeData", &_args16, &_result17); err != nil {
+	_args16.Data = data
+	var _result17 TDataServicePutDataResult
+	if err = p.c.Call(ctx, "putData", &_args16, &_result17); err != nil {
 		return
 	}
 	return _result17.GetSuccess(), nil
@@ -1753,14 +1960,26 @@ func (p *TDataServiceClient) RemoveData(ctx context.Context, key int64) (r TErro
 
 // Parameters:
 //  - Key
-func (p *TDataServiceClient) GetListData(ctx context.Context, key []int64) (r *TListDataResult_, err error) {
-	var _args18 TDataServiceGetListDataArgs
+func (p *TDataServiceClient) RemoveData(ctx context.Context, key int64) (r TErrorCode, err error) {
+	var _args18 TDataServiceRemoveDataArgs
 	_args18.Key = key
-	var _result19 TDataServiceGetListDataResult
-	if err = p.c.Call(ctx, "getListData", &_args18, &_result19); err != nil {
+	var _result19 TDataServiceRemoveDataResult
+	if err = p.c.Call(ctx, "removeData", &_args18, &_result19); err != nil {
 		return
 	}
 	return _result19.GetSuccess(), nil
+}
+
+// Parameters:
+//  - Key
+func (p *TDataServiceClient) GetListData(ctx context.Context, key []int64) (r *TListDataResult_, err error) {
+	var _args20 TDataServiceGetListDataArgs
+	_args20.Key = key
+	var _result21 TDataServiceGetListDataResult
+	if err = p.c.Call(ctx, "getListData", &_args20, &_result21); err != nil {
+		return
+	}
+	return _result21.GetSuccess(), nil
 }
 
 type TDataServiceProcessor struct {
@@ -1783,12 +2002,12 @@ func (p *TDataServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFunct
 
 func NewTDataServiceProcessor(handler TDataService) *TDataServiceProcessor {
 
-	self20 := &TDataServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
-	self20.processorMap["getData"] = &tDataServiceProcessorGetData{handler: handler}
-	self20.processorMap["putData"] = &tDataServiceProcessorPutData{handler: handler}
-	self20.processorMap["removeData"] = &tDataServiceProcessorRemoveData{handler: handler}
-	self20.processorMap["getListData"] = &tDataServiceProcessorGetListData{handler: handler}
-	return self20
+	self22 := &TDataServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
+	self22.processorMap["getData"] = &tDataServiceProcessorGetData{handler: handler}
+	self22.processorMap["putData"] = &tDataServiceProcessorPutData{handler: handler}
+	self22.processorMap["removeData"] = &tDataServiceProcessorRemoveData{handler: handler}
+	self22.processorMap["getListData"] = &tDataServiceProcessorGetListData{handler: handler}
+	return self22
 }
 
 func (p *TDataServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -1801,12 +2020,12 @@ func (p *TDataServiceProcessor) Process(ctx context.Context, iprot, oprot thrift
 	}
 	iprot.Skip(thrift.STRUCT)
 	iprot.ReadMessageEnd()
-	x21 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
+	x23 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
 	oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-	x21.Write(oprot)
+	x23.Write(oprot)
 	oprot.WriteMessageEnd()
 	oprot.Flush(ctx)
-	return false, x21
+	return false, x23
 
 }
 
@@ -2741,13 +2960,13 @@ func (p *TDataServiceGetListDataArgs) ReadField1(iprot thrift.TProtocol) error {
 	tSlice := make([]int64, 0, size)
 	p.Key = tSlice
 	for i := 0; i < size; i++ {
-		var _elem22 int64
+		var _elem24 int64
 		if v, err := iprot.ReadI64(); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
-			_elem22 = v
+			_elem24 = v
 		}
-		p.Key = append(p.Key, _elem22)
+		p.Key = append(p.Key, _elem24)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return thrift.PrependError("error reading list end: ", err)
@@ -2941,8 +3160,8 @@ type TMarketPlaceServiceProcessor struct {
 }
 
 func NewTMarketPlaceServiceProcessor(handler TMarketPlaceService) *TMarketPlaceServiceProcessor {
-	self38 := &TMarketPlaceServiceProcessor{NewTDataServiceProcessor(handler)}
-	return self38
+	self40 := &TMarketPlaceServiceProcessor{NewTDataServiceProcessor(handler)}
+	return self40
 }
 
 // HELPER FUNCTIONS AND STRUCTURES

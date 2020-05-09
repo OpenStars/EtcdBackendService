@@ -39,6 +39,8 @@ typedef class TMarketPlaceItem TData;
 
 class TMediaItem;
 
+class TLocation;
+
 class TMarketPlaceItem;
 
 class TDataResult;
@@ -105,6 +107,60 @@ void swap(TMediaItem &a, TMediaItem &b);
 
 std::ostream& operator<<(std::ostream& out, const TMediaItem& obj);
 
+typedef struct _TLocation__isset {
+  _TLocation__isset() : latitude(false), longitude(false), extend(false) {}
+  bool latitude :1;
+  bool longitude :1;
+  bool extend :1;
+} _TLocation__isset;
+
+class TLocation : public virtual ::apache::thrift::TBase {
+ public:
+
+  TLocation(const TLocation&);
+  TLocation& operator=(const TLocation&);
+  TLocation() : latitude(0), longitude(0) {
+  }
+
+  virtual ~TLocation() throw();
+  double latitude;
+  double longitude;
+  std::map<std::string, std::string>  extend;
+
+  _TLocation__isset __isset;
+
+  void __set_latitude(const double val);
+
+  void __set_longitude(const double val);
+
+  void __set_extend(const std::map<std::string, std::string> & val);
+
+  bool operator == (const TLocation & rhs) const
+  {
+    if (!(latitude == rhs.latitude))
+      return false;
+    if (!(longitude == rhs.longitude))
+      return false;
+    if (!(extend == rhs.extend))
+      return false;
+    return true;
+  }
+  bool operator != (const TLocation &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const TLocation & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(TLocation &a, TLocation &b);
+
+std::ostream& operator<<(std::ostream& out, const TLocation& obj);
+
 typedef struct _TMarketPlaceItem__isset {
   _TMarketPlaceItem__isset() : ID(false), title(false), price(false), listMediaItems(false), category(false), subfeatures(false), descriptions(false), uid(false), count(false), isdelivery(false), tags(false), timestamps(false), location(false) {}
   bool ID :1;
@@ -127,7 +183,7 @@ class TMarketPlaceItem : public virtual ::apache::thrift::TBase {
 
   TMarketPlaceItem(const TMarketPlaceItem&);
   TMarketPlaceItem& operator=(const TMarketPlaceItem&);
-  TMarketPlaceItem() : ID(0), title(), price(0), category(0), descriptions(), uid(0), count(0), isdelivery(0), timestamps(0), location() {
+  TMarketPlaceItem() : ID(0), title(), price(0), category(0), descriptions(), uid(0), count(0), isdelivery(0), timestamps(0) {
   }
 
   virtual ~TMarketPlaceItem() throw();
@@ -143,7 +199,7 @@ class TMarketPlaceItem : public virtual ::apache::thrift::TBase {
   bool isdelivery;
   std::vector<std::string>  tags;
   int64_t timestamps;
-  std::string location;
+  TLocation location;
 
   _TMarketPlaceItem__isset __isset;
 
@@ -171,7 +227,7 @@ class TMarketPlaceItem : public virtual ::apache::thrift::TBase {
 
   void __set_timestamps(const int64_t val);
 
-  void __set_location(const std::string& val);
+  void __set_location(const TLocation& val);
 
   bool operator == (const TMarketPlaceItem & rhs) const
   {
