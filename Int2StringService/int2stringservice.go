@@ -3,6 +3,7 @@ package Int2StringService
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/OpenStars/EtcdBackendService/Int2StringService/i2skv/thrift/gen-go/OpenStars/Common/I2SKV"
@@ -59,6 +60,7 @@ func (m *Int2StringService) GetData(key int64) (string, error) {
 			m.port = p
 		}
 	}
+	fmt.Println(m.host, ":", m.port)
 
 	client := transports.GetTI2StringServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
