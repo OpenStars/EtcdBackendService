@@ -121,7 +121,7 @@ func (es *ESClient) DeleteIndexES() {
 		fmt.Printf("[deleteIndexES] err = %v \n", err)
 		return
 	}
-
+	esclient.Search()
 	fmt.Println("[deleteIndexES] = ", deleteIndex)
 	return
 }
