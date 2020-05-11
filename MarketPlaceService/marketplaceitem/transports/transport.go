@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/OpenStars/EtcdBackendService/MarketPlaceService/marketplaceitem/thrift/gen-go/OpenStars/Platform/MarketPlace"
-	"github.com/OpenStars/thriftpool"
+	thriftpool "github.com/OpenStars/thriftpoolv2"
 	"github.com/apache/thrift/lib/go/thrift"
 )
 
