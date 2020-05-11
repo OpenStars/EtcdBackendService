@@ -2,6 +2,8 @@ package ESClientService
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 
@@ -80,6 +82,37 @@ func NewESClient(url, indexName, typeName string) ESClientServiceIf {
 	es.checkExistedIndex(indexString)
 
 	return es
+}
+
+func (es *ESClient) PutDataToES2(id string, data interface{}) error {
+	dataByte, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return es.PutDataToES(id, string(dataByte))
+}
+
+func (es *ESClient) MultiPutToES(mapID2Data map[string]interface{}) error {
+	ctx := context.Background()
+	esclient, _ := es.getESClient()
+	if esclient == nil {
+		return errors.New("es client null")
+	}
+	bulk := esclient.Bulk()
+	for id, data := range mapID2Data {
+		req := elastic.NewBulkIndexRequest()
+		req.OpType("index")
+		req.Index(es.indexName)
+		req.Id(id)
+		req.Doc(data)
+		bulk.Add(req)
+	}
+	_, err := bulk.Do(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 // kiểm tra xem có index hay chưa (index chính là database , type ứng với 1 table, doc ứng với 1 item)

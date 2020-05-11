@@ -5,4 +5,5 @@ type ESClientServiceIf interface {
 	DeleteIndexES()
 	DeleteDataES(id string)
 	UpdateDataES(id string, mapUpdate map[string]interface{})
+	PutDataToES2(id string, data interface{}) error
 }
