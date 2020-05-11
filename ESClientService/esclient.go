@@ -56,13 +56,21 @@ type ESClient struct {
 	url       string
 	indexName string
 	typeName  string
+	client    *elastic.Client
 }
 
 func NewESClient(url, indexName, typeName string) ESClientServiceIf {
+	client, err := elastic.NewClient(elastic.SetURL(url),
+		elastic.SetSniff(false),
+		elastic.SetHealthcheck(false))
+	if err != nil {
+		log.Println("ESClient err", err)
+	}
 	es := &ESClient{
 		url:       url,
 		indexName: indexName,
 		typeName:  typeName,
+		client:    client,
 	}
 
 	// make index if not existed
@@ -102,13 +110,15 @@ func (es *ESClient) checkExistedIndex(indexString string) {
 
 func (es *ESClient) getESClient() (*elastic.Client, error) {
 
-	client, err := elastic.NewClient(elastic.SetURL(es.url),
-		elastic.SetSniff(false),
-		elastic.SetHealthcheck(false))
+	if es.client == nil {
+		client, err := elastic.NewClient(elastic.SetURL(es.url),
+			elastic.SetSniff(false),
+			elastic.SetHealthcheck(false))
+		fmt.Printf("[getESClient] ES initialized... err = %v \n", err)
+		es.client = client
+	}
 
-	fmt.Printf("[getESClient] ES initialized... err = %v \n", err)
-
-	return client, err
+	return es.client, nil
 }
 
 func (es *ESClient) PutDataToES(id string, dataJson string) (err error) {
