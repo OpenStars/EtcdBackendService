@@ -197,3 +197,31 @@ func (es *ESClient) UpdateDataES(id string, mapUpdate map[string]interface{}) {
 
 	fmt.Println("[updateDataES] = ", update)
 }
+
+func (es *ESClient) SearchESByQuery(mapSearch map[string]interface{}, sort map[string]bool) ([]*elastic.SearchHit, error) {
+	fmt.Printf("[SearchESByQuery] mapSearch = %v, sort = %v \n", mapSearch, sort)
+	ctx := context.Background()
+	esclient, _ := es.getESClient()
+	searchSource := elastic.NewSearchSource()
+	for k, v := range mapSearch {
+		searchSource.Query(elastic.NewMatchQuery(k, v))
+	}
+
+	for k, v := range sort {
+		searchSource.Sort(k, v)
+	}
+
+	searchService := esclient.Search().Index(es.indexName).SearchSource(searchSource)
+
+	searchResult, err := searchService.Do(ctx)
+	if err != nil || searchResult == nil || searchResult.Hits == nil {
+		fmt.Println("[SearchESByQuery] Error = ", err)
+		return []*elastic.SearchHit{}, err
+	}
+
+	// for _, v := range searchResult.Hits.Hits {
+	// 	fmt.Printf("%s \n", string(v.Source))
+	// }
+
+	return searchResult.Hits.Hits, nil
+}
