@@ -20,6 +20,38 @@ const indexString = `
 	}
 }`
 
+// type Doc struct {
+// }
+
+// // default _doc
+// type Mapping struct {
+// 	Doc *Doc `json:"_doc"`
+// }
+
+// type Setting struct {
+// 	Number_of_shards   int `json:"number_of_shards"`
+// 	Number_of_replicas int `json:"number_of_replicas"`
+// }
+
+// type Index struct {
+// 	Mappings *Mapping `json:"mappings"`
+// 	Settings *Setting `json:"settings"`
+// }
+
+// func makeIndexString() *Index {
+// 	index := &Index{
+// 		Settings: &Setting{
+// 			Number_of_shards:   1,
+// 			Number_of_replicas: 0,
+// 		},
+// 		Mappings: &Mapping{
+// 			Doc: &Doc{},
+// 		},
+// 	}
+
+// 	return index
+// }
+
 type ESClient struct {
 	url       string
 	indexName string
@@ -32,6 +64,11 @@ func NewESClient(url, indexName, typeName string) ESClientServiceIf {
 		indexName: indexName,
 		typeName:  typeName,
 	}
+
+	// make index if not existed
+	// indexByte, _ := json.Marshal(makeIndexString())
+	// indexString := string(indexByte)
+	// indexString = strings.ReplaceAll(indexString, "default1", typeName)
 	es.checkExistedIndex(indexString)
 
 	return es
