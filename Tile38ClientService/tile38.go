@@ -42,6 +42,25 @@ func NewTile38ManagerServiceModel(location string, serviceID string, etcdServers
 	return tile38Client
 }
 
+func NewTile38ManagerServiceModel2(location string, sid string, etcdEndpoints []string, defaultHost, defaultPort string) Tile38ManagerServiceIf {
+	tile38Client := &Tile38ManagerService{
+		host:        defaultHost,
+		port:        defaultPort,
+		sid:         sid,
+		location:    location,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdEndpoints),
+	}
+
+	if tile38Client.etcdManager != nil {
+		err := tile38Client.etcdManager.SetDefaultEntpoint(sid, defaultHost, defaultPort)
+		if err != nil {
+			log.Println("SetDefaultEndpoint sid", sid, "err", err)
+			return nil
+		}
+	}
+	return tile38Client
+}
+
 // DeleteLocationInTile38 delete location by key in tile38
 func (r *Tile38ManagerService) DeleteLocationInTile38(keyLocation interface{}) (result bool, err error) {
 	log.Printf("[DeleteLocationInTile38] keyLocation = %v \n", keyLocation)
