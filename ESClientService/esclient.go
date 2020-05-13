@@ -231,6 +231,13 @@ func (es *ESClient) UpdateDataES(id string, mapUpdate map[string]interface{}) {
 	fmt.Println("[updateDataES] = ", update)
 }
 
+func (es *ESClient) Search() {
+	// esclient, _ := es.getESClient()
+	// termQuery := elastic.NewTermQuery("k", "v")
+	// esclient.Search().Index(es.indexName).Query(termQuery).
+	// searchsv.q
+}
+
 func (es *ESClient) SearchESByQuery(mapSearch map[string]interface{}, sort map[string]bool) ([]*elastic.SearchHit, error) {
 	fmt.Printf("[SearchESByQuery] mapSearch = %v, sort = %v \n", mapSearch, sort)
 	ctx := context.Background()
