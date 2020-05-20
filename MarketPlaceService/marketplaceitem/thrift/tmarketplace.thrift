@@ -37,6 +37,7 @@ struct TMarketPlaceItem{
     11: list<string> tags,
     12: i64 timestamps,
     13: TLocation location,
+    14: bool isDelete,
 }
 
 typedef TMarketPlaceItem TData
