@@ -75,6 +75,24 @@ func (m *pubprofileclient) UpdateProfileByPubkey(pubkey string, profileUpdate *p
 	return false, nil
 }
 
+func (m *pubprofileclient) SetProfileByPubkey(pubkey string, profileUpdate *pubprofile.ProfileData) (r bool, err error) {
+	client := transports.GetPubProfileServiceBinaryClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return false, errors.New("Can not connect to backend service host: " + m.host + " port: " + m.port)
+	}
+
+	resp, err := client.Client.(*pubprofile.PubProfileServiceClient).SetProfileByPubkey(context.Background(), pubkey, profileUpdate)
+	if err != nil {
+		return false, errors.New("Backend service err:" + err.Error())
+	}
+	defer client.BackToPool()
+
+	if resp != nil {
+		return resp.Resp, nil
+	}
+	return false, nil
+}
+
 func (m *pubprofileclient) UpdateProfileByUID(uid int64, profileUpdate *pubprofile.ProfileData) (r bool, err error) {
 	client := transports.GetPubProfileServiceBinaryClient(m.host, m.port)
 	if client == nil || client.Client == nil {

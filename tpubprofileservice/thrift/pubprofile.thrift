@@ -47,6 +47,7 @@ struct ResponseBool {
 service PubProfileService {
   ResponseProfile GetProfileByPubkey(1:string pubkey);
 	ResponseProfile GetProfileByUID(1: i64 uid);
+  ResponseBool SetProfileByPubkey(1: string pubkey,2: ProfileData profileSet);
   ResponseBool UpdateProfileByUID(1: i64 uid,2: ProfileData profileUpdate);
   ResponseBool UpdateProfileByPubkey(1: string pubkey,2: ProfileData profileUpdate);
 }
