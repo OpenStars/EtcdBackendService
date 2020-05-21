@@ -153,8 +153,8 @@ func main() {
       fmt.Fprintln(os.Stderr, "GetData requires 1 args")
       flag.Usage()
     }
-    argvalue0, err41 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err41 != nil {
+    argvalue0, err43 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err43 != nil {
       Usage()
       return
     }
@@ -167,25 +167,25 @@ func main() {
       fmt.Fprintln(os.Stderr, "PutData requires 2 args")
       flag.Usage()
     }
-    argvalue0, err42 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err42 != nil {
+    argvalue0, err44 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err44 != nil {
       Usage()
       return
     }
     value0 := argvalue0
-    arg43 := flag.Arg(2)
-    mbTrans44 := thrift.NewTMemoryBufferLen(len(arg43))
-    defer mbTrans44.Close()
-    _, err45 := mbTrans44.WriteString(arg43)
-    if err45 != nil {
+    arg45 := flag.Arg(2)
+    mbTrans46 := thrift.NewTMemoryBufferLen(len(arg45))
+    defer mbTrans46.Close()
+    _, err47 := mbTrans46.WriteString(arg45)
+    if err47 != nil {
       Usage()
       return
     }
-    factory46 := thrift.NewTJSONProtocolFactory()
-    jsProt47 := factory46.GetProtocol(mbTrans44)
+    factory48 := thrift.NewTJSONProtocolFactory()
+    jsProt49 := factory48.GetProtocol(mbTrans46)
     argvalue1 := MarketPlace.NewTMarketPlaceItem()
-    err48 := argvalue1.Read(jsProt47)
-    if err48 != nil {
+    err50 := argvalue1.Read(jsProt49)
+    if err50 != nil {
       Usage()
       return
     }
@@ -198,8 +198,8 @@ func main() {
       fmt.Fprintln(os.Stderr, "RemoveData requires 1 args")
       flag.Usage()
     }
-    argvalue0, err49 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err49 != nil {
+    argvalue0, err51 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err51 != nil {
       Usage()
       return
     }
@@ -212,19 +212,19 @@ func main() {
       fmt.Fprintln(os.Stderr, "GetListData requires 1 args")
       flag.Usage()
     }
-    arg50 := flag.Arg(1)
-    mbTrans51 := thrift.NewTMemoryBufferLen(len(arg50))
-    defer mbTrans51.Close()
-    _, err52 := mbTrans51.WriteString(arg50)
-    if err52 != nil { 
+    arg52 := flag.Arg(1)
+    mbTrans53 := thrift.NewTMemoryBufferLen(len(arg52))
+    defer mbTrans53.Close()
+    _, err54 := mbTrans53.WriteString(arg52)
+    if err54 != nil { 
       Usage()
       return
     }
-    factory53 := thrift.NewTJSONProtocolFactory()
-    jsProt54 := factory53.GetProtocol(mbTrans51)
+    factory55 := thrift.NewTJSONProtocolFactory()
+    jsProt56 := factory55.GetProtocol(mbTrans53)
     containerStruct0 := MarketPlace.NewTMarketPlaceServiceGetListDataArgs()
-    err55 := containerStruct0.ReadField1(jsProt54)
-    if err55 != nil {
+    err57 := containerStruct0.ReadField1(jsProt56)
+    if err57 != nil {
       Usage()
       return
     }

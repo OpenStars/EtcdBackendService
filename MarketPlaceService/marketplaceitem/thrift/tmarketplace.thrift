@@ -38,6 +38,7 @@ struct TMarketPlaceItem{
     12: i64 timestamps,
     13: TLocation location,
     14: bool isDelete,
+    15: map<string,string> mapExtend,
 }
 
 typedef TMarketPlaceItem TData
