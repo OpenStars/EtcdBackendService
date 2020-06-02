@@ -28,7 +28,7 @@ func main() {
 		"cat2": 8,
 	})
 
-	r, err := client.GetLocationItemNearby(101, 100.4, 60, nil, 0, 10)
+	r, err := client.GetLocationItemNearby(101, 100.4, 60000, nil, 0, 10)
 	if err != nil {
 		log.Println("err", err)
 		return
