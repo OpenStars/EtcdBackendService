@@ -1,19 +1,39 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/OpenStars/EtcdBackendService/Tile38ClientService"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 func main() {
-	c := Tile38ClientService.NewTile38ManagerServiceModel("location", "", []string{},
+	client := Tile38ClientService.NewTile38ManagerServiceModel("location", "", []string{},
 		GoEndpointBackendManager.EndPoint{
 			ServiceID: "testtile38",
-			Host:      "10.60.68.104",
+			Host:      "10.110.1.21",
 			Port:      "9851",
 		})
+	client.SetLocationItemToTile38(1, 101, 100, map[string]interface{}{
+		"cat1": 5,
+		"cat2": 7,
+	})
+	client.SetLocationItemToTile38(2, 101, 100.5, map[string]interface{}{
+		"cat1": 5,
+		"cat2": 6,
+	})
+
+	client.SetLocationItemToTile38(2, 101, 100.5, map[string]interface{}{
+		"cat1": 6,
+		"cat2": 8,
+	})
+
+	r, err := client.GetLocationItemNearby(101, 100.4, 60, nil, 0, 10)
+	if err != nil {
+		log.Println("err", err)
+		return
+	}
+	log.Println("r", r)
 
 	// var e error
 
@@ -40,7 +60,7 @@ func main() {
 	// rs, err := c.GetLocationItemNearby(1, 1, 1000, nil, 0, 10)
 	// log.Println("rs", rs, "err", err)
 	// // c.DeleteLocationInTile38(1)
-	fmt.Println(c.GetLocationInTile38("03f2c0e35fa86722c4e0533a37e35d5b1c73771f660f1d9081e6205fbbb950402d"))
+	// fmt.Println(c.GetLocationInTile38("03f2c0e35fa86722c4e0533a37e35d5b1c73771f660f1d9081e6205fbbb950402d"))
 
 	// // 10 km, lay 5 phan tu dau tien
 	// fmt.Println(c.GetLocationItemNearby(10.11111, 10.11111, 10, map[string][2]interface{}{}, 1, 5))
