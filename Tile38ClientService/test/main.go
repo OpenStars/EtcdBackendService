@@ -14,21 +14,21 @@ func main() {
 			Host:      "10.110.1.21",
 			Port:      "9851",
 		})
-	client.SetLocationItemToTile38(1, 101, 100, map[string]interface{}{
+	client.SetLocationItemToTile38(1, 21.044946, 105.801253, map[string]interface{}{
 		"cat1": 5,
 		"cat2": 7,
 	})
-	client.SetLocationItemToTile38(2, 101, 100.5, map[string]interface{}{
+	client.SetLocationItemToTile38(2, 21.061043, 105.801494, map[string]interface{}{
 		"cat1": 5,
 		"cat2": 6,
 	})
 
-	client.SetLocationItemToTile38(2, 101, 100.5, map[string]interface{}{
+	client.SetLocationItemToTile38(2, 21.061043, 105.801584, map[string]interface{}{
 		"cat1": 6,
 		"cat2": 8,
 	})
 
-	r, err := client.GetLocationItemNearby(101, 100.4, 60, nil, 0, 10)
+	r, err := client.GetLocationItemNearby(21.061043, 105.801494, 6000, nil, 0, 10)
 	if err != nil {
 		log.Println("err", err)
 		return
