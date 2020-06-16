@@ -17,6 +17,8 @@ const indexString = `
 		"number_of_replicas": 0
 	},
 	"mappings":{
+		"_doc": {
+		}
 	}
 }`
 
@@ -125,6 +127,7 @@ func (es *ESClient) checkExistedIndex(indexString string) {
 		// Handle error
 
 		log.Printf("[checkExistedIndex] err = %v \n", err)
+		return
 	}
 	if !exists {
 		// Create a new index.
