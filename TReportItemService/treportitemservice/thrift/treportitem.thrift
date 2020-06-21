@@ -20,6 +20,7 @@ struct TReportItem{
     6: i64 timestamps,
     7: bool isDelete,
     8: map<string,string> mapExtend,
+    9: i64 marketitemID,
 }
 
 
