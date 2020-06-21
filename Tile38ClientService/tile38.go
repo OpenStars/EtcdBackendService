@@ -257,7 +257,8 @@ func (r *Tile38ManagerService) DropAll() error {
 		return err
 	}
 	defer c.Close()
-	_, err = c.Do("DROP " + r.location)
+	rs, err := c.Do("DROP " + r.location)
+	log.Println("rs", rs, "err", err)
 	if err != nil {
 		return err
 	}

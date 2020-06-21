@@ -14,28 +14,30 @@ func main() {
 			Host:      "10.110.1.21",
 			Port:      "9851",
 		})
-	client.SetLocationItemToTile38(1, 21.044946, 105.801253, map[string]interface{}{
-		"cat1": 5,
-		"cat2": 7,
-	})
-	client.SetLocationItemToTile38(2, 21.061043, 105.801494, map[string]interface{}{
-		"cat1": 5,
-		"cat2": 6,
-	})
+	err := client.DropAll()
+	log.Println("drop all err", err)
+	// client.SetLocationItemToTile38(1, 21.044946, 105.801253, map[string]interface{}{
+	// 	"cat1": 5,
+	// 	"cat2": 7,
+	// })
+	// client.SetLocationItemToTile38(2, 21.061043, 105.801494, map[string]interface{}{
+	// 	"cat1": 5,
+	// 	"cat2": 6,
+	// })
 
-	client.SetLocationItemToTile38(3, 21.061043, 105.801584, map[string]interface{}{
-		"cat1": 6,
-		"cat2": 8,
-	})
+	// client.SetLocationItemToTile38(3, 21.061043, 105.801584, map[string]interface{}{
+	// 	"cat1": 6,
+	// 	"cat2": 8,
+	// })
 
-	r, err := client.GetLocationItemNearby(21.061043, 105.801494, 6, map[string][2]interface{}{
-		"cat1": [2]interface{}{5, 5},
-	}, 0, 10)
-	if err != nil {
-		log.Println("err", err)
-		return
-	}
-	log.Println("r", r)
+	// r, err := client.GetLocationItemNearby(21.061043, 105.801494, 6, map[string][2]interface{}{
+	// 	"cat1": [2]interface{}{5, 5},
+	// }, 0, 10)
+	// if err != nil {
+	// 	log.Println("err", err)
+	// 	return
+	// }
+	// log.Println("r", r)
 
 	// var e error
 

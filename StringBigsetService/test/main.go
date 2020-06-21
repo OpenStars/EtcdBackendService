@@ -1,27 +1,38 @@
 package main
 
 import (
-	"TrustKeys/TKRealtimeClient/common/util"
 	"log"
 
 	"github.com/OpenStars/EtcdBackendService/StringBigsetService"
 	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 )
 
+//host = 10.60.1.20
+//port = 18408
 func TestSV() {
-	svClient := StringBigsetService.NewStringBigsetServiceModel2([]string{"10.60.1.20:2379"}, "/test/", "10.110.1.21", "33183")
+	svClient := StringBigsetService.NewStringBigsetServiceModel2([]string{"10.60.1.20:2379"}, "/test/", "10.60.68.103", "19007")
 	//  BSKEYCATEGORY2ITEM0000000000000000015
 	//  BSKEYCATEGORY2ITEM0000000000000000015
-	BSKEYCATEGORY2ITEM := "BSKEYCATEGORY2ITEM"
-	bskeyparentcat := generic.TStringKey(BSKEYCATEGORY2ITEM + util.PaddingZeros(15))
-	log.Println("bskeycat", string(bskeyparentcat))
-	itemkey := generic.TItemKey(util.PaddingZeros(55))
-	item, err := svClient.BsGetItem(bskeyparentcat, itemkey)
-	if item != nil {
-		log.Println("item", string(item.Key))
-	} else {
-		log.Println("err", err)
+	//  0000000000000000055
+	//  0000000000000000055
+	bskey := generic.TStringKey("|LIST_MARKETPLACE_ITEM_OF_UID|0000000000000004711")
+	lsItems, err := svClient.BsGetSliceR(bskey, 0, 10)
+	if err != nil {
+		log.Fatalln("err", err)
 	}
+	for i := 0; i < len(lsItems); i++ {
+		log.Println(i, string(lsItems[i].Value), "key", string(lsItems[i].Key))
+	}
+	// BSKEYCATEGORY2ITEM := "BSKEYCATEGORY2ITEM"
+	// bskeyparentcat := generic.TStringKey(BSKEYCATEGORY2ITEM + util.PaddingZeros(15))
+	// log.Println("bskeycat", string(bskeyparentcat))
+	// itemkey := generic.TItemKey(util.PaddingZeros(55))
+	// item, err := svClient.BsGetItem(bskeyparentcat, itemkey)
+	// if item != nil {
+	// 	log.Println("item", string(item.Key))
+	// } else {
+	// 	log.Println("err", err)
+	// }
 	// total, err := svClient.GetTotalCount(generic.TStringKey("SYSTEM_USER_ACTIVE"))
 	// lsItems, err := svClient.TotalStringKeyCount(generic.TStringKey("02ea252935dfc60ed6c882897ee0a52b6ac30fa5fa7570344317e6a5e6ef52a87f"), 0, 1)
 	// if err != nil {
