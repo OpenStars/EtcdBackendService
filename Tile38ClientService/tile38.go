@@ -240,3 +240,28 @@ func (r *Tile38ManagerService) SetLocationItemToTile38(keyLocation interface{}, 
 	}
 	return
 }
+
+func (r *Tile38ManagerService) DropAll() error {
+	log.Printf("[DropAll] key:%v", r.location)
+
+	if r.etcdManager != nil {
+		h, p, err := r.etcdManager.GetEndpoint(r.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			r.host = h
+			r.port = p
+		}
+	}
+	c, err := transports.GetTile38LocationClient(r.host, r.port)
+	if err != nil {
+		return err
+	}
+	defer c.Close()
+	rs, err := c.Do("DROP " + r.location)
+	log.Println("rs", rs, "err", err)
+	if err != nil {
+		return err
+	}
+	return nil
+}
