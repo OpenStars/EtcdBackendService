@@ -142,6 +142,7 @@ func (r *Tile38ManagerService) GetLocationItemNearby(lat, long, radius float64, 
 			r.port = p
 		}
 	}
+	fmt.Printf("[GetLocationNearby] host = %s , port = %s \n", r.host, r.port)
 	c, err := transports.GetTile38LocationClient(r.host, r.port)
 	if c != nil {
 		defer c.Close()
