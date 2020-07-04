@@ -10,7 +10,7 @@ import (
 //host = 10.60.1.20
 //port = 18408
 func TestSV() {
-	svClient := StringBigsetService.NewStringBigsetServiceModel2([]string{"10.60.1.20:2379"}, "/test/", "10.60.68.103", "19007")
+	svClient := StringBigsetService.NewStringBigsetServiceModel2([]string{"10.60.1.20:2379"}, "/test/", " 10.110.69.96", "20427")
 	//  BSKEYCATEGORY2ITEM0000000000000000015
 	//  BSKEYCATEGORY2ITEM0000000000000000015
 	//  0000000000000000055

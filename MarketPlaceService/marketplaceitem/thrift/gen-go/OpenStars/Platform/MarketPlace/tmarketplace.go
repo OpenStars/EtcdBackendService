@@ -523,6 +523,7 @@ func (p *TLocation) String() string {
 //  - Location
 //  - IsDelete
 //  - MapExtend
+//  - PlaceID
 type TMarketPlaceItem struct {
   ID int64 `thrift:"ID,1" db:"ID" json:"ID"`
   Title string `thrift:"title,2" db:"title" json:"title"`
@@ -539,6 +540,7 @@ type TMarketPlaceItem struct {
   Location *TLocation `thrift:"location,13" db:"location" json:"location"`
   IsDelete bool `thrift:"isDelete,14" db:"isDelete" json:"isDelete"`
   MapExtend map[string]string `thrift:"mapExtend,15" db:"mapExtend" json:"mapExtend"`
+  PlaceID string `thrift:"placeID,16" db:"placeID" json:"placeID"`
 }
 
 func NewTMarketPlaceItem() *TMarketPlaceItem {
@@ -607,6 +609,10 @@ func (p *TMarketPlaceItem) GetIsDelete() bool {
 
 func (p *TMarketPlaceItem) GetMapExtend() map[string]string {
   return p.MapExtend
+}
+
+func (p *TMarketPlaceItem) GetPlaceID() string {
+  return p.PlaceID
 }
 func (p *TMarketPlaceItem) IsSetLocation() bool {
   return p.Location != nil
@@ -768,6 +774,16 @@ func (p *TMarketPlaceItem) Read(iprot thrift.TProtocol) error {
     case 15:
       if fieldTypeId == thrift.MAP {
         if err := p.ReadField15(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 16:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField16(iprot); err != nil {
           return err
         }
       } else {
@@ -986,6 +1002,15 @@ var _val9 string
   return nil
 }
 
+func (p *TMarketPlaceItem)  ReadField16(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 16: ", err)
+} else {
+  p.PlaceID = v
+}
+  return nil
+}
+
 func (p *TMarketPlaceItem) Write(oprot thrift.TProtocol) error {
   if err := oprot.WriteStructBegin("TMarketPlaceItem"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
@@ -1005,6 +1030,7 @@ func (p *TMarketPlaceItem) Write(oprot thrift.TProtocol) error {
     if err := p.writeField13(oprot); err != nil { return err }
     if err := p.writeField14(oprot); err != nil { return err }
     if err := p.writeField15(oprot); err != nil { return err }
+    if err := p.writeField16(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
     return thrift.PrependError("write field stop error: ", err) }
@@ -1198,6 +1224,16 @@ func (p *TMarketPlaceItem) writeField15(oprot thrift.TProtocol) (err error) {
   }
   if err := oprot.WriteFieldEnd(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 15:mapExtend: ", p), err) }
+  return err
+}
+
+func (p *TMarketPlaceItem) writeField16(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("placeID", thrift.STRING, 16); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 16:placeID: ", p), err) }
+  if err := oprot.WriteString(string(p.PlaceID)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.placeID (16) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 16:placeID: ", p), err) }
   return err
 }
 
