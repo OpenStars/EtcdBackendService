@@ -147,7 +147,7 @@ func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey ge
 	defer client.BackToPool()
 
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil || len(rs.Items.Items) == 0 {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	return rs.Items.Items, nil
 }
@@ -217,8 +217,8 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 	defer client.BackToPool()
-	if r.Error != generic.TErrorCode_EGood {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + r.Error.String())
+	if r.Error != generic.TErrorCode_EGood || r.Item == nil || r.Item.Key == nil {
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	return r.Item, nil
 }
@@ -280,7 +280,7 @@ func (m *StringBigsetService) GetBigSetInfoByName(bskey generic.TStringKey) (*ge
 	defer client.BackToPool()
 
 	if rs.Info == nil {
-		return nil, errors.New("Get bigset info by name err " + rs.Error.String())
+		return nil, nil
 	}
 	return rs.Info, nil
 
@@ -303,13 +303,12 @@ func (m *StringBigsetService) RemoveAll(bskey generic.TStringKey) error {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).RemoveAll(ctx, bskey)
+	_, err := client.Client.(*generic.TStringBigSetKVServiceClient).RemoveAll(ctx, bskey)
 	if err != nil {
 		// client = transports.NewGetBsGenericClient(m.host, m.port)
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 	defer client.BackToPool()
-	log.Println("BsRemoveAll rs", rs)
 	return nil
 }
 func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*generic.TStringBigSetInfo, error) {
@@ -337,7 +336,7 @@ func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*gen
 	defer client.BackToPool()
 
 	if rs.Info == nil {
-		return nil, errors.New("Get bigset info by name err " + rs.Error.String())
+		return nil, nil
 	}
 	return rs.Info, nil
 }
@@ -366,9 +365,8 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 	}
 	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
-
 	if len(rs.Items.Items) == 0 {
 		return []*generic.TItem{}, nil
 	}
@@ -399,7 +397,7 @@ func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int3
 	}
 	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 
 	if len(rs.Items.Items) == 0 {
@@ -494,7 +492,7 @@ func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromK
 	}
 	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if len(rs.Items.Items) == 0 {
 		return []*generic.TItem{}, nil
@@ -526,7 +524,7 @@ func (m *StringBigsetService) BsGetSliceFromItemR(bskey generic.TStringKey, from
 	}
 	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	if len(rs.Items.Items) == 0 {
 		return []*generic.TItem{}, nil
@@ -541,6 +539,8 @@ func (m *StringBigsetService) handlerEventChangeEndpoint(ep *GoEndpointBackendMa
 }
 
 func NewStringBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) StringBigsetServiceIf {
+
+	log.Println("Init StringBigset Service sid", serviceID, "address", defaultEnpoint.Host+":"+defaultEnpoint.Port)
 	// aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
 	// err, ep := aepm.GetEndPoint()
 	stringbs := &StringBigsetService{
@@ -579,6 +579,8 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 }
 
 func NewStringBigsetServiceModel2(etcdEndpoints []string, sid string, defaultEndpointsHost string, defaultEndpointPort string) StringBigsetServiceIf {
+
+	log.Println("Init StringBigset Service sid", sid, "address", defaultEndpointsHost+":"+defaultEndpointPort)
 	stringbs := &StringBigsetService{
 		host:        defaultEndpointsHost,
 		port:        defaultEndpointPort,

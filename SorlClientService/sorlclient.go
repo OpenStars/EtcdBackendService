@@ -1,7 +1,6 @@
 package SorlClientService
 
 import (
-	"UserManagement/utils/logger"
 	"bytes"
 	"errors"
 	"fmt"
@@ -33,11 +32,11 @@ func (o *solrclientservice) AddDataToSolr(solrID int64, solrData map[string]inte
 	_, err = o.sconn.Update(f, true)
 
 	if err != nil {
-		logger.Error("[AddDataToSolr] solrID = %d, solrData = %v, error = %v \n", solrID, solrData, err)
+		// logger.Error("[AddDataToSolr] solrID = %d, solrData = %v, error = %v \n", solrID, solrData, err)
 		return
 	}
 
-	logger.Info("[AddDataToSolr] add data success solrid = %d, solrData = %v \n", solrID, solrData)
+	// logger.Info("[AddDataToSolr] add data success solrid = %d, solrData = %v \n", solrID, solrData)
 	return
 }
 
@@ -49,7 +48,7 @@ func (o *solrclientservice) UpdateDataSolr(query string, solrData map[string]int
 
 	res, _ := o.sconn.SelectRaw(query)
 	if int64(res.Results.NumFound) <= 0 {
-		logger.Info("[UpdateDataSolr] Can not found data query = %s \n", query)
+		// logger.Info("[UpdateDataSolr] Can not found data query = %s \n", query)
 		return errors.New("can not found data")
 	}
 	solrID := res.Results.Collection[0].Field("id").(string)
@@ -64,7 +63,7 @@ func (o *solrclientservice) UpdateDataSolr(query string, solrData map[string]int
 	_, err = o.sconn.Update(f, true)
 
 	if err != nil {
-		logger.Error("[UpdateDataSolr] solrID = %d, solrData = %v, error = %v \n", solrID, solrData, err)
+		// logger.Error("[UpdateDataSolr] solrID = %d, solrData = %v, error = %v \n", solrID, solrData, err)
 		return
 	}
 	return
@@ -77,7 +76,7 @@ func (o *solrclientservice) SelectByQueryString(query string) (result []solr.Doc
 	res, err := o.sconn.SelectRaw(query)
 
 	if err != nil {
-		logger.Info("[SelectByQueryString] err select: %v \n", err)
+		// logger.Info("[SelectByQueryString] err select: %v \n", err)
 		return make([]solr.Document, 0), 0, err
 	}
 
@@ -102,7 +101,7 @@ func (o *solrclientservice) SelectByQueryParams(query string) (result []solr.Doc
 	)
 
 	if err != nil {
-		logger.Info("[SelectByQueryString] err select: %v \n", err)
+		// logger.Info("[SelectByQueryString] err select: %v \n", err)
 		return make([]solr.Document, 0), 0, err
 	}
 
