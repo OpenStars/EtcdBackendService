@@ -217,8 +217,11 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 	defer client.BackToPool()
+	if r == nil {
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: r = nil")
+	}
 	if r.Error != generic.TErrorCode_EGood || r.Item == nil || r.Item.Key == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error")
 	}
 	return r.Item, nil
 }
@@ -397,7 +400,7 @@ func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int3
 	}
 	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: ")
 	}
 
 	if len(rs.Items.Items) == 0 {
@@ -492,7 +495,7 @@ func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromK
 	}
 	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: ")
 	}
 	if len(rs.Items.Items) == 0 {
 		return []*generic.TItem{}, nil
@@ -524,7 +527,7 @@ func (m *StringBigsetService) BsGetSliceFromItemR(bskey generic.TStringKey, from
 	}
 	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: ")
 	}
 	if len(rs.Items.Items) == 0 {
 		return []*generic.TItem{}, nil

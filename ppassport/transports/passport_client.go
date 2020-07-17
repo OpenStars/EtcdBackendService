@@ -3,10 +3,10 @@ package transports
 import (
 	"fmt"
 
-	"git.apache.org/thrift.git/lib/go/thrift"
+	"github.com/apache/thrift/lib/go/thrift"
 
 	"github.com/OpenStars/EtcdBackendService/ppassport/thrift/gen-go/OpenStars/Platform/Passport"
-	"github.com/OpenStars/thriftpool"
+	thriftpool "github.com/OpenStars/thriftpoolv2"
 )
 
 var (
