@@ -399,7 +399,7 @@ func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int3
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
 	}
 	defer client.BackToPool()
-	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
+	if rs == nil || rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: ")
 	}
 
