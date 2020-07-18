@@ -217,6 +217,9 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 	defer client.BackToPool()
+	if r == nil {
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: r = nil")
+	}
 	if r.Error != generic.TErrorCode_EGood || r.Item == nil || r.Item.Key == nil {
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + r.Error.String())
 	}
