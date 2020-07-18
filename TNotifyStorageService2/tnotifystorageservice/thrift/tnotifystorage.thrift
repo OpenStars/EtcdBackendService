@@ -14,18 +14,15 @@ enum TErrorCode{
 struct TNotifyItem{
     1: i64 Id, // notifyitem id
     2: i64 subjectId // chu the phat ra hanh dong
-    3: string actionId, // hanh dong
-    4: i64  objectId, // doi tuong chiu tac dong cua chu the
-    5: i64 subjectType, // uid, pageid or groupid
-    7: list<i64> extendSubjectId,
-    9: map<string,string> messageLang, // render message in language
-    10: optional string extend,
-    11: bool seen,
-    12: i64 timestamps,
-    13: i64 sourceId,
-    14: i64 parentId,
-    15: map<string,string> mapData,
+    3: string actionType, // hanh dong
+    4: string objectId, // doi tuong chiu tac dong cua chu the
+    5: map<string,string> messLang, // render message in language
+    6: bool seen,
+    7: i64 timestamps,
+    8: map<string,string> mapExtend,
+    9: i64 uid, // nguoi nhan notification
 }
+
 
 typedef TNotifyItem TData
 
