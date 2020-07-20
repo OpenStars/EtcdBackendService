@@ -345,6 +345,9 @@ func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*gen
 }
 
 func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error) {
+	if count == 0 {
+		return nil, errors.New("Empty data")
+	}
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -377,6 +380,9 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 }
 
 func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error) {
+	if count == 0 {
+		return nil, errors.New("Empty data")
+	}
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -919,6 +925,9 @@ func (m *StringBigsetService) CreateStringBigSet2(bskey generic.TStringKey) (*ge
 }
 
 func (m *StringBigsetService) BsGetSlice2(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error) {
+	if count == 0 {
+		return nil, nil
+	}
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
