@@ -359,6 +359,7 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 	}
 
 	client := transports.GetBsGenericClient(m.host, m.port)
+	log.Println("host", m.host, "port", m.port)
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
