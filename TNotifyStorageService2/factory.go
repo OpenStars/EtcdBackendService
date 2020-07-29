@@ -46,3 +46,43 @@ func NewTNotifyStorageService(serviceID string, etcdServers []string, defaultEnd
 	// notifysv.etcdManager.GetAllEndpoint(serviceID)
 	return notifysv
 }
+
+func NewTNotifyStorageService2(etcdServers []string, serviceID, defaultEndpointHost, defaultEndpointPort string) TNotifyStorageServiceIf {
+	// aepm := GoEndpointBackendManager.NewEndPointManager(etcdServers, serviceID)
+	// err, ep := aepm.GetEndPoint()
+	// if err != nil {
+	// 	log.Println("Init Local TNotifyStorageService sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+	// 	return &tnotifytorageservice{
+	// 		host: defaultEnpoint.Host,
+	// 		port: defaultEnpoint.Port,
+	// 		sid:  defaultEnpoint.ServiceID,
+	// 	}
+	// }
+	// sv := &tnotifytorageservice{
+	// 	host: ep.Host,
+	// 	port: ep.Port,
+	// 	sid:  ep.ServiceID,
+	// }
+	// go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
+	// sv.epm = aepm
+	// log.Println("Init From Etcd TNotifyStorageService sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	// return sv
+
+	notifysv := &tnotifytorageservice{
+		host:        defaultEndpointHost,
+		port:        defaultEndpointPort,
+		sid:         serviceID,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+	}
+
+	if notifysv.etcdManager == nil {
+		return nil
+	}
+	err := notifysv.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpointHost, defaultEndpointPort)
+	if err != nil {
+		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
+	}
+	// notifysv.etcdManager.GetAllEndpoint(serviceID)
+	return notifysv
+}
