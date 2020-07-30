@@ -14,17 +14,19 @@ import (
 	"strconv"
 	"strings"
 	"github.com/apache/thrift/lib/go/thrift"
-	"OpenStars/Platform/Passport"
+	"OpenStars/Common/TNotifyStorageService"
 )
 
-var _ = Passport.GoUnusedProtection__
+var _ = TNotifyStorageService.GoUnusedProtection__
 
 func Usage() {
   fmt.Fprintln(os.Stderr, "Usage of ", os.Args[0], " [-h host:port] [-u url] [-f[ramed]] function [arg1 [arg2...]]:")
   flag.PrintDefaults()
   fmt.Fprintln(os.Stderr, "\nFunctions:")
-  fmt.Fprintln(os.Stderr, "  TDataResult getData(TKey key)")
-  fmt.Fprintln(os.Stderr, "  TErrorCode putData(TKey key, TPassportInfo data)")
+  fmt.Fprintln(os.Stderr, "  TDataResult getData(i64 Id)")
+  fmt.Fprintln(os.Stderr, "  TErrorCode putData(i64 Id, TNotifyItem data)")
+  fmt.Fprintln(os.Stderr, "  TListDataResult getListData( lskeys)")
+  fmt.Fprintln(os.Stderr, "  bool removeData(i64 id)")
   fmt.Fprintln(os.Stderr)
   os.Exit(0)
 }
@@ -139,7 +141,7 @@ func main() {
   }
   iprot := protocolFactory.GetProtocol(trans)
   oprot := protocolFactory.GetProtocol(trans)
-  client := Passport.NewTPassportServiceClient(thrift.NewTStandardClient(iprot, oprot))
+  client := TNotifyStorageService.NewTNotifyStorageServiceClient(thrift.NewTStandardClient(iprot, oprot))
   if err := trans.Open(); err != nil {
     fmt.Fprintln(os.Stderr, "Error opening socket to ", host, ":", port, " ", err)
     os.Exit(1)
@@ -151,12 +153,12 @@ func main() {
       fmt.Fprintln(os.Stderr, "GetData requires 1 args")
       flag.Usage()
     }
-    argvalue0, err22 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err22 != nil {
+    argvalue0, err37 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err37 != nil {
       Usage()
       return
     }
-    value0 := Passport.TKey(argvalue0)
+    value0 := argvalue0
     fmt.Print(client.GetData(context.Background(), value0))
     fmt.Print("\n")
     break
@@ -165,30 +167,70 @@ func main() {
       fmt.Fprintln(os.Stderr, "PutData requires 2 args")
       flag.Usage()
     }
-    argvalue0, err23 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err23 != nil {
+    argvalue0, err38 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err38 != nil {
       Usage()
       return
     }
-    value0 := Passport.TKey(argvalue0)
-    arg24 := flag.Arg(2)
-    mbTrans25 := thrift.NewTMemoryBufferLen(len(arg24))
-    defer mbTrans25.Close()
-    _, err26 := mbTrans25.WriteString(arg24)
-    if err26 != nil {
+    value0 := argvalue0
+    arg39 := flag.Arg(2)
+    mbTrans40 := thrift.NewTMemoryBufferLen(len(arg39))
+    defer mbTrans40.Close()
+    _, err41 := mbTrans40.WriteString(arg39)
+    if err41 != nil {
       Usage()
       return
     }
-    factory27 := thrift.NewTJSONProtocolFactory()
-    jsProt28 := factory27.GetProtocol(mbTrans25)
-    argvalue1 := Passport.NewTPassportInfo()
-    err29 := argvalue1.Read(jsProt28)
-    if err29 != nil {
+    factory42 := thrift.NewTJSONProtocolFactory()
+    jsProt43 := factory42.GetProtocol(mbTrans40)
+    argvalue1 := TNotifyStorageService.NewTNotifyItem()
+    err44 := argvalue1.Read(jsProt43)
+    if err44 != nil {
       Usage()
       return
     }
     value1 := argvalue1
     fmt.Print(client.PutData(context.Background(), value0, value1))
+    fmt.Print("\n")
+    break
+  case "getListData":
+    if flag.NArg() - 1 != 1 {
+      fmt.Fprintln(os.Stderr, "GetListData requires 1 args")
+      flag.Usage()
+    }
+    arg45 := flag.Arg(1)
+    mbTrans46 := thrift.NewTMemoryBufferLen(len(arg45))
+    defer mbTrans46.Close()
+    _, err47 := mbTrans46.WriteString(arg45)
+    if err47 != nil { 
+      Usage()
+      return
+    }
+    factory48 := thrift.NewTJSONProtocolFactory()
+    jsProt49 := factory48.GetProtocol(mbTrans46)
+    containerStruct0 := TNotifyStorageService.NewTNotifyStorageServiceGetListDataArgs()
+    err50 := containerStruct0.ReadField1(jsProt49)
+    if err50 != nil {
+      Usage()
+      return
+    }
+    argvalue0 := containerStruct0.Lskeys
+    value0 := argvalue0
+    fmt.Print(client.GetListData(context.Background(), value0))
+    fmt.Print("\n")
+    break
+  case "removeData":
+    if flag.NArg() - 1 != 1 {
+      fmt.Fprintln(os.Stderr, "RemoveData requires 1 args")
+      flag.Usage()
+    }
+    argvalue0, err51 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err51 != nil {
+      Usage()
+      return
+    }
+    value0 := argvalue0
+    fmt.Print(client.RemoveData(context.Background(), value0))
     fmt.Print("\n")
     break
   case "":

@@ -14,17 +14,16 @@ import (
 	"strconv"
 	"strings"
 	"github.com/apache/thrift/lib/go/thrift"
-	"OpenStars/Platform/Passport"
+	"openstars/signservice"
 )
 
-var _ = Passport.GoUnusedProtection__
+var _ = signservice.GoUnusedProtection__
 
 func Usage() {
   fmt.Fprintln(os.Stderr, "Usage of ", os.Args[0], " [-h host:port] [-u url] [-f[ramed]] function [arg1 [arg2...]]:")
   flag.PrintDefaults()
   fmt.Fprintln(os.Stderr, "\nFunctions:")
-  fmt.Fprintln(os.Stderr, "  TDataResult getData(TKey key)")
-  fmt.Fprintln(os.Stderr, "  TErrorCode putData(TKey key, TPassportInfo data)")
+  fmt.Fprintln(os.Stderr, "  DataSignResult SignData(string privateKey, string data)")
   fmt.Fprintln(os.Stderr)
   os.Exit(0)
 }
@@ -139,56 +138,23 @@ func main() {
   }
   iprot := protocolFactory.GetProtocol(trans)
   oprot := protocolFactory.GetProtocol(trans)
-  client := Passport.NewTPassportServiceClient(thrift.NewTStandardClient(iprot, oprot))
+  client := signservice.NewSignDataServiceClient(thrift.NewTStandardClient(iprot, oprot))
   if err := trans.Open(); err != nil {
     fmt.Fprintln(os.Stderr, "Error opening socket to ", host, ":", port, " ", err)
     os.Exit(1)
   }
   
   switch cmd {
-  case "getData":
-    if flag.NArg() - 1 != 1 {
-      fmt.Fprintln(os.Stderr, "GetData requires 1 args")
-      flag.Usage()
-    }
-    argvalue0, err22 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err22 != nil {
-      Usage()
-      return
-    }
-    value0 := Passport.TKey(argvalue0)
-    fmt.Print(client.GetData(context.Background(), value0))
-    fmt.Print("\n")
-    break
-  case "putData":
+  case "SignData":
     if flag.NArg() - 1 != 2 {
-      fmt.Fprintln(os.Stderr, "PutData requires 2 args")
+      fmt.Fprintln(os.Stderr, "SignData requires 2 args")
       flag.Usage()
     }
-    argvalue0, err23 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err23 != nil {
-      Usage()
-      return
-    }
-    value0 := Passport.TKey(argvalue0)
-    arg24 := flag.Arg(2)
-    mbTrans25 := thrift.NewTMemoryBufferLen(len(arg24))
-    defer mbTrans25.Close()
-    _, err26 := mbTrans25.WriteString(arg24)
-    if err26 != nil {
-      Usage()
-      return
-    }
-    factory27 := thrift.NewTJSONProtocolFactory()
-    jsProt28 := factory27.GetProtocol(mbTrans25)
-    argvalue1 := Passport.NewTPassportInfo()
-    err29 := argvalue1.Read(jsProt28)
-    if err29 != nil {
-      Usage()
-      return
-    }
+    argvalue0 := flag.Arg(1)
+    value0 := argvalue0
+    argvalue1 := flag.Arg(2)
     value1 := argvalue1
-    fmt.Print(client.PutData(context.Background(), value0, value1))
+    fmt.Print(client.SignData(context.Background(), value0, value1))
     fmt.Print("\n")
     break
   case "":
