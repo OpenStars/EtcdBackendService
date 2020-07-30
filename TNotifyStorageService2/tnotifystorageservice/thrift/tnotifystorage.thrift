@@ -23,7 +23,6 @@ struct TNotifyItem{
     9: i64 uid, // nguoi nhan notification
 }
 
-
 typedef TNotifyItem TData
 
 
@@ -51,5 +50,6 @@ service TDataService{
 service TNotifyStorageService extends TDataService{
     
 }
+
 
 

@@ -5,7 +5,7 @@ import (
 	//Todo: Fix this
 	"fmt"
 
-	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService/tnotifystorageservice/thrift/gen-go/OpenStars/Common/TNotifyStorageService"
+	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService2/tnotifystorageservice/thrift/gen-go/OpenStars/Common/TNotifyStorageService"
 	"github.com/OpenStars/thriftpoolv2"
 	"github.com/apache/thrift/lib/go/thrift"
 )

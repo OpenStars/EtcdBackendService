@@ -7,7 +7,6 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService2/tnotifystorageservice/thrift/gen-go/OpenStars/Common/TNotifyStorageService"
 	"github.com/OpenStars/EtcdBackendService/TNotifyStorageService2/tnotifystorageservice/transports"
-	"github.com/OpenStars/EtcdBackendService/TPostStorageService/tpoststorageservice/thrift/gen-go/OpenStars/Common/TPostStorageService"
 	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
@@ -111,9 +110,9 @@ func (m *tnotifytorageservice) GetListDatas(listkey []int64) ([]*TNotifyStorageS
 			m.port = p
 		}
 	}
-	var tlistkeys []TPostStorageService.TKey
+	var tlistkeys []TNotifyStorageService.TKey
 	for i := 0; i < len(listkey); i++ {
-		tlistkeys = append(tlistkeys, TPostStorageService.TKey(listkey[i]))
+		tlistkeys = append(tlistkeys, TNotifyStorageService.TKey(listkey[i]))
 	}
 	client := transports.GetTNotifyStorageServiceCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {

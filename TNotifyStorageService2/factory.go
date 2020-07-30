@@ -76,7 +76,7 @@ func NewTNotifyStorageService2(etcdServers []string, serviceID, defaultEndpointH
 	}
 
 	if notifysv.etcdManager == nil {
-		return nil
+		return notifysv
 	}
 	err := notifysv.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpointHost, defaultEndpointPort)
 	if err != nil {
