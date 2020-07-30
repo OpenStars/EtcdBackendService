@@ -147,7 +147,7 @@ func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey ge
 	defer client.BackToPool()
 
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil || len(rs.Items.Items) == 0 {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: ")
 	}
 	return rs.Items.Items, nil
 }
