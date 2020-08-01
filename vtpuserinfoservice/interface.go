@@ -1,6 +1,6 @@
-package vtpuserservice
+package vtpuserinfoservice
 
-import "github.com/OpenStars/EtcdBackendService/VTPEndCustomers/thrift/gen-go/openstars/enduservtp"
+import "github.com/OpenStars/EtcdBackendService/vtpuserinfoservice/thrift/gen-go/openstars/enduservtp"
 
 type VTPEndUserService interface {
 	GetData(key int64) (*enduservtp.TEndUserVTP, error)

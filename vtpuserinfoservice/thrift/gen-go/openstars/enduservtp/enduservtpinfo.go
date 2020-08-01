@@ -275,8 +275,6 @@ func (p *TAddress) String() string {
 //  - PhoneNumber
 //  - DisplayName
 //  - Address
-//  - TradingCode
-//  - ProductCode
 //  - Email
 //  - Type
 //  - EvaluateUser
@@ -287,8 +285,7 @@ type TEndUserVTP struct {
   PhoneNumber string `thrift:"phoneNumber,2" db:"phoneNumber" json:"phoneNumber"`
   DisplayName string `thrift:"displayName,3" db:"displayName" json:"displayName"`
   Address *TAddress `thrift:"address,4" db:"address" json:"address"`
-  TradingCode int64 `thrift:"tradingCode,5" db:"tradingCode" json:"tradingCode"`
-  ProductCode int64 `thrift:"productCode,6" db:"productCode" json:"productCode"`
+  // unused fields # 5 to 6
   Email string `thrift:"email,7" db:"email" json:"email"`
   Type TTypeUser `thrift:"type,8" db:"type" json:"type"`
   EvaluateUser int64 `thrift:"evaluateUser,9" db:"evaluateUser" json:"evaluateUser"`
@@ -318,14 +315,6 @@ func (p *TEndUserVTP) GetAddress() *TAddress {
     return TEndUserVTP_Address_DEFAULT
   }
 return p.Address
-}
-
-func (p *TEndUserVTP) GetTradingCode() int64 {
-  return p.TradingCode
-}
-
-func (p *TEndUserVTP) GetProductCode() int64 {
-  return p.ProductCode
 }
 
 func (p *TEndUserVTP) GetEmail() string {
@@ -397,26 +386,6 @@ func (p *TEndUserVTP) Read(iprot thrift.TProtocol) error {
     case 4:
       if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField4(iprot); err != nil {
-          return err
-        }
-      } else {
-        if err := iprot.Skip(fieldTypeId); err != nil {
-          return err
-        }
-      }
-    case 5:
-      if fieldTypeId == thrift.I64 {
-        if err := p.ReadField5(iprot); err != nil {
-          return err
-        }
-      } else {
-        if err := iprot.Skip(fieldTypeId); err != nil {
-          return err
-        }
-      }
-    case 6:
-      if fieldTypeId == thrift.I64 {
-        if err := p.ReadField6(iprot); err != nil {
           return err
         }
       } else {
@@ -525,24 +494,6 @@ func (p *TEndUserVTP)  ReadField4(iprot thrift.TProtocol) error {
   return nil
 }
 
-func (p *TEndUserVTP)  ReadField5(iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading field 5: ", err)
-} else {
-  p.TradingCode = v
-}
-  return nil
-}
-
-func (p *TEndUserVTP)  ReadField6(iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading field 6: ", err)
-} else {
-  p.ProductCode = v
-}
-  return nil
-}
-
 func (p *TEndUserVTP)  ReadField7(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
   return thrift.PrependError("error reading field 7: ", err)
@@ -616,8 +567,6 @@ func (p *TEndUserVTP) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
     if err := p.writeField3(oprot); err != nil { return err }
     if err := p.writeField4(oprot); err != nil { return err }
-    if err := p.writeField5(oprot); err != nil { return err }
-    if err := p.writeField6(oprot); err != nil { return err }
     if err := p.writeField7(oprot); err != nil { return err }
     if err := p.writeField8(oprot); err != nil { return err }
     if err := p.writeField9(oprot); err != nil { return err }
@@ -669,26 +618,6 @@ func (p *TEndUserVTP) writeField4(oprot thrift.TProtocol) (err error) {
   }
   if err := oprot.WriteFieldEnd(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 4:address: ", p), err) }
-  return err
-}
-
-func (p *TEndUserVTP) writeField5(oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin("tradingCode", thrift.I64, 5); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:tradingCode: ", p), err) }
-  if err := oprot.WriteI64(int64(p.TradingCode)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.tradingCode (5) field write error: ", p), err) }
-  if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 5:tradingCode: ", p), err) }
-  return err
-}
-
-func (p *TEndUserVTP) writeField6(oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin("productCode", thrift.I64, 6); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:productCode: ", p), err) }
-  if err := oprot.WriteI64(int64(p.ProductCode)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.productCode (6) field write error: ", p), err) }
-  if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 6:productCode: ", p), err) }
   return err
 }
 

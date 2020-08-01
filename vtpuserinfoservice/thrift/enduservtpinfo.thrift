@@ -27,8 +27,6 @@ struct TEndUserVTP{
     2: string phoneNumber,
     3: string displayName,
     4: TAddress address,
-    5: i64 tradingCode,
-    6: i64 productCode,
     7: string email,
     8: TTypeUser type,
     9: i64 evaluateUser,

@@ -1,4 +1,4 @@
-package vtpuserservice
+package vtpuserinfoservice
 
 import (
 	"log"

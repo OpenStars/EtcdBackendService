@@ -3,7 +3,7 @@ package transports
 import (
 	"log"
 
-	"github.com/OpenStars/EtcdBackendService/VTPEndCustomers/thrift/gen-go/openstars/enduservtp"
+	"github.com/OpenStars/EtcdBackendService/vtpuserinfoservice/thrift/gen-go/openstars/enduservtp"
 	"github.com/OpenStars/thriftpoolv2"
 	"github.com/apache/thrift/lib/go/thrift"
 )

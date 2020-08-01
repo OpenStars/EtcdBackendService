@@ -1,12 +1,12 @@
-package vtpuserservice
+package vtpuserinfoservice
 
 import (
 	"context"
 	"errors"
 	"log"
 
-	"github.com/OpenStars/EtcdBackendService/VTPEndCustomers/thrift/gen-go/openstars/enduservtp"
-	"github.com/OpenStars/EtcdBackendService/VTPEndCustomers/transports"
+	"github.com/OpenStars/EtcdBackendService/vtpuserinfoservice/thrift/gen-go/openstars/enduservtp"
+	"github.com/OpenStars/EtcdBackendService/vtpuserinfoservice/transports"
 	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
