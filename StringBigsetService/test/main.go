@@ -5,17 +5,21 @@ import (
 
 	"github.com/OpenStars/EtcdBackendService/StringBigsetService"
 	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
+	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
 )
 
 //host = 10.60.1.20
 //port = 18408
 func TestSV() {
-	svClient := StringBigsetService.NewStringBigsetServiceModel2([]string{"10.60.1.20:2379"}, "/test/", " 10.110.69.96", "20427")
-	//  BSKEYCATEGORY2ITEM0000000000000000015
-	//  BSKEYCATEGORY2ITEM0000000000000000015
-	//  0000000000000000055
-	//  0000000000000000055
-	bskey := generic.TStringKey("|LIST_MARKETPLACE_ITEM_OF_UID|0000000000000004711")
+	svClient := StringBigsetService.NewStringBigsetServiceModel("", []string{}, GoEndpointBackendManager.EndPoint{
+		Host:      "127.0.0.1",
+		Port:      "18407",
+		ServiceID: ""})
+	bskey := generic.TStringKey("minhnv")
+	svClient.BsPutItem(bskey, &generic.TItem{
+		Key:   []byte("minhv"),
+		Value: []byte("1234"),
+	})
 	lsItems, err := svClient.BsGetSliceR(bskey, 0, 10)
 	if err != nil {
 		log.Fatalln("err", err)
