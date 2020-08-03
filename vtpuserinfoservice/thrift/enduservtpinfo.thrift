@@ -23,10 +23,12 @@ struct TAddress {
 }
 
 struct TEndUserVTP{
-    1: TKey uid
+    1: TKey uid,
     2: string phoneNumber,
     3: string displayName,
-    4: TAddress address,
+    4: list<TAddress> address,
+    5: i64 totalSuccess,
+    6: i64 totalFail,
     7: string email,
     8: TTypeUser type,
     9: i64 evaluateUser,

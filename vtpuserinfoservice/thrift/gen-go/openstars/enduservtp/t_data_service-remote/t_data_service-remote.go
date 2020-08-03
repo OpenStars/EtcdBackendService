@@ -152,8 +152,8 @@ func main() {
       fmt.Fprintln(os.Stderr, "GetData requires 1 args")
       flag.Usage()
     }
-    argvalue0, err18 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err18 != nil {
+    argvalue0, err19 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err19 != nil {
       Usage()
       return
     }
@@ -166,19 +166,19 @@ func main() {
       fmt.Fprintln(os.Stderr, "GetMultiData requires 1 args")
       flag.Usage()
     }
-    arg19 := flag.Arg(1)
-    mbTrans20 := thrift.NewTMemoryBufferLen(len(arg19))
-    defer mbTrans20.Close()
-    _, err21 := mbTrans20.WriteString(arg19)
-    if err21 != nil { 
+    arg20 := flag.Arg(1)
+    mbTrans21 := thrift.NewTMemoryBufferLen(len(arg20))
+    defer mbTrans21.Close()
+    _, err22 := mbTrans21.WriteString(arg20)
+    if err22 != nil { 
       Usage()
       return
     }
-    factory22 := thrift.NewTJSONProtocolFactory()
-    jsProt23 := factory22.GetProtocol(mbTrans20)
+    factory23 := thrift.NewTJSONProtocolFactory()
+    jsProt24 := factory23.GetProtocol(mbTrans21)
     containerStruct0 := enduservtp.NewTDataServiceGetMultiDataArgs()
-    err24 := containerStruct0.ReadField1(jsProt23)
-    if err24 != nil {
+    err25 := containerStruct0.ReadField1(jsProt24)
+    if err25 != nil {
       Usage()
       return
     }
@@ -192,25 +192,25 @@ func main() {
       fmt.Fprintln(os.Stderr, "PutData requires 2 args")
       flag.Usage()
     }
-    argvalue0, err25 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-    if err25 != nil {
+    argvalue0, err26 := (strconv.ParseInt(flag.Arg(1), 10, 64))
+    if err26 != nil {
       Usage()
       return
     }
     value0 := enduservtp.TKey(argvalue0)
-    arg26 := flag.Arg(2)
-    mbTrans27 := thrift.NewTMemoryBufferLen(len(arg26))
-    defer mbTrans27.Close()
-    _, err28 := mbTrans27.WriteString(arg26)
-    if err28 != nil {
+    arg27 := flag.Arg(2)
+    mbTrans28 := thrift.NewTMemoryBufferLen(len(arg27))
+    defer mbTrans28.Close()
+    _, err29 := mbTrans28.WriteString(arg27)
+    if err29 != nil {
       Usage()
       return
     }
-    factory29 := thrift.NewTJSONProtocolFactory()
-    jsProt30 := factory29.GetProtocol(mbTrans27)
+    factory30 := thrift.NewTJSONProtocolFactory()
+    jsProt31 := factory30.GetProtocol(mbTrans28)
     argvalue1 := enduservtp.NewTEndUserVTP()
-    err31 := argvalue1.Read(jsProt30)
-    if err31 != nil {
+    err32 := argvalue1.Read(jsProt31)
+    if err32 != nil {
       Usage()
       return
     }
