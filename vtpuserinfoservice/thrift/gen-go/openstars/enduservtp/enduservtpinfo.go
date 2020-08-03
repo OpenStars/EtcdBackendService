@@ -280,6 +280,7 @@ func (p *TAddress) String() string {
 //  - EvaluateUser
 //  - Deleted
 //  - MapExtData
+//  - CreateTime
 type TEndUserVTP struct {
   UID TKey `thrift:"uid,1" db:"uid" json:"uid"`
   PhoneNumber string `thrift:"phoneNumber,2" db:"phoneNumber" json:"phoneNumber"`
@@ -291,6 +292,7 @@ type TEndUserVTP struct {
   EvaluateUser int64 `thrift:"evaluateUser,9" db:"evaluateUser" json:"evaluateUser"`
   Deleted bool `thrift:"deleted,10" db:"deleted" json:"deleted"`
   MapExtData map[string]string `thrift:"mapExtData,11" db:"mapExtData" json:"mapExtData"`
+  CreateTime int64 `thrift:"createTime,12" db:"createTime" json:"createTime"`
 }
 
 func NewTEndUserVTP() *TEndUserVTP {
@@ -335,6 +337,10 @@ func (p *TEndUserVTP) GetDeleted() bool {
 
 func (p *TEndUserVTP) GetMapExtData() map[string]string {
   return p.MapExtData
+}
+
+func (p *TEndUserVTP) GetCreateTime() int64 {
+  return p.CreateTime
 }
 func (p *TEndUserVTP) IsSetAddress() bool {
   return p.Address != nil
@@ -436,6 +442,16 @@ func (p *TEndUserVTP) Read(iprot thrift.TProtocol) error {
     case 11:
       if fieldTypeId == thrift.MAP {
         if err := p.ReadField11(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 12:
+      if fieldTypeId == thrift.I64 {
+        if err := p.ReadField12(iprot); err != nil {
           return err
         }
       } else {
@@ -559,6 +575,15 @@ var _val1 string
   return nil
 }
 
+func (p *TEndUserVTP)  ReadField12(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadI64(); err != nil {
+  return thrift.PrependError("error reading field 12: ", err)
+} else {
+  p.CreateTime = v
+}
+  return nil
+}
+
 func (p *TEndUserVTP) Write(oprot thrift.TProtocol) error {
   if err := oprot.WriteStructBegin("TEndUserVTP"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
@@ -572,6 +597,7 @@ func (p *TEndUserVTP) Write(oprot thrift.TProtocol) error {
     if err := p.writeField9(oprot); err != nil { return err }
     if err := p.writeField10(oprot); err != nil { return err }
     if err := p.writeField11(oprot); err != nil { return err }
+    if err := p.writeField12(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
     return thrift.PrependError("write field stop error: ", err) }
@@ -678,6 +704,16 @@ func (p *TEndUserVTP) writeField11(oprot thrift.TProtocol) (err error) {
   }
   if err := oprot.WriteFieldEnd(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 11:mapExtData: ", p), err) }
+  return err
+}
+
+func (p *TEndUserVTP) writeField12(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("createTime", thrift.I64, 12); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 12:createTime: ", p), err) }
+  if err := oprot.WriteI64(int64(p.CreateTime)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.createTime (12) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 12:createTime: ", p), err) }
   return err
 }
 

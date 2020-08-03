@@ -32,6 +32,7 @@ struct TEndUserVTP{
     9: i64 evaluateUser,
     10: bool deleted,
     11: map<string, string> mapExtData,
+    12: i64 createTime,
 }
 
 typedef TEndUserVTP TData
