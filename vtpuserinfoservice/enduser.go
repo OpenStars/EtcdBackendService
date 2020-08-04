@@ -47,7 +47,7 @@ func (m *vtpenduserservice) GetData(key int64) (*enduservtp.TEndUserVTP, error) 
 		return nil, errors.New("Backend service:" + m.sid + " err:" + r.ErrorCode.String())
 	}
 
-	if r.Data.UID == int64(0) && r.Data.PhoneNumber == "" {
+	if int64(r.Data.UID) == int64(0) && r.Data.PhoneNumber == "" {
 		return nil, errors.New("Data not existed")
 	}
 
