@@ -18,8 +18,10 @@ enum TTypeUser{
 }
 
 struct TAddress {
-    1: i64 addressID,
-    2: string addressStr,
+    1: i64 wardID,
+    2: i64 districtID,
+    3: i64 provinceID,
+    4: string addressStr,
 }
 
 struct TEndUserVTP{
@@ -35,6 +37,7 @@ struct TEndUserVTP{
     10: bool deleted,
     11: map<string, string> mapExtData,
     12: i64 createTime,
+    13: i64 cusID
 }
 
 typedef TEndUserVTP TData
