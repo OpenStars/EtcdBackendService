@@ -12,14 +12,14 @@ import (
 //port = 18408
 func TestSV() {
 	svClient := StringBigsetService.NewStringBigsetServiceModel("", []string{}, GoEndpointBackendManager.EndPoint{
-		Host:      "127.0.0.1",
-		Port:      "18407",
+		Host:      "10.110.1.21",
+		Port:      "18507",
 		ServiceID: ""})
-	bskey := generic.TStringKey("minhnv")
-	svClient.BsPutItem(bskey, &generic.TItem{
-		Key:   []byte("minhv"),
-		Value: []byte("1234"),
-	})
+	bskey := generic.TStringKey("GiacNgoTVLinkPaper")
+	// svClient.BsPutItem(bskey, &generic.TItem{
+	// 	Key:   []byte("minhv2"),
+	// 	Value: []byte("1234"),
+	// })
 	lsItems, err := svClient.BsGetSliceR(bskey, 0, 10)
 	if err != nil {
 		log.Fatalln("err", err)

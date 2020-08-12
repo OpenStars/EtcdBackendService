@@ -168,14 +168,17 @@ func (r *Tile38ManagerService) GetLocationItemNearby(lat, long, radius float64, 
 		vals, err := redis.Values(c.Do("NEARBY", args...))
 		if err != nil {
 			log.Printf("[GetLocationNearby] could not NEARBY: %v\n", err)
+			return result, err
 		}
 		// the first element is the cursor
-		if len(vals) < 2 {
+		if vals == nil || len(vals) < 2 {
 			log.Printf("[GetLocationNearby] invalid value")
+			return result, err
 		}
 		vals, err = redis.Values(vals[1], nil)
 		if err != nil {
 			log.Printf("[GetLocationNearby] invalid value")
+			return result, err
 		}
 		for _, val := range vals {
 
