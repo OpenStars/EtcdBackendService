@@ -359,7 +359,7 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 	}
 
 	client := transports.GetBsGenericClient(m.host, m.port)
-	log.Println("host", m.host, "port", m.port)
+
 	if client == nil || client.Client == nil {
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
@@ -372,7 +372,7 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 	}
 	defer client.BackToPool()
 	if rs.Error != generic.TErrorCode_EGood || rs.Items == nil {
-		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
 	}
 	if len(rs.Items.Items) == 0 {
 		return []*generic.TItem{}, nil
@@ -589,6 +589,26 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 }
 
 func NewStringBigsetServiceModel2(etcdEndpoints []string, sid string, defaultEndpointsHost string, defaultEndpointPort string) StringBigsetServiceIf {
+
+	log.Println("Init StringBigset Service sid", sid, "address", defaultEndpointsHost+":"+defaultEndpointPort)
+	stringbs := &StringBigsetService{
+		host:        defaultEndpointsHost,
+		port:        defaultEndpointPort,
+		sid:         sid,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdEndpoints),
+	}
+	if stringbs.etcdManager == nil {
+		return stringbs
+	}
+	err := stringbs.etcdManager.SetDefaultEntpoint(sid, defaultEndpointsHost, defaultEndpointPort)
+	if err != nil {
+		log.Println("SetDefaultEndpoint sid", sid, "err", err)
+		return nil
+	}
+	return stringbs
+}
+
+func NewClient(etcdEndpoints []string, sid string, defaultEndpointsHost string, defaultEndpointPort string) Client {
 
 	log.Println("Init StringBigset Service sid", sid, "address", defaultEndpointsHost+":"+defaultEndpointPort)
 	stringbs := &StringBigsetService{
