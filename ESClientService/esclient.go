@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	elastic "gopkg.in/olivere/elastic.v7"
+	"github.com/olivere/elastic"
 )
 
 const indexString = `
@@ -17,8 +17,6 @@ const indexString = `
 		"number_of_replicas": 0
 	},
 	"mappings":{
-		"_doc": {
-		}
 	}
 }`
 

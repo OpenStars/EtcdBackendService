@@ -108,12 +108,12 @@ func NewInt2StringService(serviceID string, etcdServers []string, defaultEndpoin
 	}
 
 	if i2ssv.etcdManager == nil {
-		return nil
+		return i2ssv
 	}
 	err := i2ssv.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpoint.Host, defaultEndpoint.Port)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
-		return nil
+		return i2ssv
 	}
 	// i2ssv.etcdManager.GetAllEndpoint(serviceID)
 	return i2ssv
