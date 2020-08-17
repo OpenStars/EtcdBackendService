@@ -45,3 +45,23 @@ func NewTPostStorageService(serviceID string, etcdServers []string, defaultEndpo
 	// postsv.etcdManager.GetAllEndpoint(serviceID)
 	return postsv
 }
+
+func NewClient(etcdServers []string, serviceID string, host, port string) TPostStorageServiceIf {
+	postsv := &tpoststorageservice{
+		host:        host,
+		port:        port,
+		sid:         serviceID,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+	}
+
+	if postsv.etcdManager == nil {
+		return nil
+	}
+	err := postsv.etcdManager.SetDefaultEntpoint(serviceID, host, port)
+	if err != nil {
+		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
+	}
+	// postsv.etcdManager.GetAllEndpoint(serviceID)
+	return postsv
+}

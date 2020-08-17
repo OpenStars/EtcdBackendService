@@ -7,4 +7,5 @@ type TPostStorageServiceIf interface {
 	PutData(idpost int64, data *TPostStorageService.TPostItem) error
 	RemoveData(idpost int64) error
 	GetListDatas(listkey []int64) ([]*TPostStorageService.TPostItem, error)
+	GetData2(idpost int64) (*TPostStorageService.TPostItem, error)
 }

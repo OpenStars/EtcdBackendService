@@ -19,6 +19,26 @@ type tpoststorageservice struct {
 	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
 }
 
+func (m *tpoststorageservice) GetData2(idpost int64) (*TPostStorageService.TPostItem, error) {
+	client := transports.GetTPostStorageServiceCompactClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+
+	r, err := client.Client.(*TPostStorageService.TPostStorageServiceClient).GetData(context.Background(), TPostStorageService.TKey(idpost))
+	if err != nil {
+		return nil, errors.New("Backend service:" + m.sid + " err:" + err.Error())
+	}
+	defer client.BackToPool()
+	if r.Data == nil {
+		return nil, nil
+	}
+	if r.ErrorCode != TPostStorageService.TErrorCode_EGood {
+		return nil, nil
+	}
+	return r.Data, nil
+}
+
 func (m *tpoststorageservice) GetData(key int64) (*TPostStorageService.TPostItem, error) {
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
