@@ -61,7 +61,13 @@ struct TOrder{
     50: i32 is_pending,
     51: i32 order_action_505
     52: i32 fee_collected,
+    53: string post_code_type2,
+    54: string branch_id,
+    55: string branch_id_type2,
+    56: string regon_id,
+    57: string regon_id_type2,
 }
+
 
 typedef TOrder TData
 

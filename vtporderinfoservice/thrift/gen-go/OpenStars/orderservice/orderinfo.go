@@ -137,6 +137,11 @@ func TDataPtr(v TData) *TData { return &v }
 //  - IsPending
 //  - OrderAction_505
 //  - FeeCollected
+//  - PostCodeType2
+//  - BranchID
+//  - BranchIDType2
+//  - RegonID
+//  - RegonIDType2
 type TOrder struct {
   OrderGenID TKey `thrift:"orderGenID,1" db:"orderGenID" json:"orderGenID"`
   OrderID int64 `thrift:"order_id,2" db:"order_id" json:"order_id"`
@@ -188,6 +193,11 @@ type TOrder struct {
   IsPending int32 `thrift:"is_pending,50" db:"is_pending" json:"is_pending"`
   OrderAction_505 int32 `thrift:"order_action_505,51" db:"order_action_505" json:"order_action_505"`
   FeeCollected int32 `thrift:"fee_collected,52" db:"fee_collected" json:"fee_collected"`
+  PostCodeType2 string `thrift:"post_code_type2,53" db:"post_code_type2" json:"post_code_type2"`
+  BranchID string `thrift:"branch_id,54" db:"branch_id" json:"branch_id"`
+  BranchIDType2 string `thrift:"branch_id_type2,55" db:"branch_id_type2" json:"branch_id_type2"`
+  RegonID string `thrift:"regon_id,56" db:"regon_id" json:"regon_id"`
+  RegonIDType2 string `thrift:"regon_id_type2,57" db:"regon_id_type2" json:"regon_id_type2"`
 }
 
 func NewTOrder() *TOrder {
@@ -389,6 +399,26 @@ func (p *TOrder) GetOrderAction_505() int32 {
 
 func (p *TOrder) GetFeeCollected() int32 {
   return p.FeeCollected
+}
+
+func (p *TOrder) GetPostCodeType2() string {
+  return p.PostCodeType2
+}
+
+func (p *TOrder) GetBranchID() string {
+  return p.BranchID
+}
+
+func (p *TOrder) GetBranchIDType2() string {
+  return p.BranchIDType2
+}
+
+func (p *TOrder) GetRegonID() string {
+  return p.RegonID
+}
+
+func (p *TOrder) GetRegonIDType2() string {
+  return p.RegonIDType2
 }
 func (p *TOrder) Read(iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(); err != nil {
@@ -893,6 +923,56 @@ func (p *TOrder) Read(iprot thrift.TProtocol) error {
           return err
         }
       }
+    case 53:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField53(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 54:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField54(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 55:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField55(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 56:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField56(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 57:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField57(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
     default:
       if err := iprot.Skip(fieldTypeId); err != nil {
         return err
@@ -1350,6 +1430,51 @@ func (p *TOrder)  ReadField52(iprot thrift.TProtocol) error {
   return nil
 }
 
+func (p *TOrder)  ReadField53(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 53: ", err)
+} else {
+  p.PostCodeType2 = v
+}
+  return nil
+}
+
+func (p *TOrder)  ReadField54(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 54: ", err)
+} else {
+  p.BranchID = v
+}
+  return nil
+}
+
+func (p *TOrder)  ReadField55(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 55: ", err)
+} else {
+  p.BranchIDType2 = v
+}
+  return nil
+}
+
+func (p *TOrder)  ReadField56(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 56: ", err)
+} else {
+  p.RegonID = v
+}
+  return nil
+}
+
+func (p *TOrder)  ReadField57(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 57: ", err)
+} else {
+  p.RegonIDType2 = v
+}
+  return nil
+}
+
 func (p *TOrder) Write(oprot thrift.TProtocol) error {
   if err := oprot.WriteStructBegin("TOrder"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
@@ -1403,6 +1528,11 @@ func (p *TOrder) Write(oprot thrift.TProtocol) error {
     if err := p.writeField50(oprot); err != nil { return err }
     if err := p.writeField51(oprot); err != nil { return err }
     if err := p.writeField52(oprot); err != nil { return err }
+    if err := p.writeField53(oprot); err != nil { return err }
+    if err := p.writeField54(oprot); err != nil { return err }
+    if err := p.writeField55(oprot); err != nil { return err }
+    if err := p.writeField56(oprot); err != nil { return err }
+    if err := p.writeField57(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
     return thrift.PrependError("write field stop error: ", err) }
@@ -1898,6 +2028,56 @@ func (p *TOrder) writeField52(oprot thrift.TProtocol) (err error) {
   return thrift.PrependError(fmt.Sprintf("%T.fee_collected (52) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 52:fee_collected: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField53(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("post_code_type2", thrift.STRING, 53); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 53:post_code_type2: ", p), err) }
+  if err := oprot.WriteString(string(p.PostCodeType2)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.post_code_type2 (53) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 53:post_code_type2: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField54(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("branch_id", thrift.STRING, 54); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 54:branch_id: ", p), err) }
+  if err := oprot.WriteString(string(p.BranchID)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.branch_id (54) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 54:branch_id: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField55(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("branch_id_type2", thrift.STRING, 55); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 55:branch_id_type2: ", p), err) }
+  if err := oprot.WriteString(string(p.BranchIDType2)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.branch_id_type2 (55) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 55:branch_id_type2: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField56(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("regon_id", thrift.STRING, 56); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 56:regon_id: ", p), err) }
+  if err := oprot.WriteString(string(p.RegonID)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.regon_id (56) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 56:regon_id: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField57(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("regon_id_type2", thrift.STRING, 57); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 57:regon_id_type2: ", p), err) }
+  if err := oprot.WriteString(string(p.RegonIDType2)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.regon_id_type2 (57) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 57:regon_id_type2: ", p), err) }
   return err
 }
 
