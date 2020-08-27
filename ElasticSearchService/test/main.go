@@ -84,23 +84,26 @@ func main() {
 	// urlPath := "http://10.110.1.21:9092/"
 	// rawUrl, _ := url.Parse(urlPath)
 	// log.Println(rawUrl.Path)
-	esclient := ElasticSearchService.NewClient([]string{"http://11.110.1.21:9200"})
-	// query := map[string]interface{}{
-	// 	"query": map[string]interface{}{
-	// 		"match": map[string]interface{}{
-	// 			"name": "Áo nam lkm",
-	// 		},
-	// 	},
-	// }
-	// rs, err := esclient.Search("eshop", query)
-	IndexToES(esclient)
+	esclient := ElasticSearchService.NewClient([]string{"http://10.110.1.100:9206/"})
+
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"match": map[string]interface{}{
+				"displayName": "Sơn",
+			},
+		},
+	}
+	rs, err := esclient.Search("trustkeysprofile", query)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	doc, err := ElasticSearchService.ParseRawDocuments(rs)
+	// IndexToES(esclient)
 	// result, err := esclient.Get("eshop", "qUl2LXQBTjAo_D0k19Q7")
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-	// err := esclient.DeteleIndex("eshop")
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-	// log.Println(string(rs))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Println(doc)
 }
