@@ -1,4 +1,4 @@
-package vtpuserinfoservice
+package vtpcalllogservice
 
 import "github.com/OpenStars/EtcdBackendService/vtpcalllogservice/thrift/gen-go/OpenStars/calllog"
 
