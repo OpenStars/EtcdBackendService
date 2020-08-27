@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"strconv"
 
 	"github.com/OpenStars/EtcdBackendService/ElasticSearchService"
 )
@@ -30,7 +31,8 @@ func IndexToES(esclient ElasticSearchService.Client) {
 		Timestamp:    1598342499,
 	}
 	databytes, _ := json.Marshal(sitem1)
-	err := esclient.Index("eshop", string(databytes))
+	id, err := esclient.Update("eshop", strconv.Itoa(1), string(databytes))
+	log.Println("Index success id", id)
 	if err != nil {
 		log.Println("[ERROR] Index docID", sitem1.ID, "err", err)
 	}
@@ -46,7 +48,8 @@ func IndexToES(esclient ElasticSearchService.Client) {
 	}
 
 	databytes, _ = json.Marshal(sitem2)
-	err = esclient.Index("eshop", string(databytes))
+	id, err = esclient.Index("eshop", strconv.Itoa(2), string(databytes))
+	log.Println("Index success id", id)
 	if err != nil {
 		log.Println("[ERROR] Index docID", sitem2.ID, "err", err)
 	}
@@ -63,7 +66,8 @@ func IndexToES(esclient ElasticSearchService.Client) {
 	}
 
 	databytes, _ = json.Marshal(sitem3)
-	err = esclient.Index("eshop", string(databytes))
+	id, err = esclient.Index("eshop", strconv.Itoa(3), string(databytes))
+	log.Println("Index success id", id)
 	if err != nil {
 		log.Println("[ERROR] Index docID", sitem3.ID, "err", err)
 	}
@@ -80,15 +84,23 @@ func main() {
 	// urlPath := "http://10.110.1.21:9092/"
 	// rawUrl, _ := url.Parse(urlPath)
 	// log.Println(rawUrl.Path)
-	// esclient := ElasticSearchService.NewClient([]string{"http://10.110.1.21:9200"})
-	// // IndexToES(esclient)
-	// // result, err := esclient.Get("eshop", "qUl2LXQBTjAo_D0k19Q7")
-	// // if err != nil {
-	// // 	log.Fatalln(err)
-	// // }
+	esclient := ElasticSearchService.NewClient([]string{"http://11.110.1.21:9200"})
+	// query := map[string]interface{}{
+	// 	"query": map[string]interface{}{
+	// 		"match": map[string]interface{}{
+	// 			"name": "Áo nam lkm",
+	// 		},
+	// 	},
+	// }
+	// rs, err := esclient.Search("eshop", query)
+	IndexToES(esclient)
+	// result, err := esclient.Get("eshop", "qUl2LXQBTjAo_D0k19Q7")
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
 	// err := esclient.DeteleIndex("eshop")
 	// if err != nil {
 	// 	log.Fatalln(err)
 	// }
-	// log.Println(string(result))
+	// log.Println(string(rs))
 }

@@ -18,21 +18,32 @@ type client struct {
 	url      string
 }
 
-func (m *client) Index(indexName, documentJson string) error {
+func (m *client) Index(indexName, docID, documentJson string) (bool, error) {
 	req := esapi.IndexRequest{
-		Index:   indexName,
-		Body:    strings.NewReader(documentJson),
-		Refresh: "true",
+		Index:      indexName,
+		Body:       strings.NewReader(documentJson),
+		DocumentID: docID,
+		Refresh:    "true",
 	}
 	res, err := req.Do(context.Background(), m.esclient)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if res.IsError() {
-		return errors.New("Error Indexing document " + res.Status())
+		return false, errors.New("Error Indexing document " + res.Status())
 	}
-	log.Println("[ESINFO] Index document response", res.String())
-	return nil
+	defer res.Body.Close()
+	resultBody, err := ioutil.ReadAll(res.Body)
+	var resultBodyMap map[string]interface{}
+	err = json.Unmarshal(resultBody, &resultBodyMap)
+	if err != nil {
+		return false, errors.New("Response unvalid")
+	}
+	if resultBodyMap["_id"] == nil {
+		return false, errors.New("Index document error " + string(resultBody))
+	}
+	// log.Println("[ESINFO] Index document response", string(resultBody))
+	return true, nil
 }
 
 func (m *client) Search(indexName string, query map[string]interface{}) (rawResult []byte, err error) {
@@ -42,7 +53,7 @@ func (m *client) Search(indexName string, query map[string]interface{}) (rawResu
 	}
 	res, err := m.esclient.Search(
 		m.esclient.Search.WithContext(context.Background()),
-		m.esclient.Search.WithIndex("test"),
+		m.esclient.Search.WithIndex(indexName),
 		m.esclient.Search.WithBody(&buf),
 		m.esclient.Search.WithTrackTotalHits(true),
 		m.esclient.Search.WithPretty(),
@@ -62,7 +73,7 @@ func (m *client) Search(indexName string, query map[string]interface{}) (rawResu
 
 }
 
-func (m *client) Delete(indexName string, docID string) error {
+func (m *client) Delete(indexName string, docID string) (bool, error) {
 	req := esapi.DeleteRequest{
 		Index:      indexName,
 		DocumentID: docID,
@@ -70,13 +81,13 @@ func (m *client) Delete(indexName string, docID string) error {
 	}
 	res, err := req.Do(context.Background(), m.esclient)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if res.IsError() {
-		return errors.New("Error Indexing document " + res.Status())
+		return false, errors.New("Error Indexing document " + res.Status())
 	}
 	log.Println("[ESINFO] Index document response", res.String())
-	return nil
+	return true, nil
 }
 
 func (m *client) Get(indexName string, id string) (rawResult []byte, err error) {
@@ -102,7 +113,7 @@ func (m *client) Get(indexName string, id string) (rawResult []byte, err error) 
 	return resultBody, nil
 }
 
-func (m *client) Update(indexName string, id string, documentJson string) error {
+func (m *client) Update(indexName string, id string, documentJson string) (bool, error) {
 
 	req := esapi.UpdateRequest{
 		Index:      indexName,
@@ -113,27 +124,27 @@ func (m *client) Update(indexName string, id string, documentJson string) error 
 
 	res, err := req.Do(context.Background(), m.esclient)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if res.IsError() {
-		return errors.New("Error Update document " + res.Status())
+		return false, errors.New("Error Update document " + res.Status())
 	}
 	log.Println("[ESINFO] Index document response", res.String())
-	return nil
+	return true, nil
 }
 
-func (m *client) DeteleIndex(indexName string) error {
+func (m *client) DeteleIndex(indexName string) (bool, error) {
 
 	req := esapi.DeleteRequest{
 		Index: indexName,
 	}
 	res, err := req.Do(context.Background(), m.esclient)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if res.IsError() {
-		return errors.New("Error delete document " + res.Status())
+		return false, errors.New("Error delete document " + res.Status())
 	}
 	log.Println("[ESINFO] delete document response", res.String())
-	return nil
+	return true, nil
 }
