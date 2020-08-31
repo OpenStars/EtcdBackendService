@@ -148,3 +148,40 @@ func (m *client) DeteleIndex(indexName string) (bool, error) {
 	log.Println("[ESINFO] delete document response", res.String())
 	return true, nil
 }
+
+func ParseResultToDocuments(rawResult []byte) ([]interface{}, error) {
+	var result map[string]interface{}
+	err := json.Unmarshal(rawResult, &result)
+	if err != nil {
+		return nil, err
+	}
+	if result["hits"] == nil {
+		return nil, errors.New("NOT FOUND")
+	}
+	hits := result["hits"].(map[string]interface{})
+	if hits == nil {
+		return nil, errors.New("NOT FOUND")
+	}
+	if hits["hits"] == nil {
+		return nil, errors.New("NOT FOUND")
+	}
+	histhist := hits["hits"].([]interface{})
+	if histhist == nil {
+		return nil, errors.New("NOT FOUND")
+	}
+	var listDoc []interface{}
+	for _, h := range histhist {
+		hi := h.(map[string]interface{})
+		if hi == nil {
+			continue
+		}
+		if hi["_source"] == nil {
+			continue
+		}
+		listDoc = append(listDoc, hi["_source"].(interface{}))
+	}
+	if len(listDoc) == 0 {
+		return nil, errors.New("NOT FOUND")
+	}
+	return listDoc, nil
+}
