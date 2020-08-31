@@ -1,4 +1,4 @@
-package vtpcalllogservice
+package vtpnotifystorage
 
 import (
 	"context"

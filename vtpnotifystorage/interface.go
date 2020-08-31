@@ -1,4 +1,4 @@
-package vtpcalllogservice
+package vtpnotifystorage
 
 import "github.com/OpenStars/EtcdBackendService/vtpnotifystorage/thrift/gen-go/OpenStars/notifystorage"
 
