@@ -5,6 +5,7 @@ import (
 
 	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func NewSimpleSessionClient(serviceID string, etcdServers []string, defaultEndpoint GoEndpointBackendManager.EndPoint) SimpleSessionClientIf {
@@ -33,12 +34,18 @@ func NewSimpleSessionClient(serviceID string, etcdServers []string, defaultEndpo
 		port:        defaultEndpoint.Port,
 		sid:         defaultEndpoint.ServiceID,
 		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+		bot_chatID:  -1001469468779,
+		bot_token:   "1108341214:AAEKNbFf6PO7Y6UJGK-xepDDOGKlBU2QVCg",
+		botClient:   nil,
 	}
-
+	bot, err := tgbotapi.NewBotAPI(sessionsv.bot_token)
+	if err == nil {
+		sessionsv.botClient = bot
+	}
 	if sessionsv.etcdManager == nil {
-		return nil
+		return sessionsv
 	}
-	err := sessionsv.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpoint.Host, defaultEndpoint.Port)
+	err = sessionsv.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpoint.Host, defaultEndpoint.Port)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
@@ -74,12 +81,18 @@ func NewSimpleSessionClient2(etcdServers []string, sid, defaultHost, defaultPort
 		port:        defaultPort,
 		sid:         sid,
 		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+		bot_chatID:  -1001469468779,
+		bot_token:   "1108341214:AAEKNbFf6PO7Y6UJGK-xepDDOGKlBU2QVCg",
+		botClient:   nil,
 	}
-
+	bot, err := tgbotapi.NewBotAPI(sessionsv.bot_token)
+	if err == nil {
+		sessionsv.botClient = bot
+	}
 	if sessionsv.etcdManager == nil {
 		return sessionsv
 	}
-	err := sessionsv.etcdManager.SetDefaultEntpoint(sid, defaultHost, defaultPort)
+	err = sessionsv.etcdManager.SetDefaultEntpoint(sid, defaultHost, defaultPort)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", sid, "err", err)
 		return nil
@@ -115,12 +128,18 @@ func NewClient(etcdServers []string, sid, defaultHost, defaultPort string) Clien
 		port:        defaultPort,
 		sid:         sid,
 		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+		bot_chatID:  -1001469468779,
+		bot_token:   "1108341214:AAEKNbFf6PO7Y6UJGK-xepDDOGKlBU2QVCg",
+		botClient:   nil,
 	}
-
+	bot, err := tgbotapi.NewBotAPI(sessionsv.bot_token)
+	if err == nil {
+		sessionsv.botClient = bot
+	}
 	if sessionsv.etcdManager == nil {
 		return sessionsv
 	}
-	err := sessionsv.etcdManager.SetDefaultEntpoint(sid, defaultHost, defaultPort)
+	err = sessionsv.etcdManager.SetDefaultEntpoint(sid, defaultHost, defaultPort)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", sid, "err", err)
 		return nil

@@ -9,6 +9,7 @@ import (
 	"github.com/OpenStars/EtcdBackendService/SimpleSessionService/simplesession/transports"
 	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type simpleSessionClient struct {
@@ -17,6 +18,17 @@ type simpleSessionClient struct {
 	sid         string
 	epm         GoEndpointBackendManager.EndPointManagerIf
 	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
+
+	bot_token  string
+	bot_chatID int64
+	botClient  *tgbotapi.BotAPI
+}
+
+func (m *simpleSessionClient) notifyEndpointError() {
+	if m.botClient != nil {
+		msg := tgbotapi.NewMessage(m.bot_chatID, "Hệ thống kiểm soát endpoint phát hiện endpoint sid "+m.sid+" address "+m.host+":"+m.port+" đang không hoạt động")
+		m.botClient.Send(msg)
+	}
 }
 
 func (m *simpleSessionClient) GetSession(sskey string) (*simplesession.TUserSessionInfo, error) {
@@ -31,11 +43,13 @@ func (m *simpleSessionClient) GetSession(sskey string) (*simplesession.TUserSess
 	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*simplesession.TSimpleSessionService_WClient).GetSession(context.Background(), simplesession.TSessionKey(sskey))
 	if err != nil {
+		go m.notifyEndpointError()
 		return nil, errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
 	defer client.BackToPool()
@@ -57,6 +71,7 @@ func (m *simpleSessionClient) CreateSession(uid int64) (string, error) {
 	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
 		return "", errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
@@ -67,6 +82,7 @@ func (m *simpleSessionClient) CreateSession(uid int64) (string, error) {
 	}
 	r, err := client.Client.(*simplesession.TSimpleSessionService_WClient).CreateSession(context.Background(), userinfo)
 	if err != nil {
+		go m.notifyEndpointError()
 		return "", errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
 	defer client.BackToPool()
@@ -88,11 +104,13 @@ func (m *simpleSessionClient) RemoveSession(sskey string) error {
 	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
 		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*simplesession.TSimpleSessionService_WClient).RemoveSession(context.Background(), simplesession.TSessionKey(sskey))
 	if err != nil {
+		go m.notifyEndpointError()
 		return errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
 	defer client.BackToPool()
@@ -114,11 +132,13 @@ func (m *simpleSessionClient) GetSessionV2(sskey string) (*simplesession.TUserSe
 	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
 		return nil, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*simplesession.TSimpleSessionService_WClient).GetSession(context.Background(), simplesession.TSessionKey(sskey))
 	if err != nil {
+		go m.notifyEndpointError()
 		return nil, errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
 	defer client.BackToPool()
@@ -140,6 +160,7 @@ func (m *simpleSessionClient) CreateSessionV2(uid int64, deviceInfo string, data
 	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
 		return "", errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
@@ -153,6 +174,7 @@ func (m *simpleSessionClient) CreateSessionV2(uid int64, deviceInfo string, data
 	}
 	r, err := client.Client.(*simplesession.TSimpleSessionService_WClient).CreateSession(context.Background(), userinfo)
 	if err != nil {
+		go m.notifyEndpointError()
 		return "", errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
 	defer client.BackToPool()
@@ -174,11 +196,13 @@ func (m *simpleSessionClient) RemoveSessionV2(sskey string) (bool, error) {
 	}
 	client := transports.GetSimpleSessionCompactClient(m.host, m.port)
 	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
 		return false, errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
 	}
 
 	r, err := client.Client.(*simplesession.TSimpleSessionService_WClient).RemoveSession(context.Background(), simplesession.TSessionKey(sskey))
 	if err != nil {
+		go m.notifyEndpointError()
 		return false, errors.New("Backend service:" + m.sid + " err:" + err.Error())
 	}
 	defer client.BackToPool()
