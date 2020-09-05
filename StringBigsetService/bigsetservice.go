@@ -712,9 +712,8 @@ func NewClientWithMonitor(etcdEndpoints []string, sid string, host string, port 
 // ================================================== Version 2 ===============================================================
 
 func (m *StringBigsetService) notifyEndpointError() {
-	log.Println("NotifyError")
 	if m.botClient != nil {
-		log.Println("Notifi error")
+
 		msg := tgbotapi.NewMessage(m.bot_chatID, "Hệ thống kiểm soát endpoint phát hiện endpoint sid "+m.sid+" address "+m.host+":"+m.port+" đang không hoạt động")
 		m.botClient.Send(msg)
 	}

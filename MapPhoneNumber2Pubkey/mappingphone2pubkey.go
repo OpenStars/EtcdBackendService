@@ -152,12 +152,18 @@ func NewMappingPhone2Pubkey(serviceID string, etcdServers []string, defaultEndpo
 		port:        defaultEndpoint.Port,
 		sid:         defaultEndpoint.ServiceID,
 		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+		bot_chatID:  -1001469468779,
+		bot_token:   "1108341214:AAEKNbFf6PO7Y6UJGK-xepDDOGKlBU2QVCg",
+		botClient:   nil,
 	}
-
+	bot, err := tgbotapi.NewBotAPI(mapphone2pub.bot_token)
+	if err == nil {
+		mapphone2pub.botClient = bot
+	}
 	if mapphone2pub.etcdManager == nil {
-		return nil
+		return mapphone2pub
 	}
-	err := mapphone2pub.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpoint.Host, defaultEndpoint.Port)
+	err = mapphone2pub.etcdManager.SetDefaultEntpoint(serviceID, defaultEndpoint.Host, defaultEndpoint.Port)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
 		return nil
