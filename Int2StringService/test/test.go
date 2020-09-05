@@ -22,12 +22,12 @@ func (s *Server) Run() {
 }
 
 func TestStringBigset() {
-	sid := "/trustkeys/tkverifyprofile/stringbigset"
-	etcd := []string{"127.0.0.1:2379"}
+	sid := ""
+	etcd := []string{""}
 	defaultEp := GoEndpointBackendManager.EndPoint{
 		ServiceID: sid,
-		Host:      "127.0.0.1",
-		Port:      "8883",
+		Host:      "10.110.1.21",
+		Port:      "57183",
 	}
 	ai2s := StringBigsetService.NewStringBigsetServiceModel(sid, etcd, defaultEp)
 	sv := &Server{
@@ -66,12 +66,12 @@ func TestString2Int() {
 }
 
 func TestInt2String() {
-	sid := "/openstars/services/int2string"
-	etcd := []string{"127.0.0.1:2379"}
+	sid := ""
+	etcd := []string{""}
 	defaultEp := GoEndpointBackendManager.EndPoint{
 		ServiceID: sid,
 		Host:      "127.0.0.1",
-		Port:      "8883",
+		Port:      "57183",
 	}
 	ai2s := Int2StringService.NewInt2StringService(sid, etcd, defaultEp)
 	sv := &Server{
