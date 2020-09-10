@@ -88,7 +88,7 @@ type TData *TOrder
 func TDataPtr(v TData) *TData { return &v }
 
 // Attributes:
-//  - MaVandon
+//  - OrderLadingcode
 //  - OrderCreatedate
 //  - OrderSendname
 //  - OrderSendaddress
@@ -98,7 +98,7 @@ func TDataPtr(v TData) *TData { return &v }
 //  - OrderNote
 //  - NgayGiao
 //  - Buucucgo
-//  - BuuTaNhan
+//  - BuuTa
 //  - TrangThai
 //  - IDNhan
 //  - MotaSp
@@ -108,8 +108,13 @@ func TDataPtr(v TData) *TData { return &v }
 //  - TienThuHo
 //  - OrderReference
 //  - DvCongThem
+//  - Thoigian
+//  - MaBuucuc
+//  - DieuHanh
+//  - OrderSendward
+//  - OrderSenddistrict
 type TOrder struct {
-  MaVandon TKey `thrift:"ma_vandon,1" db:"ma_vandon" json:"ma_vandon"`
+  OrderLadingcode TKey `thrift:"order_ladingcode,1" db:"order_ladingcode" json:"order_ladingcode"`
   OrderCreatedate int64 `thrift:"order_createdate,2" db:"order_createdate" json:"order_createdate"`
   OrderSendname string `thrift:"order_sendname,3" db:"order_sendname" json:"order_sendname"`
   OrderSendaddress string `thrift:"order_sendaddress,4" db:"order_sendaddress" json:"order_sendaddress"`
@@ -119,7 +124,7 @@ type TOrder struct {
   OrderNote string `thrift:"order_note,8" db:"order_note" json:"order_note"`
   NgayGiao int64 `thrift:"ngay_giao,9" db:"ngay_giao" json:"ngay_giao"`
   Buucucgo string `thrift:"buucucgo,10" db:"buucucgo" json:"buucucgo"`
-  BuuTaNhan string `thrift:"buu_ta_nhan,11" db:"buu_ta_nhan" json:"buu_ta_nhan"`
+  BuuTa int64 `thrift:"buu_ta,11" db:"buu_ta" json:"buu_ta"`
   TrangThai int64 `thrift:"trang_thai,12" db:"trang_thai" json:"trang_thai"`
   IDNhan int64 `thrift:"id_nhan,13" db:"id_nhan" json:"id_nhan"`
   MotaSp string `thrift:"mota_sp,14" db:"mota_sp" json:"mota_sp"`
@@ -129,6 +134,11 @@ type TOrder struct {
   TienThuHo int64 `thrift:"tien_thu_ho,18" db:"tien_thu_ho" json:"tien_thu_ho"`
   OrderReference string `thrift:"order_reference,19" db:"order_reference" json:"order_reference"`
   DvCongThem string `thrift:"dv_cong_them,20" db:"dv_cong_them" json:"dv_cong_them"`
+  Thoigian int64 `thrift:"thoigian,21" db:"thoigian" json:"thoigian"`
+  MaBuucuc string `thrift:"ma_buucuc,22" db:"ma_buucuc" json:"ma_buucuc"`
+  DieuHanh int64 `thrift:"dieu_hanh,23" db:"dieu_hanh" json:"dieu_hanh"`
+  OrderSendward string `thrift:"order_sendward,24" db:"order_sendward" json:"order_sendward"`
+  OrderSenddistrict string `thrift:"order_senddistrict,25" db:"order_senddistrict" json:"order_senddistrict"`
 }
 
 func NewTOrder() *TOrder {
@@ -136,8 +146,8 @@ func NewTOrder() *TOrder {
 }
 
 
-func (p *TOrder) GetMaVandon() TKey {
-  return p.MaVandon
+func (p *TOrder) GetOrderLadingcode() TKey {
+  return p.OrderLadingcode
 }
 
 func (p *TOrder) GetOrderCreatedate() int64 {
@@ -176,8 +186,8 @@ func (p *TOrder) GetBuucucgo() string {
   return p.Buucucgo
 }
 
-func (p *TOrder) GetBuuTaNhan() string {
-  return p.BuuTaNhan
+func (p *TOrder) GetBuuTa() int64 {
+  return p.BuuTa
 }
 
 func (p *TOrder) GetTrangThai() int64 {
@@ -214,6 +224,26 @@ func (p *TOrder) GetOrderReference() string {
 
 func (p *TOrder) GetDvCongThem() string {
   return p.DvCongThem
+}
+
+func (p *TOrder) GetThoigian() int64 {
+  return p.Thoigian
+}
+
+func (p *TOrder) GetMaBuucuc() string {
+  return p.MaBuucuc
+}
+
+func (p *TOrder) GetDieuHanh() int64 {
+  return p.DieuHanh
+}
+
+func (p *TOrder) GetOrderSendward() string {
+  return p.OrderSendward
+}
+
+func (p *TOrder) GetOrderSenddistrict() string {
+  return p.OrderSenddistrict
 }
 func (p *TOrder) Read(iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(); err != nil {
@@ -329,7 +359,7 @@ func (p *TOrder) Read(iprot thrift.TProtocol) error {
         }
       }
     case 11:
-      if fieldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField11(iprot); err != nil {
           return err
         }
@@ -428,6 +458,56 @@ func (p *TOrder) Read(iprot thrift.TProtocol) error {
           return err
         }
       }
+    case 21:
+      if fieldTypeId == thrift.I64 {
+        if err := p.ReadField21(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 22:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField22(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 23:
+      if fieldTypeId == thrift.I64 {
+        if err := p.ReadField23(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 24:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField24(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 25:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField25(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
     default:
       if err := iprot.Skip(fieldTypeId); err != nil {
         return err
@@ -448,7 +528,7 @@ func (p *TOrder)  ReadField1(iprot thrift.TProtocol) error {
   return thrift.PrependError("error reading field 1: ", err)
 } else {
   temp := TKey(v)
-  p.MaVandon = temp
+  p.OrderLadingcode = temp
 }
   return nil
 }
@@ -535,10 +615,10 @@ func (p *TOrder)  ReadField10(iprot thrift.TProtocol) error {
 }
 
 func (p *TOrder)  ReadField11(iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadString(); err != nil {
+  if v, err := iprot.ReadI64(); err != nil {
   return thrift.PrependError("error reading field 11: ", err)
 } else {
-  p.BuuTaNhan = v
+  p.BuuTa = v
 }
   return nil
 }
@@ -624,6 +704,51 @@ func (p *TOrder)  ReadField20(iprot thrift.TProtocol) error {
   return nil
 }
 
+func (p *TOrder)  ReadField21(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadI64(); err != nil {
+  return thrift.PrependError("error reading field 21: ", err)
+} else {
+  p.Thoigian = v
+}
+  return nil
+}
+
+func (p *TOrder)  ReadField22(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 22: ", err)
+} else {
+  p.MaBuucuc = v
+}
+  return nil
+}
+
+func (p *TOrder)  ReadField23(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadI64(); err != nil {
+  return thrift.PrependError("error reading field 23: ", err)
+} else {
+  p.DieuHanh = v
+}
+  return nil
+}
+
+func (p *TOrder)  ReadField24(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 24: ", err)
+} else {
+  p.OrderSendward = v
+}
+  return nil
+}
+
+func (p *TOrder)  ReadField25(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 25: ", err)
+} else {
+  p.OrderSenddistrict = v
+}
+  return nil
+}
+
 func (p *TOrder) Write(oprot thrift.TProtocol) error {
   if err := oprot.WriteStructBegin("TOrder"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
@@ -648,6 +773,11 @@ func (p *TOrder) Write(oprot thrift.TProtocol) error {
     if err := p.writeField18(oprot); err != nil { return err }
     if err := p.writeField19(oprot); err != nil { return err }
     if err := p.writeField20(oprot); err != nil { return err }
+    if err := p.writeField21(oprot); err != nil { return err }
+    if err := p.writeField22(oprot); err != nil { return err }
+    if err := p.writeField23(oprot); err != nil { return err }
+    if err := p.writeField24(oprot); err != nil { return err }
+    if err := p.writeField25(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
     return thrift.PrependError("write field stop error: ", err) }
@@ -657,12 +787,12 @@ func (p *TOrder) Write(oprot thrift.TProtocol) error {
 }
 
 func (p *TOrder) writeField1(oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin("ma_vandon", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:ma_vandon: ", p), err) }
-  if err := oprot.WriteString(string(p.MaVandon)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.ma_vandon (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin("order_ladingcode", thrift.STRING, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:order_ladingcode: ", p), err) }
+  if err := oprot.WriteString(string(p.OrderLadingcode)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.order_ladingcode (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:ma_vandon: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:order_ladingcode: ", p), err) }
   return err
 }
 
@@ -757,12 +887,12 @@ func (p *TOrder) writeField10(oprot thrift.TProtocol) (err error) {
 }
 
 func (p *TOrder) writeField11(oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin("buu_ta_nhan", thrift.STRING, 11); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 11:buu_ta_nhan: ", p), err) }
-  if err := oprot.WriteString(string(p.BuuTaNhan)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.buu_ta_nhan (11) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin("buu_ta", thrift.I64, 11); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 11:buu_ta: ", p), err) }
+  if err := oprot.WriteI64(int64(p.BuuTa)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.buu_ta (11) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 11:buu_ta_nhan: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 11:buu_ta: ", p), err) }
   return err
 }
 
@@ -853,6 +983,56 @@ func (p *TOrder) writeField20(oprot thrift.TProtocol) (err error) {
   return thrift.PrependError(fmt.Sprintf("%T.dv_cong_them (20) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 20:dv_cong_them: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField21(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("thoigian", thrift.I64, 21); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 21:thoigian: ", p), err) }
+  if err := oprot.WriteI64(int64(p.Thoigian)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.thoigian (21) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 21:thoigian: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField22(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("ma_buucuc", thrift.STRING, 22); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 22:ma_buucuc: ", p), err) }
+  if err := oprot.WriteString(string(p.MaBuucuc)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.ma_buucuc (22) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 22:ma_buucuc: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField23(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("dieu_hanh", thrift.I64, 23); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 23:dieu_hanh: ", p), err) }
+  if err := oprot.WriteI64(int64(p.DieuHanh)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.dieu_hanh (23) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 23:dieu_hanh: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField24(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("order_sendward", thrift.STRING, 24); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 24:order_sendward: ", p), err) }
+  if err := oprot.WriteString(string(p.OrderSendward)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.order_sendward (24) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 24:order_sendward: ", p), err) }
+  return err
+}
+
+func (p *TOrder) writeField25(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("order_senddistrict", thrift.STRING, 25); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 25:order_senddistrict: ", p), err) }
+  if err := oprot.WriteString(string(p.OrderSenddistrict)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.order_senddistrict (25) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 25:order_senddistrict: ", p), err) }
   return err
 }
 

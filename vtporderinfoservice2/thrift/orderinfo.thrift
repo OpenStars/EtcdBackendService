@@ -12,7 +12,7 @@ enum TErrorCode{
 }
 
 struct TOrder{
-    1: TKey ma_vandon,
+    1: TKey order_ladingcode,
     2: i64 order_createdate,
     3: string order_sendname,
     4: string order_sendaddress,
@@ -22,7 +22,7 @@ struct TOrder{
     8: string order_note,
     9: i64 ngay_giao,
     10: string buucucgo,
-    11: string buu_ta_nhan,
+    11: i64 buu_ta,
     12: i64 trang_thai,
     13: i64 id_nhan,
     14: string mota_sp,
@@ -32,6 +32,11 @@ struct TOrder{
     18: i64 tien_thu_ho,
     19: string order_reference,
     20: string dv_cong_them,
+    21: i64 thoigian,
+    22: string ma_buucuc,
+    23: i64 dieu_hanh,
+    24: string order_sendward,
+    25: string order_senddistrict,
 }
 
 typedef TOrder TData
