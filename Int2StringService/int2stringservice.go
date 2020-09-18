@@ -82,6 +82,7 @@ func (m *Int2StringService) GetData(key int64) (string, error) {
 
 	tkey := I2SKV.TKey(key)
 	r, err := client.Client.(*I2SKV.TI2StringServiceClient).GetData(context.Background(), tkey)
+	// log.Println(r, err)
 	if err != nil {
 		go m.notifyEndpointError()
 		return "", errors.New("Int2StringService sid:" + m.sid + " addresss: " + m.host + ":" + m.port + " err: " + err.Error())

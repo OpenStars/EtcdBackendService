@@ -169,10 +169,10 @@ func (es *ESClient) PutDataToES(id string, dataJson string) (err error) {
 		Do(ctx)
 
 	if err != nil {
-		fmt.Printf("[PutDataToES] err = %v \n", err)
+		fmt.Printf("[PutDataToES] ind = %v err = %v \n", ind, err)
 		return err
 	}
-	fmt.Printf("[PutDataToES] ind=%v, err=%v \n", ind, err)
+	// fmt.Printf("[PutDataToES] ind=%v, err=%v \n", ind, err)
 	return nil
 }
 
@@ -186,11 +186,11 @@ func (es *ESClient) DeleteIndexES() {
 	deleteIndex, err := esclient.DeleteIndex(es.indexName).Do(ctx)
 	if err != nil {
 		// Handle error
-		fmt.Printf("[deleteIndexES] err = %v \n", err)
+		fmt.Printf("[deleteIndexES] deleteIndex = %v err = %v \n", deleteIndex, err)
 		return
 	}
 	esclient.Search()
-	fmt.Println("[deleteIndexES] = ", deleteIndex)
+	// fmt.Println("[deleteIndexES] = ", deleteIndex)
 	return
 }
 
@@ -204,11 +204,11 @@ func (es *ESClient) DeleteDataES(id string) {
 	deleteIndex, err := esclient.Delete().Index(es.indexName).Type(es.typeName).Id(id).Do(ctx)
 	if err != nil {
 		// Handle error
-		fmt.Printf("[deleteDataES] err = %v \n", err)
+		fmt.Printf("[deleteDataES] deleteIndex = %v, err = %v \n", deleteIndex, err)
 		return
 	}
 
-	fmt.Println("[deleteDataES] = ", deleteIndex)
+	// fmt.Println("[deleteDataES] = ", deleteIndex)
 	return
 }
 
@@ -222,11 +222,11 @@ func (es *ESClient) UpdateDataES(id string, mapUpdate map[string]interface{}) {
 		Doc(mapUpdate).
 		Do(ctx)
 	if err != nil {
-		fmt.Printf("[updateDataES] err = %v \n", err)
+		fmt.Printf("[updateDataES] update = %v, err = %v \n", update, err)
 		return
 	}
 
-	fmt.Println("[updateDataES] = ", update)
+	// fmt.Println("[updateDataES] = ", update)
 }
 
 func (es *ESClient) Search() {
