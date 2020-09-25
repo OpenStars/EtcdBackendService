@@ -598,6 +598,7 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 	if err == nil {
 		stringbs.botClient = bot
 	}
+	stringbs.botClient = nil
 	if stringbs.etcdManager == nil {
 		return stringbs
 	}
@@ -643,6 +644,7 @@ func NewStringBigsetServiceModel2(etcdEndpoints []string, sid string, defaultEnd
 	if err == nil {
 		stringbs.botClient = bot
 	}
+	stringbs.botClient = nil
 	if stringbs.etcdManager == nil {
 		return stringbs
 	}
@@ -670,6 +672,7 @@ func NewClient(etcdEndpoints []string, sid string, defaultEndpointsHost string, 
 	if err == nil {
 		stringbs.botClient = bot
 	}
+	stringbs.botClient = nil
 	if stringbs.etcdManager == nil {
 		return stringbs
 	}
