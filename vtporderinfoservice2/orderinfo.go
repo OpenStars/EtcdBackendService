@@ -47,7 +47,7 @@ func (m *orderinfoservice) GetData(key string) (*orderservice.TOrder, error) {
 		return nil, errors.New("Backend service:" + m.sid + " err:" + r.ErrorCode.String())
 	}
 
-	if int64(r.Data.NgayGiao) == int64(0) && r.Data.MaVandon == "" {
+	if int64(r.Data.NgayGiao) == int64(0) && r.Data.OrderLadingcode == "" {
 		return nil, errors.New("Data not existed")
 	}
 

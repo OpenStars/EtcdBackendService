@@ -590,8 +590,8 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 		port:        defaultEnpoint.Port,
 		sid:         defaultEnpoint.ServiceID,
 		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
-		bot_chatID:  -1001469468779,
-		bot_token:   "1108341214:AAEKNbFf6PO7Y6UJGK-xepDDOGKlBU2QVCg",
+		bot_chatID:  0,
+		bot_token:   "",
 		botClient:   nil,
 	}
 	bot, err := tgbotapi.NewBotAPI(stringbs.bot_token)
