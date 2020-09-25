@@ -17,6 +17,7 @@ struct TVTPComment{
     3: string uid_comment, 
     4: i64 time,
     5: map<string, bool> mapExt,
+    6: string ma_buugui,
 }
 
 typedef TVTPComment TData
