@@ -86,17 +86,13 @@ func TestGetAddress2Pubkey() {
 	fmt.Println("rs:", rs)
 }
 func TestService() {
-	testservice := String2Int64Service.NewString2Int64Service("/test/", []string{"10.60.1.20:2379"}, GoEndpointBackendManager.EndPoint{
-		Host:      "10.110.1.21",
-		Port:      "37173",
-		ServiceID: "/test",
+	testservice := String2Int64Service.NewString2Int64Service("", []string{""}, GoEndpointBackendManager.EndPoint{
+		Host:      "10.255.48.160",
+		Port:      "47173",
+		ServiceID: "",
 	})
-	err := testservice.PutData("sonlh", 64)
-	uid, err := testservice.GetData("sonlh")
-	if err != nil {
-		log.Println("err", err)
-	}
-	log.Println("uid", uid)
+	uid, err := testservice.GetData("RECEIVER_PREFIX_+84989830433")
+	fmt.Printf("UID = %d , e = %v \n", uid, err)
 }
 func main() {
 	// TestGetPubkey2Uid()

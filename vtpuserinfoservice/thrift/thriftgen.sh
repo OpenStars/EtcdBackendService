@@ -1,1 +1,0 @@
-thrift -r -gen go  enduservtpinfo.thrift
