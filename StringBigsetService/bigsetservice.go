@@ -406,7 +406,7 @@ func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int3
 	if count == 0 {
 		return nil, errors.New("Empty data")
 	}
-	log.Println("host", m.host, "port", m.port, "bskey", string(bskey))
+	// log.Println("host", m.host, "port", m.port, "bskey", string(bskey))
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -1102,7 +1102,7 @@ func (m *StringBigsetService) BsGetSliceR2(bskey generic.TStringKey, fromPos int
 			m.port = p
 		}
 	}
-	log.Println("host", m.host, "port", m.port, "bskey", string(bskey))
+	// log.Println("host", m.host, "port", m.port, "bskey", string(bskey))
 	client := transports.GetBsGenericClient(m.host, m.port)
 	if client == nil || client.Client == nil {
 		go m.notifyEndpointError()

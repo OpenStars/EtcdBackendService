@@ -59,6 +59,29 @@ type ESClient struct {
 	client    *elastic.Client
 }
 
+func NewESClient2(url, indexName, typeName, indexStringRequest string) ESClientServiceIf {
+	client, err := elastic.NewClient(elastic.SetURL(url),
+		elastic.SetSniff(false),
+		elastic.SetHealthcheck(false))
+	if err != nil {
+		log.Println("ESClient err", err)
+	}
+	es := &ESClient{
+		url:       url,
+		indexName: indexName,
+		typeName:  typeName,
+		client:    client,
+	}
+
+	// make index if not existed
+	// indexByte, _ := json.Marshal(makeIndexString())
+	// indexString := string(indexByte)
+	// indexString = strings.ReplaceAll(indexString, "default1", typeName)
+	es.checkExistedIndex(indexStringRequest)
+
+	return es
+}
+
 func NewESClient(url, indexName, typeName string) ESClientServiceIf {
 	client, err := elastic.NewClient(elastic.SetURL(url),
 		elastic.SetSniff(false),
@@ -80,6 +103,34 @@ func NewESClient(url, indexName, typeName string) ESClientServiceIf {
 	es.checkExistedIndex(indexString)
 
 	return es
+}
+
+func (es *ESClient) PutDataToES3(data interface{}) error {
+	dataByte, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	esclient, err := es.getESClient()
+
+	if err != nil || esclient == nil {
+		fmt.Printf("[PutDataToES] Error initializing : %v", err)
+		return err
+	}
+
+	// fmt.Println(string(dataByte))
+
+	ind, err := esclient.Index().
+		Index(es.indexName).
+		Type(es.typeName).
+		BodyJson(string(dataByte)).
+		Do(ctx)
+
+	if err != nil {
+		fmt.Printf("[PutDataToES] ind = %v err = %v \n", ind, err)
+		return err
+	}
+	return nil
 }
 
 func (es *ESClient) PutDataToES2(id string, data interface{}) error {
