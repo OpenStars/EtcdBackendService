@@ -765,12 +765,11 @@ func NewClientWithMonitor(etcdEndpoints []string, sid string, host string, port 
 // ================================================== Version 2 ===============================================================
 
 func (m *StringBigsetService) notifyEndpointError() {
-	if m.botClient != nil {
-
-		msg := tgbotapi.NewMessage(m.bot_chatID, "Hệ thống kiểm soát endpoint phát hiện endpoint sid "+m.sid+" address "+m.host+":"+m.port+" đang không hoạt động")
-		m.botClient.Send(msg)
-	}
-
+	//if m.botClient != nil {
+	//
+	//	msg := tgbotapi.NewMessage(m.bot_chatID, "Hệ thống kiểm soát endpoint phát hiện endpoint sid "+m.sid+" address "+m.host+":"+m.port+" đang không hoạt động")
+	//	m.botClient.Send(msg)
+	//}
 }
 
 func (m *StringBigsetService) TotalStringKeyCount2() (r int64, err error) {
