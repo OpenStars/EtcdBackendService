@@ -1,10 +1,12 @@
 package transports
 
 import (
-	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
-	thriftpool "github.com/OpenStars/thriftpoolv2"
-	"github.com/apache/thrift/lib/go/thrift"
+	"fmt"
 	"sync"
+
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
+	thriftpool "github.com/Sonek-HoangBui/thriftpoolv2"
+	"github.com/apache/thrift/lib/go/thrift"
 )
 
 type PoolConfig struct {
@@ -14,37 +16,49 @@ type PoolConfig struct {
 }
 
 var (
-	onceInit = &sync.Once{}
+	onceInit         = &sync.Once{}
 	bsGenericMapPool *thriftpool.MapPool
 	//bsGenericMapPool = thriftpool.NewMapPool(1000, 3600, 3600,
 	//	thriftpool.GetThriftClientCreatorFunc(func(c thrift.TClient) interface{} { return generic.NewTStringBigSetKVServiceClient(c) }),
 	//	thriftpool.DefaultClose)
 
 	ibsGenericMapPool *thriftpool.MapPool
+	mapConfig         = map[string]*PoolConfig{}
+	defaultConfig     PoolConfig
 	//ibsGenericMapPool = thriftpool.NewMapPool(1000, 3600, 3600,
 	//	thriftpool.GetThriftClientCreatorFunc(func(c thrift.TClient) interface{} { return generic.NewTIBSDataServiceClient(c) }),
 	//	thriftpool.DefaultClose)
 )
 
-func InitPool(config PoolConfig)  {
+func InitPool(config PoolConfig, mapConfigInit map[string]*PoolConfig) {
 	onceInit.Do(func() {
-		bsGenericMapPool = thriftpool.NewMapPool(config.MaxConn, config.ConnTimeout, config.IdleTimeout,
+		defaultConfig = config
+		bsGenericMapPool = thriftpool.NewMapPool(defaultConfig.MaxConn, defaultConfig.ConnTimeout, defaultConfig.IdleTimeout,
 			thriftpool.GetThriftClientCreatorFunc(func(c thrift.TClient) interface{} { return generic.NewTStringBigSetKVServiceClient(c) }),
 			thriftpool.DefaultClose)
 
-		ibsGenericMapPool = thriftpool.NewMapPool(config.MaxConn, config.ConnTimeout, config.IdleTimeout,
+		ibsGenericMapPool = thriftpool.NewMapPool(defaultConfig.MaxConn, defaultConfig.ConnTimeout, defaultConfig.IdleTimeout,
 			thriftpool.GetThriftClientCreatorFunc(func(c thrift.TClient) interface{} { return generic.NewTIBSDataServiceClient(c) }),
 			thriftpool.DefaultClose)
+
+		mapConfig = mapConfigInit
 	})
 }
 
 //GetBsGenericClient client by host:port
 func GetBsGenericClient(aHost, aPort string) *thriftpool.ThriftSocketClient {
 	initBsStringIfNeed()
+	config := mapConfig[fmt.Sprintf("%s:%s", aHost, aPort)]
+	if config == nil {
+		client, _ := bsGenericMapPool.GetWithConfig(aHost, aPort, defaultConfig.MaxConn, defaultConfig.ConnTimeout, 3600).Get()
 
-	client, _ := bsGenericMapPool.Get(aHost, aPort).Get()
+		return client
+	}
+
+	client, _ := bsGenericMapPool.GetWithConfig(aHost, aPort, config.MaxConn, config.ConnTimeout, config.IdleTimeout).Get()
 	return client
 }
+
 func NewGetBsGenericClient(aHost, aPort string) *thriftpool.ThriftSocketClient {
 	initBsStringIfNeed()
 
