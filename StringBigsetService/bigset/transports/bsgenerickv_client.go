@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
+	"github.com/Sonek-HoangBui/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	thriftpool "github.com/Sonek-HoangBui/thriftpoolv2"
 	"github.com/apache/thrift/lib/go/thrift"
 )
