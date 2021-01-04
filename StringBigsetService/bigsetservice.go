@@ -1312,16 +1312,16 @@ func (m *StringBigsetService) BsGetSliceFromItemR2(bskey generic.TStringKey, fro
 }
 
 func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
-	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s (BsKey, ItemKey, Val) VALUES(?, ?, ?);)", m.standardSid), bsKey, itemKey, value)
+	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, ItemKey, Val) VALUES(?, ?, ?);", m.standardSid), bsKey, itemKey, value)
 	if err != nil {
-		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1331")
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1317")
 	}
 }
 
 func (m *StringBigsetService) RemoveItemBackupDB(bsKey, itemKey string) {
 	_, err := m.db.Exec(fmt.Sprintf("DELETE FROM %s where BsKey = ? and ItemKey = ?;", m.standardSid), bsKey, itemKey)
 	if err != nil {
-		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1331")
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1324")
 	}
 }
 
