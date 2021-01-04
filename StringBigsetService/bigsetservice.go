@@ -1312,7 +1312,7 @@ func (m *StringBigsetService) BsGetSliceFromItemR2(bskey generic.TStringKey, fro
 }
 
 func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
-	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, ItemKey, Val) VALUES(?, ?, ?);", m.standardSid), bsKey, itemKey, value)
+	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) VALUES(?, ?, ?);", m.standardSid), bsKey, itemKey, value)
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1317")
 	}
@@ -1329,7 +1329,7 @@ func (m *StringBigsetService) GetItemBackupDB(bsKey, itemKey string) (*generic.T
 	key := ""
 	value := ""
 
-	row := m.db.QueryRow(fmt.Sprintf("SELECT BsKey, ItemKey, Val FROM %s WHERE BsKey = ? and ItemKey = ?", m.standardSid), bsKey, itemKey)
+	row := m.db.QueryRow(fmt.Sprintf("SELECT BsKey, BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey = ?", m.standardSid), bsKey, itemKey)
 	if row.Err() != nil {
 		err := row.Scan(&key, &value)
 		if err != nil {
@@ -1347,7 +1347,7 @@ func (m *StringBigsetService) GetItemBackupDB(bsKey, itemKey string) (*generic.T
 
 func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey, endKey generic.TItemKey, begin, end int64) ([]*generic.TItem, int64, error) {
 	totalCount := int64(0)
-	row := m.db.QueryRow(fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = ? and ItemKey >= ? and ItemKey < ?", m.standardSid), bsKey, startKey, endKey, begin, end)
+	row := m.db.QueryRow(fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ?", m.standardSid), bsKey, startKey, endKey, begin, end)
 	if row.Err() != nil {
 		err := row.Scan(&totalCount)
 		if err != nil {
@@ -1355,7 +1355,7 @@ func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey
 		}
 	}
 
-	rows, err := m.db.Query(fmt.Sprintf("SELECT ItemKey, Val FROM %s WHERE BsKey = ? and ItemKey >= ? and ItemKey < ? limit ? offset ?", m.standardSid), bsKey, startKey, endKey, begin, end)
+	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ? limit ? offset ?", m.standardSid), bsKey, startKey, endKey, begin, end)
 	items := make([]*generic.TItem, 0)
 
 	if err != nil {
