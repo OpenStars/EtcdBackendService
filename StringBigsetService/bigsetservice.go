@@ -120,7 +120,7 @@ func (m *StringBigsetService) GetListKey(fromIndex int64, count int32) ([]string
 
 func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.TItem) error {
 	if m.db != nil && m.isSaveDataBackup {
-		go m.PutToBackupDB(string(bskey), string(item.Value), string(item.Key))
+		go m.PutToBackupDB(string(bskey), string(item.Key), string(item.Value))
 	}
 
 	if m.etcdManager != nil {
