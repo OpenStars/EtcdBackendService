@@ -2,8 +2,11 @@ package StringBigsetService
 
 import (
 	"context"
+	"database/sql"
 	"errors"
+	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -17,16 +20,35 @@ import (
 var reconnect = true
 var mureconnect sync.Mutex
 
+//go:generate easytags $GOFILE json,xml
+
 type StringBigsetService struct {
-	host        string
-	port        string
-	sid         string
-	epm         GoEndpointBackendManager.EndPointManagerIf
-	etcdManager *GoEndpointManager.EtcdBackendEndpointManager
+	host             string
+	port             string
+	sid              string
+	epm              GoEndpointBackendManager.EndPointManagerIf
+	etcdManager      *GoEndpointManager.EtcdBackendEndpointManager
+	db               *sql.DB
+	isSaveDataBackup bool
+	isGetDataBackup  bool
+	standardSid      string
 
 	bot_token  string
 	bot_chatID int64
 	botClient  *tgbotapi.BotAPI
+}
+
+type MySqlConfig struct {
+	Protocol string `json:"protocol" xml:"protocol"`
+	UserName string `json:"user_name" xml:"user_name"`
+	Password string `json:"password" xml:"password"`
+	Schema   string `json:"schema" xml:"schema"`
+	IdleTime string `json:"idle_time" xml:"idle_time"`
+	LifeTime string `json:"life_time" xml:"life_time"`
+	Idle     string `json:"idle" xml:"idle"`
+	OpenConn string `json:"open_conn" xml:"open_conn"`
+	Host     string `json:"host" xml:"host"`
+	Port     string `json:"port" xml:"port"`
 }
 
 func (m *StringBigsetService) TotalStringKeyCount() (r int64, err error) {
@@ -97,6 +119,9 @@ func (m *StringBigsetService) GetListKey(fromIndex int64, count int32) ([]string
 }
 
 func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.TItem) error {
+	if m.db != nil && m.isSaveDataBackup {
+		go m.PutToBackupDB(string(bskey), string(item.Value), string(item.Key))
+	}
 
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
@@ -132,6 +157,9 @@ func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.
 }
 
 func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey generic.TItemKey, endKey generic.TItemKey) ([]*generic.TItem, error) {
+	if m.db != nil && m.isGetDataBackup {
+		return m.BsRangeQueryBackupDB(string(bskey), startKey, endKey)
+	}
 
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
@@ -166,6 +194,10 @@ func (m *StringBigsetService) BsRangeQuery(bskey generic.TStringKey, startKey ge
 
 // BsRangeQueryByPage get >= startkey && <= endkey có chia page theo begin and end
 func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, startKey, endKey generic.TItemKey, begin, end int64) ([]*generic.TItem, int64, error) {
+	if m.db != nil && m.isGetDataBackup {
+		return m.GetRangeQueryByPageBackupDB(string(bskey), startKey, endKey, begin, end)
+	}
+
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -208,6 +240,10 @@ func (m *StringBigsetService) BsRangeQueryByPage(bskey generic.TStringKey, start
 }
 
 func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generic.TItemKey) (*generic.TItem, error) {
+	if m.db != nil && m.isGetDataBackup {
+		return m.GetItemBackupDB(string(bskey), string(itemkey))
+	}
+
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -239,10 +275,15 @@ func (m *StringBigsetService) BsGetItem(bskey generic.TStringKey, itemkey generi
 	if r.Error != generic.TErrorCode_EGood || r.Item == nil || r.Item.Key == nil {
 		return nil, errors.New("StringBigsetSerice: " + m.sid + " error: " + r.Error.String())
 	}
+
 	return r.Item, nil
 }
 
 func (m *StringBigsetService) GetTotalCount(bskey generic.TStringKey) (int64, error) {
+	if m.db != nil && m.isGetDataBackup {
+		return m.getTotalCountFromBackupDB(bskey)
+	}
+
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -365,6 +406,10 @@ func (m *StringBigsetService) CreateStringBigSet(bskey generic.TStringKey) (*gen
 }
 
 func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error) {
+	if m.db != nil && m.isGetDataBackup {
+		return m.BsGetSliceBackupDB(bskey, fromPos, count)
+	}
+
 	if count == 0 {
 		return nil, errors.New("Empty data")
 	}
@@ -403,6 +448,10 @@ func (m *StringBigsetService) BsGetSlice(bskey generic.TStringKey, fromPos int32
 }
 
 func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error) {
+	if m.db != nil && m.isGetDataBackup {
+		return m.BsGetSliceRBackupDB(bskey, fromPos, count)
+	}
+
 	if count == 0 {
 		return nil, errors.New("Empty data")
 	}
@@ -442,6 +491,10 @@ func (m *StringBigsetService) BsGetSliceR(bskey generic.TStringKey, fromPos int3
 }
 
 func (m *StringBigsetService) BsRemoveItem(bskey generic.TStringKey, itemkey generic.TItemKey) error {
+	if m.db != nil {
+		go m.RemoveItemBackupDB(string(bskey), string(itemkey))
+	}
+
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -473,6 +526,7 @@ func (m *StringBigsetService) BsRemoveItem(bskey generic.TStringKey, itemkey gen
 }
 
 func (m *StringBigsetService) BsMultiPut(bskey generic.TStringKey, lsItems []*generic.TItem) error {
+	// todo bsmultiput
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -508,6 +562,10 @@ func (m *StringBigsetService) BsMultiPut(bskey generic.TStringKey, lsItems []*ge
 }
 
 func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error) {
+	if m.db != nil && m.isGetDataBackup {
+		return m.BsGetSliceFromItemRBackupDB(bskey, fromKey, count)
+	}
+
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -542,6 +600,10 @@ func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromK
 }
 
 func (m *StringBigsetService) BsGetSliceFromItemR(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error) {
+	if m.db != nil && m.isGetDataBackup {
+		return m.BsGetSliceFromItemRBackupDB(bskey, fromKey, count)
+	}
+
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
 		if err != nil {
@@ -1247,4 +1309,297 @@ func (m *StringBigsetService) BsGetSliceFromItemR2(bskey generic.TStringKey, fro
 		return nil, nil
 	}
 	return rs.Items.Items, nil
+}
+
+func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
+	_, err := m.db.Exec("INSERT INTO ? (BsKey, ItemKey, Val) VALUES(?, ?, ?);", m.standardSid, bsKey, itemKey, value)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1331")
+	}
+}
+
+func (m *StringBigsetService) RemoveItemBackupDB(bsKey, itemKey string) {
+	_, err := m.db.Exec("DELETE FROM ? where BsKey = ? and ItemKey = ?;", m.standardSid, bsKey, itemKey)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1331")
+	}
+}
+
+func (m *StringBigsetService) GetItemBackupDB(bsKey, itemKey string) (*generic.TItem, error) {
+	key := ""
+	value := ""
+
+	row := m.db.QueryRow("SELECT BsKey, ItemKey, Val FROM ? WHERE BsKey = ? and ItemKey = ?", m.standardSid, bsKey, itemKey)
+	if row.Err() != nil {
+		err := row.Scan(&key, &value)
+		if err != nil {
+			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:276")
+		}
+
+		return &generic.TItem{
+			Key:   []byte(key),
+			Value: []byte(value),
+		}, err
+	}
+
+	return nil, nil
+}
+
+func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey, endKey generic.TItemKey, begin, end int64) ([]*generic.TItem, int64, error) {
+	totalCount := int64(0)
+	row := m.db.QueryRow("SELECT count(*) FROM ? WHERE BsKey = ? and ItemKey >= ? and ItemKey < ?", m.standardSid, bsKey, startKey, endKey, begin, end)
+	if row.Err() != nil {
+		err := row.Scan(&totalCount)
+		if err != nil {
+			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1384")
+		}
+	}
+
+	rows, err := m.db.Query("SELECT ItemKey, Val FROM ? WHERE BsKey = ? and ItemKey >= ? and ItemKey < ? limit ? offset ?", m.standardSid, bsKey, startKey, endKey, begin, end)
+	items := make([]*generic.TItem, 0)
+
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1397")
+		return make([]*generic.TItem, 0), 0, err
+	}
+
+	item := &generic.TItem{}
+	itemKey := ""
+	value := ""
+
+	if rows != nil {
+		for rows.Next() {
+			err := rows.Scan(itemKey, value)
+			if err != nil {
+				log.Fatal(err)
+			}
+			item.Key = []byte(itemKey)
+			item.Value = []byte(value)
+
+			items = append(items, item)
+		}
+
+		return items, totalCount, nil
+	}
+
+	return items, 0, nil
+}
+
+func (m *StringBigsetService) getTotalCountFromBackupDB(bskey generic.TStringKey) (int64, error) {
+	rs, err := m.db.Query("SELECT count(*) FROM ? WHERE BsKey = ?", m.standardSid, bskey)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1425")
+		return 0, err
+	}
+
+	totalCount := int64(0)
+
+	for rs.Next() {
+		err = rs.Scan(&totalCount)
+		if err != nil {
+			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1434")
+			return 0, err
+		}
+	}
+
+	return totalCount, nil
+}
+
+func (m *StringBigsetService) BsGetSliceFromItemRBackupDB(bskey generic.TStringKey, fromItemKey generic.TItemKey, count int32) (result []*generic.TItem, err error) {
+	result = make([]*generic.TItem, 0)
+
+	rows, err := m.db.Query("SELECT BsKey, BsItemKey, Val FROM ? WHERE BsKey = ? and BsItemKey >= ? desc limit ?", m.standardSid, bskey, string(fromItemKey), count)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1398")
+		return result, err
+	}
+
+	item := &generic.TItem{}
+	itemKey := ""
+	value := ""
+
+	if rows != nil {
+		for rows.Next() {
+			err := rows.Scan(itemKey, value)
+			if err != nil {
+				log.Fatal(err)
+			}
+			item.Key = []byte(itemKey)
+			item.Value = []byte(value)
+
+			result = append(result, item)
+		}
+
+		return result, nil
+	}
+
+	return result, nil
+}
+
+func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKey, fromItemKey generic.TItemKey, count int64) (result []*generic.TItem, err error) {
+	result = make([]*generic.TItem, 0)
+
+	rows, err := m.db.Query("SELECT BsKey, BsItemKey, Val FROM ? WHERE BsKey = ? and BsItemKey >= ? asc limit ?", m.standardSid, bskey, string(fromItemKey), count)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1416")
+		return result, err
+	}
+
+	item := &generic.TItem{}
+	itemKey := ""
+	value := ""
+
+	if rows != nil {
+		for rows.Next() {
+			err := rows.Scan(itemKey, value)
+			if err != nil {
+				log.Fatal(err)
+			}
+			item.Key = []byte(itemKey)
+			item.Value = []byte(value)
+
+			result = append(result, item)
+		}
+
+		return result, nil
+	}
+
+	return result, nil
+}
+
+func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from, count int32) (result []*generic.TItem, err error) {
+	rows, err := m.db.Query("SELECT BsKey, BsItemKey, Val FROM ? WHERE BsKey = ? desc limit ? offset ?", m.standardSid, bskey, count, from)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1452")
+		return result, err
+	}
+
+	item := &generic.TItem{}
+	itemKey := ""
+	value := ""
+
+	if rows != nil {
+		for rows.Next() {
+			err := rows.Scan(itemKey, value)
+			if err != nil {
+				log.Fatal(err)
+			}
+			item.Key = []byte(itemKey)
+			item.Value = []byte(value)
+
+			result = append(result, item)
+		}
+
+		return result, err
+	}
+
+	return result, err
+}
+
+func (m *StringBigsetService) BsGetSliceBackupDB(bskey generic.TStringKey, from, count int32) (result []*generic.TItem, err error) {
+	rows, err := m.db.Query("SELECT BsKey, BsItemKey, Val FROM ? WHERE BsKey = ? limit ? offset ?", m.standardSid, bskey, count, from)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1452")
+		return result, err
+	}
+
+	item := &generic.TItem{}
+	itemKey := ""
+	value := ""
+
+	if rows != nil {
+		for rows.Next() {
+			err := rows.Scan(itemKey, value)
+			if err != nil {
+				log.Fatal(err)
+			}
+			item.Key = []byte(itemKey)
+			item.Value = []byte(value)
+
+			result = append(result, item)
+		}
+
+		return result, err
+	}
+
+	return result, err
+}
+
+func (m *StringBigsetService) BsRangeQueryBackupDB(bsKey string, begin generic.TItemKey, end generic.TItemKey) (result []*generic.TItem, err error) {
+	rows, err := m.db.Query("SELECT BsKey, BsItemKey, Val FROM ? WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ?", m.standardSid, bsKey, string(begin), string(end))
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1452")
+		return result, err
+	}
+
+	item := &generic.TItem{}
+	itemKey := ""
+	value := ""
+
+	if rows != nil {
+		for rows.Next() {
+			err := rows.Scan(itemKey, value)
+			if err != nil {
+				log.Fatal(err)
+			}
+			item.Key = []byte(itemKey)
+			item.Value = []byte(value)
+
+			result = append(result, item)
+		}
+
+		return result, err
+	}
+
+	return result, err
+}
+
+func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint, cfg MySqlConfig) StringBigsetServiceIf {
+	log.Println("Init StringBigset Service sid", serviceID, "address", defaultEnpoint.Host+":"+defaultEnpoint.Port)
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s:%s)/%s?collation=utf8_bin&interpolateParams=true",
+		cfg.UserName, cfg.Password, cfg.Protocol, cfg.Host, cfg.Port, cfg.Schema))
+	if err != nil {
+		log.Println(err.Error(), "err.Error() can't connect to tikv StringBigsetService/bigsetservice.go:1438")
+		return nil
+	}
+
+	stringbs := &StringBigsetService{
+		host:        defaultEnpoint.Host,
+		port:        defaultEnpoint.Port,
+		sid:         defaultEnpoint.ServiceID,
+		db:          db,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+		bot_chatID:  0,
+		bot_token:   "",
+		botClient:   nil,
+	}
+
+	bot, err := tgbotapi.NewBotAPI(stringbs.bot_token)
+	if err == nil {
+		stringbs.botClient = bot
+	}
+	stringbs.botClient = nil
+	if stringbs.etcdManager == nil {
+		return stringbs
+	}
+	err = stringbs.etcdManager.SetDefaultEntpoint(serviceID, defaultEnpoint.Host, defaultEnpoint.Port)
+	if err != nil {
+		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
+	}
+
+	standardSid := strings.ReplaceAll(strings.ReplaceAll(serviceID, "/", "_"), "-", "_")
+	_, err = db.Exec(`create table if not exists ?
+		(
+			BsKey                varchar(255),
+			BsItemKey            varchar(1024),
+			Value            	 text,
+			primary key (BsKey, BsItemKey)
+		); `, standardSid)
+	stringbs.standardSid = standardSid
+	if err != nil {
+		log.Println(err.Error(), "err.Error() create table failed StringBigsetService/bigsetservice.go:691")
+	}
+
+	return stringbs
 }
