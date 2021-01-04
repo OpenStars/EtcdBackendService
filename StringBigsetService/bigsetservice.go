@@ -1594,8 +1594,8 @@ func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint Go
 	_, err = db.Exec(`create table if not exists ?
 		(
 			BsKey                varchar(255),
-			BsItemKey            varchar(1024),
-			Value            	 text,
+			BsItemKey            varchar(255),
+			Val            	 text,
 			primary key (BsKey, BsItemKey)
 		); `, standardSid)
 	stringbs.standardSid = standardSid
