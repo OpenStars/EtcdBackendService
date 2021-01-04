@@ -1554,7 +1554,7 @@ func (m *StringBigsetService) BsRangeQueryBackupDB(bsKey string, begin generic.T
 	return result, err
 }
 
-func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint, cfg MySqlConfig) StringBigsetServiceIf {
+func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint, cfg MySqlConfig, isSaveDataBackup, isGetDataBackup bool) StringBigsetServiceIf {
 	log.Println("Init StringBigset Service sid", serviceID, "address", defaultEnpoint.Host+":"+defaultEnpoint.Port)
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s:%s)/%s?collation=utf8_bin&interpolateParams=true",
 		cfg.UserName, cfg.Password, cfg.Protocol, cfg.Host, cfg.Port, cfg.Schema))
@@ -1564,14 +1564,16 @@ func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint Go
 	}
 
 	stringbs := &StringBigsetService{
-		host:        defaultEnpoint.Host,
-		port:        defaultEnpoint.Port,
-		sid:         defaultEnpoint.ServiceID,
-		db:          db,
-		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
-		bot_chatID:  0,
-		bot_token:   "",
-		botClient:   nil,
+		host:             defaultEnpoint.Host,
+		port:             defaultEnpoint.Port,
+		sid:              defaultEnpoint.ServiceID,
+		isSaveDataBackup: isSaveDataBackup,
+		isGetDataBackup:  isGetDataBackup,
+		db:               db,
+		etcdManager:      GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+		bot_chatID:       0,
+		bot_token:        "",
+		botClient:        nil,
 	}
 
 	bot, err := tgbotapi.NewBotAPI(stringbs.bot_token)
