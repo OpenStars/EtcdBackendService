@@ -1591,13 +1591,13 @@ func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint Go
 	}
 
 	standardSid := strings.ReplaceAll(strings.ReplaceAll(serviceID, "/", "_"), "-", "_")
-	_, err = db.Exec(`create table if not exists ?
+	_, err = db.Exec(fmt.Sprintf(`create table if not exists %s
 		(
 			BsKey                varchar(255),
 			BsItemKey            varchar(255),
 			Val            	 text,
 			primary key (BsKey, BsItemKey)
-		); `, standardSid)
+		); `, standardSid))
 	stringbs.standardSid = standardSid
 	if err != nil {
 		log.Println(err.Error(), "err.Error() create table failed StringBigsetService/bigsetservice.go:691")
