@@ -19,7 +19,6 @@ import (
 
 var reconnect = true
 var mureconnect sync.Mutex
-var logChan = make(chan string, 10)
 
 //go:generate easytags $GOFILE json,xml
 
@@ -33,6 +32,7 @@ type StringBigsetService struct {
 	isSaveDataBackup bool
 	isGetDataBackup  bool
 	enableLogQuery   bool
+	logChan          chan string
 	standardSid      string
 
 	bot_token  string
@@ -1321,18 +1321,18 @@ func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
 	item, _ := m.GetItemBackupDB(bsKey, itemKey)
 	if item != nil {
 		_, err := m.db.Exec(fmt.Sprintf("UPDATE %s set Val = ? where BsKey = ? and BsItemKey = ?;", m.standardSid), bsKey, itemKey, value)
-		logChan <- fmt.Sprintf("UPDATE %s set Val = %s where BsKey = %s and BsItemKey = %s;", m.standardSid, bsKey, itemKey, value)
+		m.logChan <- fmt.Sprintf("UPDATE %s set Val = %s where BsKey = %s and BsItemKey = %s;", m.standardSid, bsKey, itemKey, value)
 		if err != nil {
-			logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1319")
+			m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1319")
 		}
 
 		return
 	}
 
 	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) values (?, ?, ?);", m.standardSid), bsKey, itemKey, value)
-	logChan <- fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) values (%s, %s, %s);", m.standardSid, bsKey, itemKey, value)
+	m.logChan <- fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) values (%s, %s, %s);", m.standardSid, bsKey, itemKey, value)
 	if err != nil {
-		logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1327")
+		m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1327")
 	}
 }
 
@@ -1340,7 +1340,7 @@ func (m *StringBigsetService) RemoveItemBackupDB(bsKey, itemKey string) {
 	_, err := m.db.Exec(fmt.Sprintf("DELETE FROM %s where BsKey = ? and ItemKey = ?;", m.standardSid), bsKey, itemKey)
 	log.Println(fmt.Sprintf("DELETE FROM %s where BsKey = %s and ItemKey = %s;", m.standardSid, bsKey, itemKey))
 	if err != nil {
-		logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1324")
+		m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1324")
 	}
 }
 
@@ -1349,14 +1349,14 @@ func (m *StringBigsetService) GetItemBackupDB(bsKey, itemKey string) (*generic.T
 	value := ""
 
 	row := m.db.QueryRow(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey = ?", m.standardSid), bsKey, itemKey)
-	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey = %s", m.standardSid, bsKey, itemKey)
+	m.logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey = %s", m.standardSid, bsKey, itemKey)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 
 	err := row.Scan(&key, &value)
 	if err != nil {
-		logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:276")
+		m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:276")
 	}
 
 	if key == "" {
@@ -1372,7 +1372,7 @@ func (m *StringBigsetService) GetItemBackupDB(bsKey, itemKey string) (*generic.T
 func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey, endKey generic.TItemKey, begin, end int64) ([]*generic.TItem, int64, error) {
 	totalCount := int64(0)
 	row := m.db.QueryRow(fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ?", m.standardSid), bsKey, string(startKey), string(endKey))
-	logChan <- fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s", m.standardSid, bsKey, string(startKey), string(endKey))
+	m.logChan <- fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s", m.standardSid, bsKey, string(startKey), string(endKey))
 	if row.Err() != nil {
 		return make([]*generic.TItem, 0), 0, row.Err()
 	}
@@ -1384,11 +1384,11 @@ func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey
 	}
 
 	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ? limit %d offset %d", m.standardSid, begin, end), bsKey, string(startKey), string(endKey))
-	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s limit %d offset %d", m.standardSid, bsKey, string(startKey), string(endKey), begin, end)
+	m.logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s limit %d offset %d", m.standardSid, bsKey, string(startKey), string(endKey), begin, end)
 	result := make([]*generic.TItem, 0)
 
 	if err != nil {
-		logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1397")
+		m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1397")
 		return make([]*generic.TItem, 0), 0, err
 	}
 
@@ -1412,7 +1412,7 @@ func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey
 
 func (m *StringBigsetService) getTotalCountFromBackupDB(bskey generic.TStringKey) (int64, error) {
 	rs, err := m.db.Query(fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = ?", m.standardSid), bskey)
-	logChan <- fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = %s", m.standardSid, bskey)
+	m.logChan <- fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = %s", m.standardSid, bskey)
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1425")
 		return 0, err
@@ -1423,7 +1423,7 @@ func (m *StringBigsetService) getTotalCountFromBackupDB(bskey generic.TStringKey
 	for rs.Next() {
 		err = rs.Scan(&totalCount)
 		if err != nil {
-			logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1434")
+			m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1434")
 			return 0, err
 		}
 	}
@@ -1435,7 +1435,7 @@ func (m *StringBigsetService) BsGetSliceFromItemRBackupDB(bskey generic.TStringK
 	result = make([]*generic.TItem, 0)
 
 	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey >= ? order by BsItemKey desc limit %d", m.standardSid, count), bskey, string(fromItemKey))
-	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s order by BsItemKey desc limit %d", m.standardSid, bskey, string(fromItemKey), count)
+	m.logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s order by BsItemKey desc limit %d", m.standardSid, bskey, string(fromItemKey), count)
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1398")
 		return result, err
@@ -1463,7 +1463,7 @@ func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKe
 	result = make([]*generic.TItem, 0)
 
 	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey >= ? limit %d", m.standardSid, count), bskey, string(fromItemKey))
-	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s limit %d", m.standardSid, bskey, string(fromItemKey), count)
+	m.logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s limit %d", m.standardSid, bskey, string(fromItemKey), count)
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1416")
 		return result, err
@@ -1474,7 +1474,7 @@ func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKe
 			item := &generic.TItem{}
 			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
-				logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1477")
+				m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1477")
 				return result, err
 			}
 
@@ -1489,9 +1489,9 @@ func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKe
 
 func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from, count int32) (result []*generic.TItem, err error) {
 	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? order by BsItemKey desc limit %d offset %d", m.standardSid, count, from), bskey)
-	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s order by BsItemKey desc limit %d offset %d", m.standardSid, bskey, count, from)
+	m.logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s order by BsItemKey desc limit %d offset %d", m.standardSid, bskey, count, from)
 	if err != nil {
-		logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1480")
+		m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1480")
 		return result, err
 	}
 
@@ -1500,7 +1500,7 @@ func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from
 			item := &generic.TItem{}
 			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
-				logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1503")
+				m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1503")
 				return result, err
 			}
 
@@ -1515,9 +1515,9 @@ func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from
 
 func (m *StringBigsetService) BsGetSliceBackupDB(bskey generic.TStringKey, from, count int32) (result []*generic.TItem, err error) {
 	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? limit %d offset %d", m.standardSid, count, from), bskey)
-	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s limit %d offset %d", m.standardSid, bskey, count, from)
+	m.logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s limit %d offset %d", m.standardSid, bskey, count, from)
 	if err != nil {
-		logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1510")
+		m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1510")
 		return result, err
 	}
 
@@ -1526,7 +1526,7 @@ func (m *StringBigsetService) BsGetSliceBackupDB(bskey generic.TStringKey, from,
 			item := &generic.TItem{}
 			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
-				logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1529")
+				m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1529")
 				return result, err
 			}
 
@@ -1541,9 +1541,9 @@ func (m *StringBigsetService) BsGetSliceBackupDB(bskey generic.TStringKey, from,
 
 func (m *StringBigsetService) BsRangeQueryBackupDB(bsKey string, begin generic.TItemKey, end generic.TItemKey) (result []*generic.TItem, err error) {
 	rows, err := m.db.Query(fmt.Sprintf("SELECT BsKey, BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ?", m.standardSid), bsKey, string(begin), string(end))
-	logChan <- fmt.Sprintf("SELECT BsKey, BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s", m.standardSid, bsKey, string(begin), string(end))
+	m.logChan <- fmt.Sprintf("SELECT BsKey, BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s", m.standardSid, bsKey, string(begin), string(end))
 	if err != nil {
-		logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1546")
+		m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1546")
 		return result, err
 	}
 
@@ -1552,7 +1552,7 @@ func (m *StringBigsetService) BsRangeQueryBackupDB(bsKey string, begin generic.T
 			item := &generic.TItem{}
 			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
-				logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1555")
+				m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1555")
 				return result, err
 			}
 
@@ -1570,7 +1570,7 @@ func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint Go
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s:%s)/%s?collation=utf8_bin&interpolateParams=true",
 		cfg.UserName, cfg.Password, cfg.Protocol, cfg.Host, cfg.Port, cfg.Schema))
 	if err != nil {
-		logChan <- fmt.Sprintf(err.Error(), "err.Error() can't connect to tikv StringBigsetService/bigsetservice.go:1438")
+		log.Println(err.Error(), "err.Error() can't connect to tikv StringBigsetService/bigsetservice.go:1438")
 		return nil
 	}
 
@@ -1581,6 +1581,7 @@ func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint Go
 		isSaveDataBackup: isSaveDataBackup,
 		isGetDataBackup:  isGetDataBackup,
 		enableLogQuery:   enableLogQuery,
+		logChan:          make(chan string, 10),
 		db:               db,
 		etcdManager:      GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
 		bot_chatID:       0,
@@ -1656,14 +1657,14 @@ func (m *StringBigsetService) BsPutItemWithoutPutBackup(bskey generic.TStringKey
 
 func (m *StringBigsetService) startLogQuery() {
 	if m.enableLogQuery {
-		for message := range logChan {
+		for message := range m.logChan {
 			log.Println(message)
 		}
 
 		return
 	}
 
-	for _ = range logChan {
+	for _ = range m.logChan {
 		// do nothing just receive log
 	}
 }
