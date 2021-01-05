@@ -32,6 +32,7 @@ type StringBigsetService struct {
 	db               *sql.DB
 	isSaveDataBackup bool
 	isGetDataBackup  bool
+	enableLogQuery   bool
 	standardSid      string
 
 	bot_token  string
@@ -1579,6 +1580,7 @@ func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint Go
 		sid:              defaultEnpoint.ServiceID,
 		isSaveDataBackup: isSaveDataBackup,
 		isGetDataBackup:  isGetDataBackup,
+		enableLogQuery:   enableLogQuery,
 		db:               db,
 		etcdManager:      GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
 		bot_chatID:       0,
@@ -1613,9 +1615,8 @@ func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint Go
 		log.Println(err.Error(), "err.Error() create table failed StringBigsetService/bigsetservice.go:691")
 	}
 
-	if enableLogQuery {
-		go startLogQuery()
-	}
+	go stringbs.startLogQuery()
+
 	return stringbs
 }
 
@@ -1653,8 +1654,16 @@ func (m *StringBigsetService) BsPutItemWithoutPutBackup(bskey generic.TStringKey
 	return nil
 }
 
-func startLogQuery() {
-	for message := range logChan {
-		log.Println(message)
+func (m *StringBigsetService) startLogQuery() {
+	if m.enableLogQuery {
+		for message := range logChan {
+			log.Println(message)
+		}
+
+		return
+	}
+
+	for _ = range logChan {
+		// do nothing just receive log
 	}
 }
