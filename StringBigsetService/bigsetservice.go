@@ -1487,7 +1487,7 @@ func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKe
 }
 
 func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from, count int32) (result []*generic.TItem, err error) {
-	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? order by BsItemKey limit %d offset %d", m.standardSid, count, from), bskey)
+	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? order by BsItemKey desc limit %d offset %d", m.standardSid, count, from), bskey)
 	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s order by BsItemKey desc limit %d offset %d", m.standardSid, bskey, count, from)
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1480")
