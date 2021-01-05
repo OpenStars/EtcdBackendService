@@ -1388,11 +1388,12 @@ func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey
 	}
 
 	item := &generic.TItem{}
-	itemKey := ""
-	value := ""
 
 	if rows != nil {
 		for rows.Next() {
+			itemKey := ""
+			value := ""
+
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
@@ -1443,11 +1444,12 @@ func (m *StringBigsetService) BsGetSliceFromItemRBackupDB(bskey generic.TStringK
 	}
 
 	item := &generic.TItem{}
-	itemKey := ""
-	value := ""
 
 	if rows != nil {
 		for rows.Next() {
+			itemKey := ""
+			value := ""
+
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
@@ -1476,11 +1478,12 @@ func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKe
 	}
 
 	item := &generic.TItem{}
-	itemKey := ""
-	value := ""
 
 	if rows != nil {
 		for rows.Next() {
+			itemKey := ""
+			value := ""
+
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
@@ -1507,11 +1510,12 @@ func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from
 	}
 
 	item := &generic.TItem{}
-	itemKey := ""
-	value := ""
 
 	if rows != nil {
 		for rows.Next() {
+			itemKey := ""
+			value := ""
+
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
@@ -1538,11 +1542,12 @@ func (m *StringBigsetService) BsGetSliceBackupDB(bskey generic.TStringKey, from,
 	}
 
 	item := &generic.TItem{}
-	itemKey := ""
-	value := ""
 
 	if rows != nil {
 		for rows.Next() {
+			itemKey := ""
+			value := ""
+
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
@@ -1569,11 +1574,12 @@ func (m *StringBigsetService) BsRangeQueryBackupDB(bsKey string, begin generic.T
 	}
 
 	item := &generic.TItem{}
-	itemKey := ""
-	value := ""
 
 	if rows != nil {
 		for rows.Next() {
+			itemKey := ""
+			value := ""
+
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
