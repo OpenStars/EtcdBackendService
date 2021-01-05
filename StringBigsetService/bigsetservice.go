@@ -1312,9 +1312,19 @@ func (m *StringBigsetService) BsGetSliceFromItemR2(bskey generic.TStringKey, fro
 }
 
 func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
-	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) VALUES(?, ?, ?);", m.standardSid), bsKey, itemKey, value)
+	item, _ := m.GetItemBackupDB(bsKey, itemKey)
+	if item != nil {
+		_, err := m.db.Exec(fmt.Sprintf("UPDATE %s set Val = ? where BsKey = ? and BsItemKey = ?;", m.standardSid), bsKey, itemKey, value)
+		if err != nil {
+			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1319")
+		}
+
+		return
+	}
+
+	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) (?, ?, ?);", m.standardSid), bsKey, itemKey, value)
 	if err != nil {
-		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1317")
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1327")
 	}
 }
 
@@ -1331,35 +1341,38 @@ func (m *StringBigsetService) GetItemBackupDB(bsKey, itemKey string) (*generic.T
 
 	row := m.db.QueryRow(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey = ?", m.standardSid), bsKey, itemKey)
 	log.Println(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey = %s", m.standardSid, bsKey, itemKey))
-	if row.Err() == nil {
-		err := row.Scan(&key, &value)
-		if err != nil {
-			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:276")
-		}
-
-		return &generic.TItem{
-			Key:   []byte(key),
-			Value: []byte(value),
-		}, err
+	if row.Err() != nil {
+		return nil, row.Err()
 	}
 
-	return nil, nil
+	err := row.Scan(&key, &value)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:276")
+	}
+
+	return &generic.TItem{
+		Key:   []byte(key),
+		Value: []byte(value),
+	}, err
 }
 
 func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey, endKey generic.TItemKey, begin, end int64) ([]*generic.TItem, int64, error) {
 	totalCount := int64(0)
 	row := m.db.QueryRow(fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ?", m.standardSid), bsKey, string(startKey), string(endKey))
 	log.Println(fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s", m.standardSid, bsKey, string(startKey), string(endKey)))
-	if row.Err() == nil {
-		err := row.Scan(&totalCount)
-		if err != nil {
-			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1384")
-		}
+	if row.Err() != nil {
+		return make([]*generic.TItem, 0), 0, row.Err()
+	}
+
+	err := row.Scan(&totalCount)
+	if err != nil {
+		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1359")
+		return make([]*generic.TItem, 0), 0, err
 	}
 
 	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ? limit %d offset %d", m.standardSid, begin, end), bsKey, string(startKey), string(endKey))
 	log.Println(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s limit %d offset %d", m.standardSid, bsKey, string(startKey), string(endKey), begin, end))
-	items := make([]*generic.TItem, 0)
+	result := make([]*generic.TItem, 0)
 
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1397")
@@ -1375,17 +1388,19 @@ func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
+				return result, 0, err
 			}
+
 			item.Key = []byte(itemKey)
 			item.Value = []byte(value)
 
-			items = append(items, item)
+			result = append(result, item)
 		}
 
-		return items, totalCount, nil
+		return result, totalCount, nil
 	}
 
-	return items, 0, nil
+	return result, 0, nil
 }
 
 func (m *StringBigsetService) getTotalCountFromBackupDB(bskey generic.TStringKey) (int64, error) {
@@ -1428,6 +1443,7 @@ func (m *StringBigsetService) BsGetSliceFromItemRBackupDB(bskey generic.TStringK
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
+				return result, err
 			}
 			item.Key = []byte(itemKey)
 			item.Value = []byte(value)
@@ -1460,6 +1476,7 @@ func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKe
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
+				return result, err
 			}
 			item.Key = []byte(itemKey)
 			item.Value = []byte(value)
@@ -1490,6 +1507,7 @@ func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
+				return result, err
 			}
 			item.Key = []byte(itemKey)
 			item.Value = []byte(value)
@@ -1520,6 +1538,7 @@ func (m *StringBigsetService) BsGetSliceBackupDB(bskey generic.TStringKey, from,
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
+				return result, err
 			}
 			item.Key = []byte(itemKey)
 			item.Value = []byte(value)
@@ -1550,6 +1569,7 @@ func (m *StringBigsetService) BsRangeQueryBackupDB(bsKey string, begin generic.T
 			err := rows.Scan(&itemKey, &value)
 			if err != nil {
 				log.Fatal(err)
+				return result, err
 			}
 			item.Key = []byte(itemKey)
 			item.Value = []byte(value)
