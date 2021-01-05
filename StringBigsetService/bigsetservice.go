@@ -1387,21 +1387,14 @@ func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey
 		return make([]*generic.TItem, 0), 0, err
 	}
 
-	item := &generic.TItem{}
-
 	if rows != nil {
 		for rows.Next() {
-			itemKey := ""
-			value := ""
-
-			err := rows.Scan(&itemKey, &value)
+			item := &generic.TItem{}
+			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
 				log.Fatal(err)
 				return result, 0, err
 			}
-
-			item.Key = []byte(itemKey)
-			item.Value = []byte(value)
 
 			result = append(result, item)
 		}
@@ -1443,20 +1436,14 @@ func (m *StringBigsetService) BsGetSliceFromItemRBackupDB(bskey generic.TStringK
 		return result, err
 	}
 
-	item := &generic.TItem{}
-
 	if rows != nil {
 		for rows.Next() {
-			itemKey := ""
-			value := ""
-
-			err := rows.Scan(&itemKey, &value)
+			item := &generic.TItem{}
+			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
 				log.Fatal(err)
 				return result, err
 			}
-			item.Key = []byte(itemKey)
-			item.Value = []byte(value)
 
 			result = append(result, item)
 		}
@@ -1477,20 +1464,14 @@ func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKe
 		return result, err
 	}
 
-	item := &generic.TItem{}
-
 	if rows != nil {
 		for rows.Next() {
-			itemKey := ""
-			value := ""
-
-			err := rows.Scan(&itemKey, &value)
+			item := &generic.TItem{}
+			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
 				log.Fatal(err)
 				return result, err
 			}
-			item.Key = []byte(itemKey)
-			item.Value = []byte(value)
 
 			result = append(result, item)
 		}
@@ -1509,20 +1490,14 @@ func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from
 		return result, err
 	}
 
-	item := &generic.TItem{}
-
 	if rows != nil {
 		for rows.Next() {
-			itemKey := ""
-			value := ""
-
-			err := rows.Scan(&itemKey, &value)
+			item := &generic.TItem{}
+			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
 				log.Fatal(err)
 				return result, err
 			}
-			item.Key = []byte(itemKey)
-			item.Value = []byte(value)
 
 			result = append(result, item)
 		}
@@ -1541,20 +1516,14 @@ func (m *StringBigsetService) BsGetSliceBackupDB(bskey generic.TStringKey, from,
 		return result, err
 	}
 
-	item := &generic.TItem{}
-
 	if rows != nil {
 		for rows.Next() {
-			itemKey := ""
-			value := ""
-
-			err := rows.Scan(&itemKey, &value)
+			item := &generic.TItem{}
+			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
 				log.Fatal(err)
 				return result, err
 			}
-			item.Key = []byte(itemKey)
-			item.Value = []byte(value)
 
 			result = append(result, item)
 		}
@@ -1573,20 +1542,14 @@ func (m *StringBigsetService) BsRangeQueryBackupDB(bsKey string, begin generic.T
 		return result, err
 	}
 
-	item := &generic.TItem{}
-
 	if rows != nil {
 		for rows.Next() {
-			itemKey := ""
-			value := ""
-
-			err := rows.Scan(&itemKey, &value)
+			item := &generic.TItem{}
+			err := rows.Scan(&item.Key, &item.Value)
 			if err != nil {
 				log.Fatal(err)
 				return result, err
 			}
-			item.Key = []byte(itemKey)
-			item.Value = []byte(value)
 
 			result = append(result, item)
 		}
