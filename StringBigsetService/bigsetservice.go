@@ -1323,8 +1323,8 @@ func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
 		return
 	}
 
-	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) (?, ?, ?);", m.standardSid), bsKey, itemKey, value)
-	log.Println(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) (%s, %s, %s);", m.standardSid, bsKey, itemKey, value))
+	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) values (?, ?, ?);", m.standardSid), bsKey, itemKey, value)
+	log.Println(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) values (%s, %s, %s);", m.standardSid, bsKey, itemKey, value))
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1327")
 	}
