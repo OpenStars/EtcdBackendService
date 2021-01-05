@@ -1315,6 +1315,7 @@ func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
 	item, _ := m.GetItemBackupDB(bsKey, itemKey)
 	if item != nil {
 		_, err := m.db.Exec(fmt.Sprintf("UPDATE %s set Val = ? where BsKey = ? and BsItemKey = ?;", m.standardSid), bsKey, itemKey, value)
+		log.Println(fmt.Sprintf("UPDATE %s set Val = %s where BsKey = %s and BsItemKey = %s;", m.standardSid, bsKey, itemKey, value))
 		if err != nil {
 			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1319")
 		}
@@ -1323,6 +1324,7 @@ func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
 	}
 
 	_, err := m.db.Exec(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) (?, ?, ?);", m.standardSid), bsKey, itemKey, value)
+	log.Println(fmt.Sprintf("INSERT INTO %s(BsKey, BsItemKey, Val) (%s, %s, %s);", m.standardSid, bsKey, itemKey, value))
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1327")
 	}
@@ -1330,6 +1332,7 @@ func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
 
 func (m *StringBigsetService) RemoveItemBackupDB(bsKey, itemKey string) {
 	_, err := m.db.Exec(fmt.Sprintf("DELETE FROM %s where BsKey = ? and ItemKey = ?;", m.standardSid), bsKey, itemKey)
+	log.Println(fmt.Sprintf("DELETE FROM %s where BsKey = %s and ItemKey = %s;", m.standardSid, bsKey, itemKey))
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1324")
 	}
