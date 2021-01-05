@@ -1353,6 +1353,10 @@ func (m *StringBigsetService) GetItemBackupDB(bsKey, itemKey string) (*generic.T
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:276")
 	}
 
+	if key == "" {
+		return nil, errors.New("EItemNotExisted")
+	}
+
 	return &generic.TItem{
 		Key:   []byte(key),
 		Value: []byte(value),
