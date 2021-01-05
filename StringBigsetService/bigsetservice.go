@@ -121,7 +121,11 @@ func (m *StringBigsetService) GetListKey(fromIndex int64, count int32) ([]string
 
 func (m *StringBigsetService) BsPutItem(bskey generic.TStringKey, item *generic.TItem) error {
 	if m.db != nil && m.isSaveDataBackup {
-		m.PutToBackupDB(string(bskey), string(item.Key), string(item.Value))
+		if m.isGetDataBackup {
+			m.PutToBackupDB(string(bskey), string(item.Key), string(item.Value))
+		} else {
+			go m.PutToBackupDB(string(bskey), string(item.Key), string(item.Value))
+		}
 	}
 
 	if m.etcdManager != nil {
@@ -1457,8 +1461,8 @@ func (m *StringBigsetService) BsGetSliceFromItemRBackupDB(bskey generic.TStringK
 func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKey, fromItemKey generic.TItemKey, count int64) (result []*generic.TItem, err error) {
 	result = make([]*generic.TItem, 0)
 
-	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey >= ? order by BsItemKey asc limit %d", m.standardSid, count), bskey, string(fromItemKey))
-	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s order by BsItemKey asc limit %d", m.standardSid, bskey, string(fromItemKey), count)
+	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey >= ? limit %d", m.standardSid, count), bskey, string(fromItemKey))
+	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey >= %s limit %d", m.standardSid, bskey, string(fromItemKey), count)
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1416")
 		return result, err
@@ -1484,7 +1488,7 @@ func (m *StringBigsetService) BsGetSliceFromItemBackupDB(bskey generic.TStringKe
 
 func (m *StringBigsetService) BsGetSliceRBackupDB(bskey generic.TStringKey, from, count int32) (result []*generic.TItem, err error) {
 	rows, err := m.db.Query(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? order by BsItemKey limit %d offset %d", m.standardSid, count, from), bskey)
-	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s order by BsItemKey limit %d offset %d", m.standardSid, bskey, count, from)
+	logChan <- fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s order by BsItemKey desc limit %d offset %d", m.standardSid, bskey, count, from)
 	if err != nil {
 		log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1480")
 		return result, err
