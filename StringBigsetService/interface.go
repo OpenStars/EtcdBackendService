@@ -40,6 +40,8 @@ type StringBigsetServiceIf interface {
 	BsGetSliceFromItemR2(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error)
 	RemoveAll2(bskey generic.TStringKey) (bool, error)
 	BsGetSliceR2(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error)
+
+	BsPutItemWithoutPutBackup(bskey generic.TStringKey, item *generic.TItem) error
 }
 
 type Client interface {

@@ -1331,7 +1331,7 @@ func (m *StringBigsetService) GetItemBackupDB(bsKey, itemKey string) (*generic.T
 
 	row := m.db.QueryRow(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = ? and BsItemKey = ?", m.standardSid), bsKey, itemKey)
 	log.Println(fmt.Sprintf("SELECT BsItemKey, Val FROM %s WHERE BsKey = %s and BsItemKey = %s", m.standardSid, bsKey, itemKey))
-	if row.Err() != nil {
+	if row.Err() == nil {
 		err := row.Scan(&key, &value)
 		if err != nil {
 			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:276")
@@ -1350,7 +1350,7 @@ func (m *StringBigsetService) GetRangeQueryByPageBackupDB(bsKey string, startKey
 	totalCount := int64(0)
 	row := m.db.QueryRow(fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = ? and BsItemKey >= ? and BsItemKey < ?", m.standardSid), bsKey, string(startKey), string(endKey))
 	log.Println(fmt.Sprintf("SELECT count(*) FROM %s WHERE BsKey = %s and BsItemKey >= %s and BsItemKey < %s", m.standardSid, bsKey, string(startKey), string(endKey)))
-	if row.Err() != nil {
+	if row.Err() == nil {
 		err := row.Scan(&totalCount)
 		if err != nil {
 			log.Println(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1384")
@@ -1613,4 +1613,38 @@ func NewClientSyncTiKv(serviceID string, etcdServers []string, defaultEnpoint Go
 	}
 
 	return stringbs
+}
+
+func (m *StringBigsetService) BsPutItemWithoutPutBackup(bskey generic.TStringKey, item *generic.TItem) error {
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+	// log.Println("BsPutItem host", m.host+":"+m.port)
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
+		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	r, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsPutItem(ctx, bskey, item)
+
+	if err != nil {
+		go m.notifyEndpointError()
+		// client = transports.NewGetBsGenericClient(m.host, m.port)
+		return errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+	}
+	defer client.BackToPool()
+
+	if r.Error != generic.TErrorCode_EGood {
+		return errors.New("StringBigsetSerice: " + m.sid + " error: " + r.Error.String())
+	}
+
+	return nil
 }
