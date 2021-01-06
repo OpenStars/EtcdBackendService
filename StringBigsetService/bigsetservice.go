@@ -1320,8 +1320,8 @@ func (m *StringBigsetService) BsGetSliceFromItemR2(bskey generic.TStringKey, fro
 func (m *StringBigsetService) PutToBackupDB(bsKey, itemKey, value string) {
 	item, _ := m.GetItemBackupDB(bsKey, itemKey)
 	if item != nil {
-		_, err := m.db.Exec(fmt.Sprintf("UPDATE %s set Val = ? where BsKey = ? and BsItemKey = ?;", m.standardSid), bsKey, itemKey, value)
-		m.logChan <- fmt.Sprintf("UPDATE %s set Val = %s where BsKey = %s and BsItemKey = %s;", m.standardSid, bsKey, itemKey, value)
+		_, err := m.db.Exec(fmt.Sprintf("UPDATE %s set Val = ? where BsKey = ? and BsItemKey = ?;", m.standardSid), value, bsKey, itemKey)
+		m.logChan <- fmt.Sprintf("UPDATE %s set Val = %s where BsKey = %s and BsItemKey = %s;", m.standardSid, value, bsKey, itemKey)
 		if err != nil {
 			m.logChan <- fmt.Sprintf(err.Error(), "err.Error() StringBigsetService/bigsetservice.go:1319")
 		}
