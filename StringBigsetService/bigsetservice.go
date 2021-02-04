@@ -643,7 +643,7 @@ func (m *StringBigsetService) handlerEventChangeEndpoint(ep *GoEndpointBackendMa
 	log.Println("Change config endpoint serviceID", ep.ServiceID, m.host, ":", m.port)
 }
 
-func NewStringBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) StringBigsetServiceIf {
+func NewStringBigsetServiceModel(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint) (StringBigsetServiceIf, error) {
 
 	log.Println("Init StringBigset Service sid", serviceID, "address", defaultEnpoint.Host+":"+defaultEnpoint.Port)
 
@@ -662,15 +662,15 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 	}
 	stringbs.botClient = nil
 	if stringbs.etcdManager == nil {
-		return stringbs
+		return stringbs, nil
 	}
 	err = stringbs.etcdManager.SetDefaultEntpoint(serviceID, defaultEnpoint.Host, defaultEnpoint.Port)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
-		return nil
+		return nil, err
 	}
 	// stringbs.etcdManager.GetAllEndpoint(serviceID)
-	return stringbs
+	return stringbs, nil
 	// if err != nil {
 	// 	log.Println("Init Local StringBigsetSerivce sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
 	// 	return &StringBigsetService{
@@ -690,7 +690,7 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 	// return sv
 }
 
-func NewStringBigsetServiceModel2(etcdEndpoints []string, sid string, defaultEndpointsHost string, defaultEndpointPort string) StringBigsetServiceIf {
+func NewStringBigsetServiceModel2(etcdEndpoints []string, sid string, defaultEndpointsHost string, defaultEndpointPort string) (StringBigsetServiceIf, error) {
 
 	log.Println("Init StringBigset Service sid", sid, "address", defaultEndpointsHost+":"+defaultEndpointPort)
 	stringbs := &StringBigsetService{
@@ -708,14 +708,14 @@ func NewStringBigsetServiceModel2(etcdEndpoints []string, sid string, defaultEnd
 	}
 	stringbs.botClient = nil
 	if stringbs.etcdManager == nil {
-		return stringbs
+		return stringbs, nil
 	}
 	err = stringbs.etcdManager.SetDefaultEntpoint(sid, defaultEndpointsHost, defaultEndpointPort)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", sid, "err", err)
-		return nil
+		return nil, err
 	}
-	return stringbs
+	return stringbs, nil
 }
 
 func NewClient(etcdEndpoints []string, sid string, defaultEndpointsHost string, defaultEndpointPort string) Client {
