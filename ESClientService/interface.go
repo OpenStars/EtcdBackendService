@@ -1,6 +1,6 @@
 package ESClientService
 
-import "github.com/olivere/elastic"
+import "github.com/olivere/elastic/v7"
 
 type ESClientServiceIf interface {
 	PutDataToES(id string, dataJson string) (err error)
