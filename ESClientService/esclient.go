@@ -105,6 +105,10 @@ func NewESClient(url, indexName, typeName string) ESClientServiceIf {
 	return es
 }
 
+func (es *ESClient) GetClientES() *elastic.Client {
+	return es.client
+}
+
 func (es *ESClient) PutDataToES3(data interface{}) error {
 	dataByte, err := json.Marshal(data)
 	if err != nil {

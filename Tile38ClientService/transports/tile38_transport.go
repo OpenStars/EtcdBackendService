@@ -30,7 +30,7 @@ var (
 )
 
 func GetTile38LocationClient(host, port string) (conn redis.Conn, err error) {
-	log.Printf("[GetTile38LocationClient - transport] address %s %s\n", host, port)
+	// log.Printf("[GetTile38LocationClient - transport] address %s %s\n", host, port)
 	p, existed := MapPool[host+":"+port]
 	if !existed || p == nil {
 		p, _ = newPool(1000, 10000, host+":"+port)
