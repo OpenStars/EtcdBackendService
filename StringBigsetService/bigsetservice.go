@@ -10,10 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
-	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/transports"
+	"github.com/Sonek-HoangBui/EtcdBackendService/StringBigsetService/bigset/transports"
+
 	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
+	"github.com/Sonek-HoangBui/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -34,10 +35,10 @@ type StringBigsetService struct {
 	enableLogQuery   bool
 	logChan          chan string
 	standardSid      string
-
-	bot_token  string
-	bot_chatID int64
-	botClient  *tgbotapi.BotAPI
+	config           transports.PoolConfig
+	bot_token        string
+	bot_chatID       int64
+	botClient        *tgbotapi.BotAPI
 }
 
 type MySqlConfig struct {
@@ -696,6 +697,54 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 	// return sv
 }
 
+func NewStringBSServiceModelWithConfig(serviceID string, etcdServers []string, defaultEnpoint GoEndpointBackendManager.EndPoint, config transports.PoolConfig) StringBigsetServiceIf {
+
+	log.Println("Init StringBigset Service sid", serviceID, "address", defaultEnpoint.Host+":"+defaultEnpoint.Port)
+
+	stringbs := &StringBigsetService{
+		host:        defaultEnpoint.Host,
+		port:        defaultEnpoint.Port,
+		sid:         defaultEnpoint.ServiceID,
+		config:      config,
+		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
+		bot_chatID:  0,
+		bot_token:   "",
+		botClient:   nil,
+	}
+	bot, err := tgbotapi.NewBotAPI(stringbs.bot_token)
+	if err == nil {
+		stringbs.botClient = bot
+	}
+	stringbs.botClient = nil
+	if stringbs.etcdManager == nil {
+		return stringbs
+	}
+	err = stringbs.etcdManager.SetDefaultEntpoint(serviceID, defaultEnpoint.Host, defaultEnpoint.Port)
+	if err != nil {
+		log.Println("SetDefaultEndpoint sid", serviceID, "err", err)
+		return nil
+	}
+	// stringbs.etcdManager.GetAllEndpoint(serviceID)
+	return stringbs
+	// if err != nil {
+	// 	log.Println("Init Local StringBigsetSerivce sid:", defaultEnpoint.ServiceID, "host:", defaultEnpoint.Host, "port:", defaultEnpoint.Port)
+	// 	return &StringBigsetService{
+	// 		host: defaultEnpoint.Host,
+	// 		port: defaultEnpoint.Port,
+	// 		sid:  defaultEnpoint.ServiceID,
+	// 	}
+	// }
+	// sv := &StringBigsetService{
+	// 	host: ep.Host,
+	// 	port: ep.Port,
+	// 	sid:  ep.ServiceID,
+	// }
+	// go aepm.EventChangeEndPoints(sv.handlerEventChangeEndpoint)
+	// sv.epm = aepm
+	// log.Println("Init From Etcd StringBigsetSerivce sid:", sv.sid, "host:", sv.host, "port:", sv.port)
+	// return sv
+}
+
 func NewStringBigsetServiceModel2(etcdEndpoints []string, sid string, defaultEndpointsHost string, defaultEndpointPort string) (StringBigsetServiceIf, error) {
 
 	log.Println("Init StringBigset Service sid", sid, "address", defaultEndpointsHost+":"+defaultEndpointPort)
@@ -783,12 +832,11 @@ func NewClientWithMonitor(etcdEndpoints []string, sid string, host string, port 
 // ================================================== Version 2 ===============================================================
 
 func (m *StringBigsetService) notifyEndpointError() {
-	if m.botClient != nil {
-
-		msg := tgbotapi.NewMessage(m.bot_chatID, "Hệ thống kiểm soát endpoint phát hiện endpoint sid "+m.sid+" address "+m.host+":"+m.port+" đang không hoạt động")
-		m.botClient.Send(msg)
-	}
-
+	//if m.botClient != nil {
+	//
+	//	msg := tgbotapi.NewMessage(m.bot_chatID, "Hệ thống kiểm soát endpoint phát hiện endpoint sid "+m.sid+" address "+m.host+":"+m.port+" đang không hoạt động")
+	//	m.botClient.Send(msg)
+	//}
 }
 
 func (m *StringBigsetService) TotalStringKeyCount2() (r int64, err error) {
