@@ -610,6 +610,44 @@ func (m *StringBigsetService) BsMultiPutIndex(lsBsKeys []generic.TStringKey, lsI
 	return nil
 }
 
+func (m *StringBigsetService) BsPutMultiBsKey(lsBsKeys []generic.TStringKey, lsItem *generic.TItem) error {
+	// todo BsMultiPutIndex
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
+		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	for i := range lsBsKeys {
+		rs, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsPutItem(ctx, lsBsKeys[i], lsItem)
+		if err != nil {
+			go m.notifyEndpointError()
+			// client = transports.NewGetBsGenericClient(m.host, m.port)
+			return errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		}
+
+		if rs.Error != generic.TErrorCode_EGood {
+			return errors.New("StringBigsetSerice: " + m.sid + " error: " + rs.Error.String())
+		}
+	}
+
+	return nil
+}
+
 func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error) {
 	if m.db != nil && m.isGetDataBackup {
 		return m.BsGetSliceFromItemRBackupDB(bskey, fromKey, count)
