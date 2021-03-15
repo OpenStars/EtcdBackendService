@@ -648,6 +648,51 @@ func (m *StringBigsetService) BsPutMultiBsKey(lsBsKeys []generic.TStringKey, lsI
 	return nil
 }
 
+func (m *StringBigsetService) BsDeleteMultiBsKey(lsBsKeys []generic.TStringKey, kItem generic.TItemKey) error {
+	if m.db != nil {
+		go func() {
+			for i := range lsBsKeys {
+				m.RemoveItemBackupDB(string(lsBsKeys[i]), string(kItem))
+			}
+		}()
+	}
+
+	if m.etcdManager != nil {
+		h, p, err := m.etcdManager.GetEndpoint(m.sid)
+		if err != nil {
+			log.Println("EtcdManager get endpoints", "err", err)
+		} else {
+			m.host = h
+			m.port = p
+		}
+	}
+
+	client := transports.GetBsGenericClient(m.host, m.port)
+	if client == nil || client.Client == nil {
+		go m.notifyEndpointError()
+		return errors.New("Can not connect to backend service: " + m.sid + "host: " + m.host + "port: " + m.port)
+	}
+	defer client.BackToPool()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	for i := range lsBsKeys {
+		m.RemoveItemBackupDB(string(lsBsKeys[i]), string(kItem))
+		ok, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRemoveItem(ctx, lsBsKeys[i], kItem)
+		if err != nil {
+			go m.notifyEndpointError()
+			// client = transports.NewGetBsGenericClient(m.host, m.port)
+			errors.New("StringBigsetSerice: " + m.sid + " error: " + err.Error())
+		}
+		if ok == false {
+			return errors.New("StringBigsetSerice: " + m.sid + " remove false")
+		}
+	}
+
+	return nil
+}
+
 func (m *StringBigsetService) BsGetSliceFromItem(bskey generic.TStringKey, fromKey generic.TItemKey, count int32) ([]*generic.TItem, error) {
 	if m.db != nil && m.isGetDataBackup {
 		return m.BsGetSliceFromItemRBackupDB(bskey, fromKey, count)
