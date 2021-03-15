@@ -678,7 +678,6 @@ func (m *StringBigsetService) BsDeleteMultiBsKey(lsBsKeys []generic.TStringKey, 
 	defer cancel()
 
 	for i := range lsBsKeys {
-		m.RemoveItemBackupDB(string(lsBsKeys[i]), string(kItem))
 		ok, err := client.Client.(*generic.TStringBigSetKVServiceClient).BsRemoveItem(ctx, lsBsKeys[i], kItem)
 		if err != nil {
 			go m.notifyEndpointError()
