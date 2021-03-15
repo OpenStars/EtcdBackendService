@@ -610,7 +610,7 @@ func (m *StringBigsetService) BsMultiPutIndex(lsBsKeys []generic.TStringKey, lsI
 	return nil
 }
 
-func (m *StringBigsetService) BsPutMultiBsKey(lsBsKeys []generic.TStringKey, lsItem generic.TItem) error {
+func (m *StringBigsetService) BsPutMultiBsKey(lsBsKeys []generic.TStringKey, lsItem *generic.TItem) error {
 	// todo BsMultiPutIndex
 	if m.etcdManager != nil {
 		h, p, err := m.etcdManager.GetEndpoint(m.sid)
