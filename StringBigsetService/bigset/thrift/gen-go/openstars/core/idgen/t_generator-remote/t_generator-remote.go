@@ -10,7 +10,7 @@ import (
 	"math"
 	"net"
 	"net/url"
-	"openstars/core/bigset/generic"
+	"openstars/core/idgen"
 	"os"
 	"strconv"
 	"strings"
@@ -18,15 +18,17 @@ import (
 	"github.com/apache/thrift/lib/go/thrift"
 )
 
-var _ = generic.GoUnusedProtection__
+var _ = idgen.GoUnusedProtection__
 
 func Usage() {
 	fmt.Fprintln(os.Stderr, "Usage of ", os.Args[0], " [-h host:port] [-u url] [-f[ramed]] function [arg1 [arg2...]]:")
 	flag.PrintDefaults()
 	fmt.Fprintln(os.Stderr, "\nFunctions:")
-	fmt.Fprintln(os.Stderr, "  void needSplit(TContainerKey rootID, TNeedSplitInfo splitInfo)")
-	fmt.Fprintln(os.Stderr, "  void splitInfoUpdated(TContainerKey rootID)")
-	fmt.Fprintln(os.Stderr, "  SplitJob getJob()")
+	fmt.Fprintln(os.Stderr, "  i32 createGenerator(string genName)")
+	fmt.Fprintln(os.Stderr, "  i32 removeGenerator(string genName)")
+	fmt.Fprintln(os.Stderr, "  i64 getCurrentValue(string genName)")
+	fmt.Fprintln(os.Stderr, "  i64 getValue(string genName)")
+	fmt.Fprintln(os.Stderr, "  i64 getStepValue(string genName, i64 step)")
 	fmt.Fprintln(os.Stderr)
 	os.Exit(0)
 }
@@ -141,64 +143,67 @@ func main() {
 	}
 	iprot := protocolFactory.GetProtocol(trans)
 	oprot := protocolFactory.GetProtocol(trans)
-	client := generic.NewBSNotificationPoolClient(thrift.NewTStandardClient(iprot, oprot))
+	client := idgen.NewTGeneratorClient(thrift.NewTStandardClient(iprot, oprot))
 	if err := trans.Open(); err != nil {
 		fmt.Fprintln(os.Stderr, "Error opening socket to ", host, ":", port, " ", err)
 		os.Exit(1)
 	}
 
 	switch cmd {
-	case "needSplit":
-		if flag.NArg()-1 != 2 {
-			fmt.Fprintln(os.Stderr, "NeedSplit requires 2 args")
+	case "createGenerator":
+		if flag.NArg()-1 != 1 {
+			fmt.Fprintln(os.Stderr, "CreateGenerator requires 1 args")
 			flag.Usage()
 		}
-		argvalue0, err307 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-		if err307 != nil {
-			Usage()
-			return
+		argvalue0 := flag.Arg(1)
+		value0 := argvalue0
+		fmt.Print(client.CreateGenerator(context.Background(), value0))
+		fmt.Print("\n")
+		break
+	case "removeGenerator":
+		if flag.NArg()-1 != 1 {
+			fmt.Fprintln(os.Stderr, "RemoveGenerator requires 1 args")
+			flag.Usage()
 		}
-		value0 := generic.TContainerKey(argvalue0)
-		arg308 := flag.Arg(2)
-		mbTrans309 := thrift.NewTMemoryBufferLen(len(arg308))
-		defer mbTrans309.Close()
-		_, err310 := mbTrans309.WriteString(arg308)
-		if err310 != nil {
-			Usage()
-			return
+		argvalue0 := flag.Arg(1)
+		value0 := argvalue0
+		fmt.Print(client.RemoveGenerator(context.Background(), value0))
+		fmt.Print("\n")
+		break
+	case "getCurrentValue":
+		if flag.NArg()-1 != 1 {
+			fmt.Fprintln(os.Stderr, "GetCurrentValue requires 1 args")
+			flag.Usage()
 		}
-		factory311 := thrift.NewTJSONProtocolFactory()
-		jsProt312 := factory311.GetProtocol(mbTrans309)
-		argvalue1 := generic.NewTNeedSplitInfo()
-		err313 := argvalue1.Read(jsProt312)
-		if err313 != nil {
+		argvalue0 := flag.Arg(1)
+		value0 := argvalue0
+		fmt.Print(client.GetCurrentValue(context.Background(), value0))
+		fmt.Print("\n")
+		break
+	case "getValue":
+		if flag.NArg()-1 != 1 {
+			fmt.Fprintln(os.Stderr, "GetValue requires 1 args")
+			flag.Usage()
+		}
+		argvalue0 := flag.Arg(1)
+		value0 := argvalue0
+		fmt.Print(client.GetValue(context.Background(), value0))
+		fmt.Print("\n")
+		break
+	case "getStepValue":
+		if flag.NArg()-1 != 2 {
+			fmt.Fprintln(os.Stderr, "GetStepValue requires 2 args")
+			flag.Usage()
+		}
+		argvalue0 := flag.Arg(1)
+		value0 := argvalue0
+		argvalue1, err17 := (strconv.ParseInt(flag.Arg(2), 10, 64))
+		if err17 != nil {
 			Usage()
 			return
 		}
 		value1 := argvalue1
-		fmt.Print(client.NeedSplit(context.Background(), value0, value1))
-		fmt.Print("\n")
-		break
-	case "splitInfoUpdated":
-		if flag.NArg()-1 != 1 {
-			fmt.Fprintln(os.Stderr, "SplitInfoUpdated requires 1 args")
-			flag.Usage()
-		}
-		argvalue0, err314 := (strconv.ParseInt(flag.Arg(1), 10, 64))
-		if err314 != nil {
-			Usage()
-			return
-		}
-		value0 := generic.TContainerKey(argvalue0)
-		fmt.Print(client.SplitInfoUpdated(context.Background(), value0))
-		fmt.Print("\n")
-		break
-	case "getJob":
-		if flag.NArg()-1 != 0 {
-			fmt.Fprintln(os.Stderr, "GetJob requires 0 args")
-			flag.Usage()
-		}
-		fmt.Print(client.GetJob(context.Background()))
+		fmt.Print(client.GetStepValue(context.Background(), value0, value1))
 		fmt.Print("\n")
 		break
 	case "":

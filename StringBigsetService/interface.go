@@ -22,8 +22,10 @@ type StringBigsetServiceIf interface {
 	RemoveAll(bskey generic.TStringKey) error
 	BsGetSliceR(bskey generic.TStringKey, fromPos int32, count int32) ([]*generic.TItem, error)
 	BsMultiPutIndex(bskey []generic.TStringKey, lsItems []*generic.TItem) error
-	BsPutMultiBsKey(bskey []generic.TStringKey, lsItem *generic.TItem) error
-	BsDeleteMultiBsKey(bskey []generic.TStringKey, lsItem generic.TItemKey) error
+	//BsPutMultiBsKey(bskey []generic.TStringKey, lsItem *generic.TItem) error
+	//BsDeleteMultiBsKey(bskey []generic.TStringKey, lsItem generic.TItemKey) error
+	BsMultiPutBsItem(lsItem []*generic.TBigsetItem) (failedItem []*generic.TBigsetItem, err error)
+	BsMultiRemoveBsItem(lsItem []*generic.TBigsetItem) (failedItem []*generic.TBigsetItem, err error)
 	//============================================================= Version 2 =========================================================================
 
 	TotalStringKeyCount2() (r int64, err error)
