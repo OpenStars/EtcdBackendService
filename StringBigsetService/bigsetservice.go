@@ -12,11 +12,11 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 
-	"github.com/Sonek-HoangBui/EtcdBackendService/StringBigsetService/bigset/transports"
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/transports"
 
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 	"github.com/OpenStars/GoEndpointManager"
 	"github.com/OpenStars/GoEndpointManager/GoEndpointBackendManager"
-	"github.com/Sonek-HoangBui/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 )
 
 var reconnect = true

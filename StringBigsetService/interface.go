@@ -1,7 +1,7 @@
 package StringBigsetService
 
 import (
-	"github.com/Sonek-HoangBui/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
+	"github.com/OpenStars/EtcdBackendService/StringBigsetService/bigset/thrift/gen-go/openstars/core/bigset/generic"
 )
 
 type StringBigsetServiceIf interface {
