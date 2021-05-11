@@ -81,6 +81,10 @@ func NewGetIBsGenericClient(aHost, aPort string) *thriftpool.ThriftSocketClient 
 	return client
 }
 
+func Close(host, port string) {
+	bsGenericMapPool.Release(host, port)
+}
+
 func initBsStringIfNeed() {
 	if bsGenericMapPool == nil {
 		onceInit.Do(func() {

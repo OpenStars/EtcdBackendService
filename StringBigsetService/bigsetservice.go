@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+
 	"github.com/Sonek-HoangBui/EtcdBackendService/StringBigsetService/bigset/transports"
 
 	"github.com/OpenStars/GoEndpointManager"
@@ -23,21 +25,21 @@ var mureconnect sync.Mutex
 //go:generate easytags $GOFILE json,xml
 
 type StringBigsetService struct {
-	host             string
-	port             string
-	sid              string
-	epm              GoEndpointBackendManager.EndPointManagerIf
-	etcdManager      *GoEndpointManager.EtcdBackendEndpointManager
-	db               *sql.DB
-	isSaveDataBackup bool
-	isGetDataBackup  bool
-	enableLogQuery   bool
-	logChan          chan string
-	standardSid      string
-	config           transports.PoolConfig
-	bot_token        string
-	bot_chatID       int64
-	//botClient          *tgbotapi.BotAPI
+	host               string
+	port               string
+	sid                string
+	epm                GoEndpointBackendManager.EndPointManagerIf
+	etcdManager        *GoEndpointManager.EtcdBackendEndpointManager
+	db                 *sql.DB
+	isSaveDataBackup   bool
+	isGetDataBackup    bool
+	enableLogQuery     bool
+	logChan            chan string
+	standardSid        string
+	config             transports.PoolConfig
+	bot_token          string
+	bot_chatID         int64
+	botClient          *tgbotapi.BotAPI
 	agentCallerName    string
 	agentCallerAddress string
 }
@@ -58,6 +60,10 @@ type MySqlConfig struct {
 func (m *StringBigsetService) SetAgentCaller(agentName string, agentAddress string) {
 	m.agentCallerAddress = agentAddress
 	m.agentCallerName = agentName
+}
+
+func (m *StringBigsetService) Close() {
+	transports.Close(m.host, m.port)
 }
 
 func (m *StringBigsetService) TotalStringKeyCount() (r int64, err error) {
@@ -838,7 +844,7 @@ func NewStringBigsetServiceModel(serviceID string, etcdServers []string, default
 		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdServers),
 		bot_chatID:  0,
 		bot_token:   "",
-		//botClient:   nil,
+		botClient:   nil,
 	}
 	//bot, err := tgbotapi.NewBotAPI(stringbs.bot_token)
 	//if err == nil {
@@ -987,18 +993,20 @@ func NewClientWithMonitor(etcdEndpoints []string, sid string, host string, port 
 		port:        port,
 		sid:         sid,
 		etcdManager: GoEndpointManager.GetEtcdBackendEndpointManagerSingleton(etcdEndpoints),
-		//botClient:   nil,
+
+		botClient:  nil,
 		bot_chatID: bot_chatID,
 		bot_token:  bot_token,
 	}
-	//bot, err := tgbotapi.NewBotAPI(bot_token)
-	//if err == nil {
-	//	stringbs.botClient = bot
-	//}
+	bot, err := tgbotapi.NewBotAPI(bot_token)
+	if err == nil {
+		stringbs.botClient = bot
+	}
 	if stringbs.etcdManager == nil {
 		return stringbs
 	}
-	err := stringbs.etcdManager.SetDefaultEntpoint(sid, host, port)
+
+	err = stringbs.etcdManager.SetDefaultEntpoint(sid, host, port)
 	if err != nil {
 		log.Println("SetDefaultEndpoint sid", sid, "err", err)
 		return nil
@@ -1009,14 +1017,14 @@ func NewClientWithMonitor(etcdEndpoints []string, sid string, host string, port 
 // ================================================== Version 2 ===============================================================
 
 func (m *StringBigsetService) notifyEndpointError(err error) {
-	//if m.botClient != nil {
-	//	errString := ""
-	//	if err != nil {
-	//		errString = err.Error()
-	//	}
-	//	msg := tgbotapi.NewMessage(m.bot_chatID, "Hệ thống kiểm soát endpoint phát hiện endpoint sid "+m.sid+" address "+m.host+":"+m.port+" đang không hoạt động"+" từ agent caller "+m.agentCallerName+"địa chỉ "+m.agentCallerAddress+" error "+errString)
-	//	m.botClient.Send(msg)
-	//}
+	if m.botClient != nil {
+		errString := ""
+		if err != nil {
+			errString = err.Error()
+		}
+		msg := tgbotapi.NewMessage(m.bot_chatID, "Hệ thống kiểm soát endpoint phát hiện endpoint sid "+m.sid+" address "+m.host+":"+m.port+" đang không hoạt động"+" từ agent caller "+m.agentCallerName+"địa chỉ "+m.agentCallerAddress+" error "+errString)
+		m.botClient.Send(msg)
+	}
 }
 
 func (m *StringBigsetService) TotalStringKeyCount2() (r int64, err error) {
